@@ -1,5 +1,6 @@
 // Global game state management
 import { PlayerData, GameState, CharmData } from './GameConfig';
+import { DEATH_CONFIG, DeathDropRecord, generateDropId, calculateDropAmount } from './DeathConfig';
 import charmsData from '../data/charms.json';
 
 class GameStateManager {
@@ -12,6 +13,9 @@ class GameStateManager {
     lastBench: null,
     droppedShells: null,
   };
+  
+  // Death drop record (more detailed than droppedShells)
+  private deathDropRecord: DeathDropRecord | null = null;
   
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
   private debugMode = false;
@@ -94,32 +98,113 @@ class GameStateManager {
     this.emit('playerDied', null);
   }
   
-  dropShells(levelId: string, x: number, y: number): void {
-    if (this.playerData.shells > 0) {
-      this.playerData.droppedShells = {
-        levelId,
-        x,
-        y,
-        amount: this.playerData.shells,
-      };
-      this.playerData.shells = 0;
-      this.emit('shellsDropped', this.playerData.droppedShells);
+  /**
+   * Drop shells at death location
+   * Handles second death behavior based on config
+   */
+  dropShells(levelId: string, x: number, y: number, roomId: string = 'default'): void {
+    if (!DEATH_CONFIG.dropCurrencyOnDeath) return;
+    
+    const currentShells = this.playerData.shells;
+    if (currentShells <= 0 && !this.deathDropRecord) return;
+    
+    // Calculate drop amount
+    const dropAmount = calculateDropAmount(currentShells);
+    
+    // Handle existing drop based on config
+    if (this.deathDropRecord) {
+      switch (DEATH_CONFIG.onSecondDeathWhileUnreclaimed) {
+        case 'replace':
+          // Replace old drop with new one
+          this.emit('deathDropReplaced', this.deathDropRecord);
+          break;
+          
+        case 'stack':
+          // Add new drop to existing
+          this.deathDropRecord.amount += dropAmount;
+          this.deathDropRecord.levelId = levelId;
+          this.deathDropRecord.roomId = roomId;
+          this.deathDropRecord.x = x;
+          this.deathDropRecord.y = y;
+          this.playerData.shells = 0;
+          this.playerData.droppedShells = {
+            levelId,
+            x,
+            y,
+            amount: this.deathDropRecord.amount,
+          };
+          this.emit('shellsDropped', this.playerData.droppedShells);
+          return;
+          
+        case 'discardNew':
+          // Don't create new drop, just zero shells
+          this.playerData.shells = 0;
+          return;
+      }
     }
+    
+    // Create new death drop record
+    this.deathDropRecord = {
+      dropId: generateDropId(),
+      amount: dropAmount,
+      levelId,
+      roomId,
+      x,
+      y,
+      createdAt: Date.now(),
+    };
+    
+    // Update player data
+    this.playerData.shells = currentShells - dropAmount;
+    this.playerData.droppedShells = {
+      levelId,
+      x,
+      y,
+      amount: dropAmount,
+    };
+    
+    this.emit('shellsDropped', this.playerData.droppedShells);
   }
   
+  /**
+   * Recover dropped shells
+   */
   recoverShells(): number {
-    if (this.playerData.droppedShells) {
-      const amount = this.playerData.droppedShells.amount;
+    if (!this.deathDropRecord && !this.playerData.droppedShells) return 0;
+    
+    const amount = this.deathDropRecord?.amount || this.playerData.droppedShells?.amount || 0;
+    
+    if (amount > 0) {
       this.addShells(amount);
-      this.playerData.droppedShells = null;
       this.emit('shellsRecovered', amount);
-      return amount;
     }
-    return 0;
+    
+    // Clear both records
+    this.deathDropRecord = null;
+    this.playerData.droppedShells = null;
+    
+    return amount;
   }
   
+  /**
+   * Get dropped shells info
+   */
   getDroppedShells(): PlayerData['droppedShells'] {
     return this.playerData.droppedShells;
+  }
+  
+  /**
+   * Get detailed death drop record
+   */
+  getDeathDropRecord(): DeathDropRecord | null {
+    return this.deathDropRecord;
+  }
+  
+  /**
+   * Check if there's an unreclaimed drop in a specific level
+   */
+  hasDropInLevel(levelId: string): boolean {
+    return this.deathDropRecord?.levelId === levelId;
   }
   
   // Charms
@@ -216,6 +301,8 @@ class GameStateManager {
       lastBench: null,
       droppedShells: null,
     };
+    // Clear death drop record
+    this.deathDropRecord = null;
     this.emit('runReset', null);
   }
   

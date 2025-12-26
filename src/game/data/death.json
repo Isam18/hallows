@@ -1,0 +1,19 @@
+{
+  "dropCurrencyOnDeath": true,
+  "dropMode": "marker",
+  "dropPercent": 1.0,
+  "minDrop": 0,
+  "persistAcrossTransitions": true,
+  "onSecondDeathWhileUnreclaimed": "replace",
+  "respawnInvulnMs": 1200,
+  "respawnGraceNoInputMs": 100,
+  "reclaimRadiusPx": 36,
+  "deathAnimDurationMs": 600,
+  "markerVisual": {
+    "bobAmplitude": 6,
+    "bobPeriodMs": 1200,
+    "pulseScale": 1.25,
+    "pulsePeriodMs": 800
+  },
+  "shadeEnemyTypeId": "death_shade"
+}
