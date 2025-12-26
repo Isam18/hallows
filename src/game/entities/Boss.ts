@@ -104,6 +104,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   getHp(): number { return this.bossHp; }
   getMaxHp(): number { return this.bossMaxHp; }
   getName(): string { return CFG.name; }
+  isDying(): boolean { return this.dead; }
   getHitRect(): Phaser.Geom.Rectangle {
     return new Phaser.Geom.Rectangle(this.x - CFG.width/2, this.y - CFG.height/2, CFG.width, CFG.height);
   }
