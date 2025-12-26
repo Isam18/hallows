@@ -36,7 +36,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.setSize(PLAYER_CONFIG.width, PLAYER_CONFIG.height);
     this.setCollideWorldBounds(true);
     (this.body as Phaser.Physics.Arcade.Body).setMaxVelocityY(600);
-    this.setTint(COLORS.player);
+    // No tint - using proper colored sprites now
   }
 
   update(time: number, delta: number): void {
@@ -165,8 +165,8 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const knockbackDir = this.x > fromX ? 1 : -1;
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(knockbackDir * PLAYER_CONFIG.knockbackForce, -PLAYER_CONFIG.knockbackForce * 0.5);
-    this.setTint(COLORS.damage);
-    this.scene.time.delayedCall(100, () => this.setTint(COLORS.player));
+    this.setTint(0xff4444); // Damage flash
+    this.scene.time.delayedCall(100, () => this.clearTint());
     this.setInvulnerable(PLAYER_CONFIG.invulnerabilityDuration);
     if (gameState.getPlayerData().hp <= 0) this.gameScene.handlePlayerDeath();
   }

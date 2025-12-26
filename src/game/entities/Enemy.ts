@@ -21,7 +21,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
     this.setSize(config.width, config.height);
     this.setCollideWorldBounds(true);
-    this.setTint(Phaser.Display.Color.HexStringToColor(config.color).color);
+    // No tint - using proper colored sprites now
     this.patrolDir = Math.random() > 0.5 ? 1 : -1;
   }
 
@@ -31,7 +31,8 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
       this.hurtTimer -= delta;
       if (this.hurtTimer <= 0) {
         this.currentState = 'patrol';
-        this.setTint(Phaser.Display.Color.HexStringToColor(this.cfg.color).color);
+        this.setTexture(this.cfg.id); // Back to normal texture
+        this.clearTint();
       }
       return;
     }
@@ -59,7 +60,7 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     this.hurtTimer = 200;
     const dir = this.x > fromX ? 1 : -1;
     (this.body as Phaser.Physics.Arcade.Body).setVelocity(dir * 100, -50);
-    this.setTint(0xffffff);
+    this.setTexture(`${this.cfg.id}_hurt`); // Flash white texture
     if (this.currentHp <= 0) this.die();
   }
 
