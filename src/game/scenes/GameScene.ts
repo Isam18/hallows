@@ -26,7 +26,7 @@ export class GameScene extends Phaser.Scene {
   player!: Player;
   private platforms!: Phaser.Physics.Arcade.StaticGroup;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
-  private enemies!: Phaser.Physics.Arcade.Group;
+  enemies!: Phaser.Physics.Arcade.Group;
   private pickups!: Phaser.Physics.Arcade.Group;
   private benches!: Phaser.Physics.Arcade.StaticGroup;
   private portals!: Phaser.Physics.Arcade.StaticGroup;
@@ -47,6 +47,10 @@ export class GameScene extends Phaser.Scene {
   // Boss arena
   private inBossArena = false;
   private bossGateClosed = false;
+  
+  // Bench tracking
+  private currentBench: Bench | null = null;
+  private activeBenchConfig: import('../entities/Bench').BenchConfig | null = null;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -148,7 +152,10 @@ export class GameScene extends Phaser.Scene {
     // Triggers (benches, portals)
     this.currentLevel.triggers.forEach(t => {
       if (t.type === 'bench') {
-        const bench = new Bench(this, t.x, t.y, t.id);
+        // Extract bench type from trigger data if available, otherwise use default
+        const benchTypeId = (t as any).benchTypeId || 'basic_bench';
+        const roomId = (t as any).roomId || this.levelId;
+        const bench = new Bench(this, t.x, t.y, t.id, benchTypeId, roomId);
         this.benches.add(bench);
       } else if (t.type === 'transition') {
         const portal = new Portal(this, t.x, t.y, t.width, t.height, {
@@ -277,6 +284,9 @@ export class GameScene extends Phaser.Scene {
       if (this.deathMarker) {
         this.deathMarker.update();
       }
+      
+      // Update bench proximity and prompts
+      this.updateBenchProximity(delta);
     }
     
     // Clear just-pressed/released states at END of frame so all systems can read them
@@ -289,6 +299,27 @@ export class GameScene extends Phaser.Scene {
     const targetOffset = this.player.getFacing() * 40; // Look ahead distance
     this.cameraLookAheadX += (targetOffset - this.cameraLookAheadX) * 0.08;
     this.cameras.main.setFollowOffset(-this.cameraLookAheadX, 0);
+  }
+  
+  /**
+   * Update bench proximity for all benches
+   */
+  private updateBenchProximity(delta: number): void {
+    const playerBounds = this.player.getBounds();
+    
+    this.benches.getChildren().forEach((benchObj) => {
+      const bench = benchObj as Bench;
+      bench.update(delta);
+      
+      // Check if player is in range
+      const benchBounds = bench.getBounds();
+      const inRange = Phaser.Geom.Rectangle.Overlaps(playerBounds, benchBounds);
+      
+      // Only set out of range here - in range is set by collision callback
+      if (!inRange) {
+        bench.setPlayerInRange(false);
+      }
+    });
   }
 
   // Current swing ID for tracking one-hit-per-swing
@@ -378,14 +409,51 @@ export class GameScene extends Phaser.Scene {
   }
 
   private handleBenchOverlap(bench: Bench): void {
+    // Update bench proximity state
+    bench.setPlayerInRange(true);
+    
+    // Check for interaction input
     if (inputManager.justPressed('interact') && gameState.getState() === 'playing') {
-      gameState.setLastBench(this.levelId, bench.getSpawnId());
-      gameState.setState('bench');
-      this.emitUIEvent('benchActivated', {
-        levelId: this.levelId,
-        benchId: bench.getSpawnId(),
-      });
+      if (bench.tryInteract()) {
+        this.activateBench(bench);
+      }
     }
+  }
+  
+  /**
+   * Activate a bench - set respawn, heal, open UI
+   */
+  private activateBench(bench: Bench): void {
+    const config = bench.getConfig();
+    this.currentBench = bench;
+    this.activeBenchConfig = config;
+    
+    // 1. Set respawn point if configured
+    if (config.setsRespawn) {
+      gameState.setLastBench(this.levelId, bench.getSpawnId());
+    }
+    
+    // 2. Heal player based on config
+    if (config.healMode === 'full') {
+      gameState.fullHeal();
+    } else if (config.healMode === 'amount' && config.healAmount > 0) {
+      gameState.heal(config.healAmount);
+    }
+    
+    // 3. Enter bench state and open UI
+    gameState.setState('bench');
+    this.emitUIEvent('benchActivated', {
+      levelId: this.levelId,
+      benchId: bench.getSpawnId(),
+      config: config,
+    });
+  }
+  
+  /**
+   * Get the currently active bench config (for UI)
+   */
+  getCurrentBenchConfig(): import('../entities/Bench').BenchConfig | null {
+    return this.activeBenchConfig;
   }
 
   private handlePortalOverlap(portal: Portal): void {
@@ -491,8 +559,59 @@ export class GameScene extends Phaser.Scene {
   }
 
   resumeFromBench(): void {
+    // Handle enemy respawn based on bench config
+    if (this.activeBenchConfig) {
+      const respawnMode = this.activeBenchConfig.enemyRespawnMode;
+      const delay = this.activeBenchConfig.enemyRespawnDelayMs || 0;
+      
+      if (respawnMode !== 'none') {
+        if (delay > 0) {
+          this.time.delayedCall(delay, () => this.respawnEnemies(respawnMode));
+        } else {
+          this.respawnEnemies(respawnMode);
+        }
+      }
+    }
+    
+    // Clear bench tracking
+    this.currentBench = null;
+    this.activeBenchConfig = null;
+    
+    // Resume gameplay
     gameState.setState('playing');
     this.emitUIEvent('benchClosed', null);
+  }
+  
+  /**
+   * Respawn enemies based on mode
+   */
+  private respawnEnemies(mode: string): void {
+    const roomId = this.currentBench?.getRoomId() || this.levelId;
+    
+    // Clear existing enemies
+    this.enemies.getChildren().forEach((enemy) => {
+      (enemy as Enemy).destroy();
+    });
+    this.enemies.clear(true, true);
+    
+    // Respawn from level data
+    this.currentLevel.enemies.forEach(e => {
+      const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
+      if (config) {
+        // Check room filter for currentRoom mode
+        const enemyRoomId = (e as any).roomId || this.levelId;
+        
+        if (mode === 'all' || mode === 'currentBiome' || 
+            (mode === 'currentRoom' && enemyRoomId === roomId)) {
+          const enemy = new Enemy(this, e.x, e.y, config);
+          this.enemies.add(enemy);
+        }
+      }
+    });
+    
+    // Re-setup enemy collisions
+    this.physics.add.collider(this.enemies, this.platforms);
+    this.physics.add.collider(this.enemies, this.walls);
   }
 
   resumeFromPause(): void {
