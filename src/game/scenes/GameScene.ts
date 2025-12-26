@@ -225,9 +225,11 @@ export class GameScene extends Phaser.Scene {
 
   private setupCamera(): void {
     const cam = this.cameras.main;
-    cam.startFollow(this.player, true, 0.1, 0.1);
+    // Use improved camera lerp from movement config
+    cam.startFollow(this.player, true, 0.12, 0.10);
     cam.setBounds(0, 0, this.currentLevel.width, this.currentLevel.height);
     cam.setZoom(1);
+    cam.setDeadzone(20, 30); // Small deadzone for stability
   }
 
   private checkDeathMarker(): void {
@@ -258,6 +260,9 @@ export class GameScene extends Phaser.Scene {
     if (gameState.getState() === 'playing' || gameState.getState() === 'boss') {
       this.player.update(time, delta);
       
+      // Update camera look-ahead based on player facing
+      this.updateCameraLookAhead();
+      
       // Update enemies
       this.enemies.getChildren().forEach((enemy) => {
         (enemy as Enemy).update(time, delta, this.player);
@@ -273,6 +278,14 @@ export class GameScene extends Phaser.Scene {
         this.deathMarker.update();
       }
     }
+  }
+
+  private cameraLookAheadX = 0;
+  
+  private updateCameraLookAhead(): void {
+    const targetOffset = this.player.getFacing() * 40; // Look ahead distance
+    this.cameraLookAheadX += (targetOffset - this.cameraLookAheadX) * 0.08;
+    this.cameras.main.setFollowOffset(-this.cameraLookAheadX, 0);
   }
 
   // Player attack hit check

@@ -6,6 +6,7 @@ import { PauseMenu } from '@/components/game/PauseMenu';
 import { DeathScreen } from '@/components/game/DeathScreen';
 import { BenchScreen } from '@/components/game/BenchScreen';
 import { VictoryScreen } from '@/components/game/VictoryScreen';
+import { DebugOverlay } from '@/components/game/DebugOverlay';
 
 const Index = () => {
   const gameContainer = useRef<HTMLDivElement>(null);
@@ -40,6 +41,9 @@ const Index = () => {
     <div className="relative w-full h-screen bg-background overflow-hidden">
       {/* Game Canvas */}
       <div ref={gameContainer} className="absolute inset-0 flex items-center justify-center" />
+
+      {/* Debug Overlay - Always available via F1 */}
+      {gameLoaded && <DebugOverlay gameRef={gameRef.current} />}
 
       {/* UI Overlay */}
       {gameLoaded && uiState !== 'menu' && (

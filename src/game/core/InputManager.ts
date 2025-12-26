@@ -6,7 +6,8 @@ export type InputAction =
   | 'dash'
   | 'attack'
   | 'interact'
-  | 'pause';
+  | 'pause'
+  | 'down'; // For future drop-through platforms
 
 interface KeyBinding {
   action: InputAction;
@@ -21,6 +22,7 @@ const DEFAULT_BINDINGS: KeyBinding[] = [
   { action: 'attack', keys: ['KeyK', 'KeyX'] },
   { action: 'interact', keys: ['KeyE', 'KeyF'] },
   { action: 'pause', keys: ['Escape'] },
+  { action: 'down', keys: ['KeyS', 'ArrowDown'] },
 ];
 
 class InputManager {
