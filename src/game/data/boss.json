@@ -1,0 +1,28 @@
+{
+  "elderGrub": {
+    "id": "elderGrub",
+    "name": "Elder Grub",
+    "maxHp": 40,
+    "phase1": {
+      "patterns": ["charge", "slam"],
+      "chargeSpeed": 200,
+      "slamDelay": 800,
+      "patternCooldown": 2000
+    },
+    "phase2": {
+      "trigger": 0.5,
+      "patterns": ["charge", "slam", "spikeBurst"],
+      "chargeSpeed": 280,
+      "slamDelay": 600,
+      "patternCooldown": 1500,
+      "spikeCount": 5
+    },
+    "contactDamage": 2,
+    "width": 80,
+    "height": 60,
+    "reward": {
+      "shells": 100,
+      "charm": "toughShell"
+    }
+  }
+}

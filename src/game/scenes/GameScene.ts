@@ -1,0 +1,488 @@
+import Phaser from 'phaser';
+import { COLORS, PLAYER_CONFIG, LevelConfig, EnemyConfig } from '../core/GameConfig';
+import gameState from '../core/GameState';
+import inputManager from '../core/InputManager';
+import { Player } from '../entities/Player';
+import { Enemy } from '../entities/Enemy';
+import { Boss } from '../entities/Boss';
+import { Pickup } from '../entities/Pickup';
+import { Bench } from '../entities/Bench';
+import { Portal } from '../entities/Portal';
+import { DeathMarker } from '../entities/DeathMarker';
+
+// Import level data
+import fadingTownData from '../data/levels/fadingTown.json';
+import ruinedCrossroadsData from '../data/levels/ruinedCrossroads.json';
+import enemiesData from '../data/enemies.json';
+
+const LEVELS: Record<string, LevelConfig> = {
+  fadingTown: fadingTownData as LevelConfig,
+  ruinedCrossroads: ruinedCrossroadsData as LevelConfig,
+};
+
+export class GameScene extends Phaser.Scene {
+  // Core entities
+  player!: Player;
+  private platforms!: Phaser.Physics.Arcade.StaticGroup;
+  private walls!: Phaser.Physics.Arcade.StaticGroup;
+  private enemies!: Phaser.Physics.Arcade.Group;
+  private pickups!: Phaser.Physics.Arcade.Group;
+  private benches!: Phaser.Physics.Arcade.StaticGroup;
+  private portals!: Phaser.Physics.Arcade.StaticGroup;
+  private deathMarker: DeathMarker | null = null;
+  private boss: Boss | null = null;
+  
+  // Level data
+  private currentLevel!: LevelConfig;
+  private levelId!: string;
+  private spawnId!: string;
+  
+  // Camera
+  private cameraTarget!: Phaser.Math.Vector2;
+  
+  // UI event emitter
+  private uiEvents!: Phaser.Events.EventEmitter;
+  
+  // Boss arena
+  private inBossArena = false;
+  private bossGateClosed = false;
+
+  constructor() {
+    super({ key: 'GameScene' });
+  }
+
+  init(data: { levelId: string; spawnId: string }): void {
+    this.levelId = data.levelId || 'fadingTown';
+    this.spawnId = data.spawnId || 'default';
+    this.inBossArena = false;
+    this.bossGateClosed = false;
+  }
+
+  create(): void {
+    // Load level
+    this.currentLevel = LEVELS[this.levelId];
+    if (!this.currentLevel) {
+      console.error(`Level not found: ${this.levelId}`);
+      this.currentLevel = LEVELS.fadingTown;
+    }
+    
+    // Set up world bounds
+    this.physics.world.setBounds(0, 0, this.currentLevel.width, this.currentLevel.height);
+    
+    // Background
+    const bgColor = Phaser.Display.Color.HexStringToColor(this.currentLevel.backgroundColor);
+    this.cameras.main.setBackgroundColor(bgColor.color);
+    
+    // Create groups
+    this.platforms = this.physics.add.staticGroup();
+    this.walls = this.physics.add.staticGroup();
+    this.enemies = this.physics.add.group();
+    this.pickups = this.physics.add.group();
+    this.benches = this.physics.add.staticGroup();
+    this.portals = this.physics.add.staticGroup();
+    
+    // Build level
+    this.buildLevel();
+    
+    // Create player at spawn
+    const spawn = this.currentLevel.spawns[this.spawnId] || this.currentLevel.spawnPoint;
+    this.player = new Player(this, spawn.x, spawn.y);
+    
+    // Set up collisions
+    this.setupCollisions();
+    
+    // Camera setup
+    this.setupCamera();
+    
+    // Check for death marker in this level
+    this.checkDeathMarker();
+    
+    // UI events
+    this.uiEvents = new Phaser.Events.EventEmitter();
+    this.registry.set('uiEvents', this.uiEvents);
+    
+    // Listen for game state changes
+    gameState.on('stateChange', this.handleStateChange.bind(this));
+    
+    // Fade in
+    this.cameras.main.fadeIn(300);
+    
+    // Emit level loaded
+    this.emitUIEvent('levelLoaded', { 
+      levelId: this.levelId, 
+      levelName: this.currentLevel.name 
+    });
+  }
+
+  private buildLevel(): void {
+    // Platforms and walls
+    this.currentLevel.platforms.forEach(p => {
+      const color = p.type === 'wall' ? COLORS.wall : COLORS.platform;
+      const platform = this.add.rectangle(
+        p.x + p.width / 2,
+        p.y + p.height / 2,
+        p.width,
+        p.height,
+        color
+      );
+      
+      if (p.type === 'wall') {
+        this.walls.add(platform);
+      } else {
+        this.platforms.add(platform);
+      }
+      
+      // Add subtle top highlight for platforms
+      if (p.type !== 'wall') {
+        this.add.rectangle(
+          p.x + p.width / 2,
+          p.y + 2,
+          p.width,
+          4,
+          COLORS.platformLight
+        );
+      }
+    });
+    
+    // Triggers (benches, portals)
+    this.currentLevel.triggers.forEach(t => {
+      if (t.type === 'bench') {
+        const bench = new Bench(this, t.x, t.y, t.id);
+        this.benches.add(bench);
+      } else if (t.type === 'transition') {
+        const portal = new Portal(this, t.x, t.y, t.width, t.height, {
+          target: t.target!,
+          targetSpawn: t.targetSpawn!,
+        });
+        this.portals.add(portal);
+      } else if (t.type === 'bossGate') {
+        const portal = new Portal(this, t.x, t.y, t.width, t.height, {
+          target: 'boss',
+          targetSpawn: 'arena',
+        });
+        this.portals.add(portal);
+      }
+    });
+    
+    // Enemies
+    this.currentLevel.enemies.forEach(e => {
+      const config = (enemiesData as Record<string, EnemyConfig>)[e.type];
+      if (config) {
+        const enemy = new Enemy(this, e.x, e.y, config);
+        this.enemies.add(enemy);
+      }
+    });
+    
+    // Pickups
+    this.currentLevel.pickups.forEach(p => {
+      if (p.type === 'shells') {
+        const pickup = new Pickup(this, p.x, p.y, 'shells', p.amount);
+        this.pickups.add(pickup);
+      }
+    });
+  }
+
+  private setupCollisions(): void {
+    // Player vs platforms/walls
+    this.physics.add.collider(this.player, this.platforms);
+    this.physics.add.collider(this.player, this.walls, 
+      (player, wall) => this.player.handleWallCollision(wall as Phaser.GameObjects.Rectangle)
+    );
+    
+    // Enemies vs platforms/walls
+    this.physics.add.collider(this.enemies, this.platforms);
+    this.physics.add.collider(this.enemies, this.walls);
+    
+    // Player vs enemies (contact damage)
+    this.physics.add.overlap(this.player, this.enemies, 
+      (player, enemy) => this.handlePlayerEnemyContact(enemy as Enemy)
+    );
+    
+    // Player vs pickups
+    this.physics.add.overlap(this.player, this.pickups,
+      (player, pickup) => this.handlePickup(pickup as Pickup)
+    );
+    
+    // Player vs benches
+    this.physics.add.overlap(this.player, this.benches,
+      (player, bench) => this.handleBenchOverlap(bench as Bench)
+    );
+    
+    // Player vs portals
+    this.physics.add.overlap(this.player, this.portals,
+      (player, portal) => this.handlePortalOverlap(portal as Portal)
+    );
+    
+    // Boss collisions (if boss exists)
+    if (this.boss) {
+      this.physics.add.collider(this.boss, this.platforms);
+      this.physics.add.collider(this.boss, this.walls);
+      this.physics.add.overlap(this.player, this.boss,
+        () => this.handlePlayerBossContact()
+      );
+    }
+  }
+
+  private setupCamera(): void {
+    const cam = this.cameras.main;
+    cam.startFollow(this.player, true, 0.1, 0.1);
+    cam.setBounds(0, 0, this.currentLevel.width, this.currentLevel.height);
+    cam.setZoom(1);
+  }
+
+  private checkDeathMarker(): void {
+    const dropped = gameState.getDroppedShells();
+    if (dropped && dropped.levelId === this.levelId) {
+      this.deathMarker = new DeathMarker(this, dropped.x, dropped.y, dropped.amount);
+      this.physics.add.overlap(this.player, this.deathMarker,
+        () => this.handleDeathMarkerPickup()
+      );
+    }
+  }
+
+  update(time: number, delta: number): void {
+    // Update input manager
+    inputManager.update();
+    
+    // Check pause
+    if (inputManager.justPressed('pause')) {
+      if (gameState.getState() === 'playing') {
+        gameState.setState('paused');
+        this.scene.pause();
+        this.emitUIEvent('pause', null);
+        return;
+      }
+    }
+    
+    // Update player
+    if (gameState.getState() === 'playing' || gameState.getState() === 'boss') {
+      this.player.update(time, delta);
+      
+      // Update enemies
+      this.enemies.getChildren().forEach((enemy) => {
+        (enemy as Enemy).update(time, delta, this.player);
+      });
+      
+      // Update boss
+      if (this.boss && this.inBossArena) {
+        this.boss.update(time, delta, this.player);
+      }
+      
+      // Update death marker animation
+      if (this.deathMarker) {
+        this.deathMarker.update();
+      }
+    }
+  }
+
+  // Player attack hit check
+  checkAttackHit(hitbox: Phaser.Geom.Rectangle): void {
+    const damage = PLAYER_CONFIG.attackDamage + gameState.getCharmModifier('damageMod');
+    
+    this.enemies.getChildren().forEach((enemy) => {
+      const e = enemy as Enemy;
+      if (Phaser.Geom.Rectangle.Overlaps(hitbox, e.getBounds())) {
+        e.takeDamage(damage, this.player.x);
+        this.applyHitstop();
+      }
+    });
+    
+    if (this.boss && Phaser.Geom.Rectangle.Overlaps(hitbox, this.boss.getBounds())) {
+      this.boss.takeDamage(damage, this.player.x);
+      this.applyHitstop();
+      this.emitUIEvent('bossHpChange', { 
+        hp: this.boss.getHp(), 
+        maxHp: this.boss.getMaxHp() 
+      });
+    }
+  }
+
+  private applyHitstop(): void {
+    this.time.timeScale = 0.1;
+    this.time.delayedCall(PLAYER_CONFIG.hitstopDuration, () => {
+      this.time.timeScale = 1;
+    });
+  }
+
+  private handlePlayerEnemyContact(enemy: Enemy): void {
+    if (this.player.isInvulnerable()) return;
+    
+    const damage = enemy.getContactDamage();
+    this.player.takeDamage(damage, enemy.x);
+  }
+
+  private handlePlayerBossContact(): void {
+    if (!this.boss || this.player.isInvulnerable()) return;
+    
+    const damage = 2; // Boss contact damage
+    this.player.takeDamage(damage, this.boss.x);
+  }
+
+  private handlePickup(pickup: Pickup): void {
+    if (pickup.isCollected()) return;
+    
+    pickup.collect();
+    gameState.addShells(pickup.getAmount());
+    this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+  }
+
+  private handleDeathMarkerPickup(): void {
+    if (!this.deathMarker) return;
+    
+    const amount = gameState.recoverShells();
+    this.deathMarker.collect();
+    this.deathMarker.destroy();
+    this.deathMarker = null;
+    
+    this.emitUIEvent('shellsRecovered', amount);
+    this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+  }
+
+  private handleBenchOverlap(bench: Bench): void {
+    if (inputManager.justPressed('interact') && gameState.getState() === 'playing') {
+      gameState.setLastBench(this.levelId, bench.getSpawnId());
+      gameState.setState('bench');
+      this.emitUIEvent('benchActivated', {
+        levelId: this.levelId,
+        benchId: bench.getSpawnId(),
+      });
+    }
+  }
+
+  private handlePortalOverlap(portal: Portal): void {
+    if (!portal.canUse()) return;
+    
+    const data = portal.getData();
+    
+    if (data.target === 'boss') {
+      this.enterBossArena();
+    } else {
+      this.transitionToLevel(data.target, data.targetSpawn);
+    }
+  }
+
+  private transitionToLevel(levelId: string, spawnId: string): void {
+    // Check if level exists
+    if (!LEVELS[levelId]) {
+      console.warn(`Level ${levelId} not found, wrapping to current level entrance`);
+      levelId = this.levelId;
+      spawnId = 'default';
+    }
+    
+    this.cameras.main.fadeOut(200, 0, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.restart({ levelId, spawnId });
+    });
+  }
+
+  private enterBossArena(): void {
+    if (this.inBossArena || !this.currentLevel.bossArena) return;
+    
+    this.inBossArena = true;
+    gameState.setState('boss');
+    
+    // Teleport player to arena
+    const arena = this.currentLevel.bossArena;
+    this.player.setPosition(arena.x + 50, arena.bossSpawn.y);
+    
+    // Spawn boss
+    this.boss = new Boss(this, arena.bossSpawn.x, arena.bossSpawn.y);
+    this.physics.add.collider(this.boss, this.platforms);
+    this.physics.add.collider(this.boss, this.walls);
+    this.physics.add.overlap(this.player, this.boss,
+      () => this.handlePlayerBossContact()
+    );
+    
+    // Close gate
+    this.bossGateClosed = true;
+    
+    // Emit boss start
+    this.emitUIEvent('bossStart', {
+      name: this.boss.getName(),
+      maxHp: this.boss.getMaxHp(),
+    });
+  }
+
+  handleBossDefeated(): void {
+    if (!this.boss) return;
+    
+    gameState.addShells(100);
+    gameState.setState('victory');
+    
+    this.emitUIEvent('bossDefeated', {
+      reward: 100,
+    });
+    this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+  }
+
+  handlePlayerDeath(): void {
+    const playerData = gameState.getPlayerData();
+    
+    // Drop shells at death location
+    gameState.dropShells(this.levelId, this.player.x, this.player.y);
+    
+    gameState.setState('death');
+    this.emitUIEvent('playerDied', {
+      shells: playerData.shells,
+      x: this.player.x,
+      y: this.player.y,
+    });
+  }
+
+  respawnPlayer(): void {
+    const lastBench = gameState.getLastBench();
+    
+    if (lastBench) {
+      // Respawn at bench
+      gameState.fullHeal();
+      gameState.setState('playing');
+      this.scene.restart({ 
+        levelId: lastBench.levelId, 
+        spawnId: lastBench.spawnId 
+      });
+    } else {
+      // No bench - restart from beginning
+      gameState.resetRun();
+      gameState.setState('playing');
+      this.scene.restart({ 
+        levelId: 'fadingTown', 
+        spawnId: 'default' 
+      });
+    }
+  }
+
+  resumeFromBench(): void {
+    gameState.setState('playing');
+    this.emitUIEvent('benchClosed', null);
+  }
+
+  resumeFromPause(): void {
+    gameState.setState('playing');
+    this.scene.resume();
+    this.emitUIEvent('unpause', null);
+  }
+
+  private handleStateChange({ newState }: { oldState: string; newState: string }): void {
+    this.emitUIEvent('stateChange', newState);
+  }
+
+  private emitUIEvent(event: string, data: any): void {
+    // Emit to registry for React UI to pick up
+    this.registry.set('lastUIEvent', { event, data, timestamp: Date.now() });
+    this.uiEvents?.emit(event, data);
+  }
+
+  // Debug methods
+  teleportToLevel(levelId: string, spawnId = 'default'): void {
+    this.transitionToLevel(levelId, spawnId);
+  }
+
+  toggleHitboxes(show: boolean): void {
+    this.physics.world.drawDebug = show;
+  }
+
+  giveShells(amount: number): void {
+    gameState.addShells(amount);
+    this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+  }
+}

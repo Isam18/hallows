@@ -1,0 +1,76 @@
+{
+  "id": "ruinedCrossroads",
+  "name": "Ruined Crossroads",
+  "width": 2000,
+  "height": 800,
+  "backgroundColor": "#080a10",
+  "spawnPoint": { "x": 100, "y": 600 },
+  "platforms": [
+    { "x": 0, "y": 750, "width": 2000, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 20, "height": 750, "type": "wall" },
+    { "x": 1980, "y": 0, "width": 20, "height": 750, "type": "wall" },
+    { "x": 150, "y": 650, "width": 100, "height": 20, "type": "platform" },
+    { "x": 300, "y": 550, "width": 120, "height": 20, "type": "platform" },
+    { "x": 500, "y": 480, "width": 150, "height": 20, "type": "platform" },
+    { "x": 700, "y": 550, "width": 100, "height": 20, "type": "platform" },
+    { "x": 850, "y": 650, "width": 200, "height": 20, "type": "platform" },
+    { "x": 1100, "y": 600, "width": 150, "height": 20, "type": "platform" },
+    { "x": 1300, "y": 500, "width": 120, "height": 20, "type": "platform" },
+    { "x": 1450, "y": 350, "width": 20, "height": 400, "type": "wall" },
+    { "x": 1470, "y": 750, "width": 530, "height": 50, "type": "ground" },
+    { "x": 250, "y": 300, "width": 20, "height": 250, "type": "wall" },
+    { "x": 600, "y": 200, "width": 20, "height": 280, "type": "wall" }
+  ],
+  "enemies": [
+    { "type": "spikyGrub", "x": 200, "y": 720 },
+    { "type": "spikyGrub", "x": 400, "y": 720 },
+    { "type": "spikyGrub", "x": 650, "y": 720 },
+    { "type": "spikyGrub", "x": 900, "y": 720 },
+    { "type": "spikyGrub", "x": 1200, "y": 720 }
+  ],
+  "pickups": [
+    { "type": "shells", "x": 350, "y": 520, "amount": 20 },
+    { "type": "shells", "x": 750, "y": 520, "amount": 15 },
+    { "type": "shells", "x": 1150, "y": 570, "amount": 25 }
+  ],
+  "triggers": [
+    {
+      "id": "benchRuins",
+      "type": "bench",
+      "x": 950,
+      "y": 705,
+      "width": 60,
+      "height": 45
+    },
+    {
+      "id": "exitToTown",
+      "type": "transition",
+      "x": 0,
+      "y": 650,
+      "width": 30,
+      "height": 100,
+      "target": "fadingTown",
+      "targetSpawn": "fromRuins"
+    },
+    {
+      "id": "bossGate",
+      "type": "bossGate",
+      "x": 1450,
+      "y": 550,
+      "width": 30,
+      "height": 200
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 700 },
+    "entrance": { "x": 100, "y": 700 },
+    "fromBoss": { "x": 1400, "y": 700 }
+  },
+  "bossArena": {
+    "x": 1470,
+    "y": 350,
+    "width": 510,
+    "height": 400,
+    "bossSpawn": { "x": 1750, "y": 650 }
+  }
+}

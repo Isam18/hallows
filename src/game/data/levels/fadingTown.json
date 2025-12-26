@@ -1,0 +1,54 @@
+{
+  "id": "fadingTown",
+  "name": "Fading Town",
+  "width": 1600,
+  "height": 600,
+  "backgroundColor": "#0a0c12",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 1600, "height": 50, "type": "ground" },
+    { "x": 200, "y": 450, "width": 150, "height": 20, "type": "platform" },
+    { "x": 450, "y": 380, "width": 120, "height": 20, "type": "platform" },
+    { "x": 650, "y": 320, "width": 100, "height": 20, "type": "platform" },
+    { "x": 850, "y": 400, "width": 200, "height": 20, "type": "platform" },
+    { "x": 1100, "y": 350, "width": 150, "height": 20, "type": "platform" },
+    { "x": 1300, "y": 450, "width": 200, "height": 20, "type": "platform" },
+    { "x": 0, "y": 0, "width": 20, "height": 550, "type": "wall" },
+    { "x": 1580, "y": 0, "width": 20, "height": 550, "type": "wall" },
+    { "x": 400, "y": 200, "width": 20, "height": 180, "type": "wall" },
+    { "x": 750, "y": 150, "width": 20, "height": 170, "type": "wall" }
+  ],
+  "enemies": [
+    { "type": "spikyGrub", "x": 300, "y": 520 },
+    { "type": "spikyGrub", "x": 600, "y": 520 },
+    { "type": "spikyGrub", "x": 900, "y": 520 }
+  ],
+  "pickups": [
+    { "type": "shells", "x": 500, "y": 350, "amount": 10 },
+    { "type": "shells", "x": 1150, "y": 320, "amount": 15 }
+  ],
+  "triggers": [
+    {
+      "id": "benchFadingTown",
+      "type": "bench",
+      "x": 800,
+      "y": 505,
+      "width": 60,
+      "height": 45
+    },
+    {
+      "id": "exitToRuins",
+      "type": "transition",
+      "x": 1550,
+      "y": 450,
+      "width": 30,
+      "height": 100,
+      "target": "ruinedCrossroads",
+      "targetSpawn": "entrance"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromRuins": { "x": 1450, "y": 500 }
+  }
+}

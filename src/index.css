@@ -2,95 +2,79 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+/* Hallow Nest Design System - Dark Atmospheric Theme */
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@300;400;500;600&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core palette - Midnight/Ghostly/Ethereal */
+    --background: 230 25% 5%;
+    --foreground: 210 20% 90%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 230 20% 8%;
+    --card-foreground: 210 20% 90%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 230 25% 6%;
+    --popover-foreground: 210 20% 90%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Ghostly White */
+    --primary: 210 30% 92%;
+    --primary-foreground: 230 25% 8%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Deep Midnight */
+    --secondary: 230 20% 12%;
+    --secondary-foreground: 210 20% 85%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted - Faded shadows */
+    --muted: 230 15% 15%;
+    --muted-foreground: 220 10% 50%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Ethereal Blue */
+    --accent: 210 80% 55%;
+    --accent-foreground: 230 25% 5%;
+    --accent-glow: 210 100% 65%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Danger - Blood/Damage */
+    --destructive: 0 70% 45%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Health - Pale soul */
+    --health: 210 60% 70%;
+    --health-empty: 230 15% 20%;
 
-    --radius: 0.5rem;
+    /* Currency - Shell gold */
+    --currency: 45 80% 60%;
+    --currency-glow: 45 100% 70%;
 
-    --sidebar-background: 0 0% 98%;
+    /* UI elements */
+    --border: 230 20% 18%;
+    --input: 230 20% 12%;
+    --ring: 210 80% 55%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    --radius: 0.25rem;
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Sidebar - darker */
+    --sidebar-background: 230 25% 4%;
+    --sidebar-foreground: 210 20% 85%;
+    --sidebar-primary: 210 80% 55%;
+    --sidebar-primary-foreground: 230 25% 5%;
+    --sidebar-accent: 230 20% 10%;
+    --sidebar-accent-foreground: 210 20% 85%;
+    --sidebar-border: 230 20% 15%;
+    --sidebar-ring: 210 80% 55%;
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Game-specific tokens */
+    --game-bg: 230 30% 3%;
+    --game-platform: 230 20% 15%;
+    --game-platform-light: 230 15% 25%;
+    --game-void: 230 40% 2%;
+    --bench-glow: 45 60% 50%;
+    --boss-hp: 0 65% 50%;
+    --player-outline: 210 20% 95%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Same dark theme - game is always dark */
   }
 }
 
@@ -100,6 +84,151 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Outfit', sans-serif;
+  }
+
+  /* Game canvas container */
+  #game-container {
+    @apply fixed inset-0 overflow-hidden;
+    background: hsl(var(--game-bg));
+  }
+
+  /* UI overlay sits above game */
+  #ui-overlay {
+    @apply fixed inset-0 pointer-events-none z-10;
+  }
+
+  #ui-overlay > * {
+    @apply pointer-events-auto;
+  }
+}
+
+@layer components {
+  /* Typography */
+  .font-title {
+    font-family: 'Cinzel', serif;
+    letter-spacing: 0.05em;
+  }
+
+  .font-mono {
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* Game UI components */
+  .game-panel {
+    @apply bg-card/95 backdrop-blur-sm border border-border rounded-sm;
+    box-shadow: 0 0 30px hsl(var(--accent) / 0.1);
+  }
+
+  .game-button {
+    @apply px-6 py-3 bg-secondary hover:bg-secondary/80 
+           border border-border hover:border-accent/50
+           text-foreground font-title tracking-wider
+           transition-all duration-200;
+  }
+
+  .game-button:hover {
+    box-shadow: 0 0 20px hsl(var(--accent) / 0.2);
+  }
+
+  .game-button-primary {
+    @apply game-button bg-accent/20 border-accent/40 hover:bg-accent/30;
+  }
+
+  /* HP pips */
+  .hp-pip {
+    @apply w-6 h-6 rounded-full border-2 transition-all duration-300;
+    border-color: hsl(var(--health));
+  }
+
+  .hp-pip-filled {
+    background: hsl(var(--health));
+    box-shadow: 0 0 10px hsl(var(--health) / 0.5);
+  }
+
+  .hp-pip-empty {
+    background: hsl(var(--health-empty));
+  }
+
+  /* Shell counter */
+  .shell-counter {
+    @apply flex items-center gap-2 font-mono text-lg;
+    color: hsl(var(--currency));
+    text-shadow: 0 0 10px hsl(var(--currency-glow) / 0.5);
+  }
+
+  /* Boss HP bar */
+  .boss-hp-container {
+    @apply w-full max-w-md h-3 bg-muted rounded-full overflow-hidden;
+  }
+
+  .boss-hp-fill {
+    @apply h-full transition-all duration-300 ease-out;
+    background: linear-gradient(90deg, hsl(var(--boss-hp)), hsl(var(--destructive)));
+  }
+
+  /* Charm slots */
+  .charm-slot {
+    @apply w-12 h-12 bg-secondary border border-border rounded-sm
+           flex items-center justify-center transition-all duration-200
+           hover:border-accent/50;
+  }
+
+  .charm-slot-equipped {
+    @apply border-accent bg-accent/10;
+    box-shadow: 0 0 15px hsl(var(--accent) / 0.3);
+  }
+
+  /* Screen overlays */
+  .screen-overlay {
+    @apply fixed inset-0 bg-background/90 backdrop-blur-sm
+           flex flex-col items-center justify-center z-50;
+  }
+
+  /* Animations */
+  .fade-in {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+
+  .slide-up {
+    animation: slideUp 0.4s ease-out forwards;
+  }
+
+  .pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      opacity: 0;
+      transform: translateY(20px);
+    }
+    to { 
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes pulseGlow {
+    0%, 100% { 
+      opacity: 0.7;
+      filter: brightness(1);
+    }
+    50% { 
+      opacity: 1;
+      filter: brightness(1.2);
+    }
+  }
+
+  /* Debug panel */
+  .debug-panel {
+    @apply fixed bottom-4 right-4 p-3 bg-card/80 border border-border
+           font-mono text-xs text-muted-foreground rounded-sm;
   }
 }
