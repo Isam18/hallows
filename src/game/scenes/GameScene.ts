@@ -244,15 +244,14 @@ export class GameScene extends Phaser.Scene {
   }
 
   update(time: number, delta: number): void {
-    // Update input manager
-    inputManager.update();
-    
-    // Check pause
+    // Check pause BEFORE clearing inputs
     if (inputManager.justPressed('pause')) {
       if (gameState.getState() === 'playing') {
         gameState.setState('paused');
         this.scene.pause();
         this.emitUIEvent('pause', null);
+        // Clear input state at end of frame
+        inputManager.update();
         return;
       }
     }
@@ -279,6 +278,9 @@ export class GameScene extends Phaser.Scene {
         this.deathMarker.update();
       }
     }
+    
+    // Clear just-pressed/released states at END of frame so all systems can read them
+    inputManager.update();
   }
 
   private cameraLookAheadX = 0;
