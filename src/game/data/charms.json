@@ -1,0 +1,35 @@
+{
+  "charms": [
+    {
+      "id": "strengthenedNail",
+      "name": "Strengthened Nail",
+      "description": "+1 damage to melee attacks",
+      "effect": {
+        "type": "damageMod",
+        "value": 1
+      },
+      "slots": 1
+    },
+    {
+      "id": "quickDash",
+      "name": "Quick Dash",
+      "description": "Reduces dash cooldown by 30%",
+      "effect": {
+        "type": "dashCooldownMod",
+        "value": 0.7
+      },
+      "slots": 1
+    },
+    {
+      "id": "toughShell",
+      "name": "Tough Shell",
+      "description": "+2 maximum HP",
+      "effect": {
+        "type": "maxHpMod",
+        "value": 2
+      },
+      "slots": 1
+    }
+  ],
+  "maxSlots": 2
+}

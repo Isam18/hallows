@@ -1,0 +1,30 @@
+{
+  "spikyGrub": {
+    "id": "spikyGrub",
+    "name": "Spiky Grub",
+    "hp": 3,
+    "patrolSpeed": 40,
+    "aggroSpeed": 80,
+    "aggroRange": 120,
+    "contactDamage": 1,
+    "dropAmount": 5,
+    "width": 32,
+    "height": 24,
+    "color": "#e8e8e8",
+    "accentColor": "#5599dd"
+  },
+  "crawlingHusk": {
+    "id": "crawlingHusk",
+    "name": "Crawling Husk",
+    "hp": 2,
+    "patrolSpeed": 30,
+    "aggroSpeed": 60,
+    "aggroRange": 100,
+    "contactDamage": 1,
+    "dropAmount": 3,
+    "width": 28,
+    "height": 20,
+    "color": "#cccccc",
+    "accentColor": "#6688cc"
+  }
+}
