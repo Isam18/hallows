@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { PLAYER_CONFIG, COLORS } from '../core/GameConfig';
 import { MOVEMENT_TUNING, MovementDebugState, createDebugState } from '../core/MovementConfig';
+import { COMBAT_TUNING } from '../core/CombatConfig';
 import gameState from '../core/GameState';
 import inputManager from '../core/InputManager';
 import type { GameScene } from '../scenes/GameScene';
@@ -50,12 +51,14 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private jumpHeld = false;
   private hasReleasedJumpSinceGround = true;
   
-  // Attack system (preserved from original)
+  // Attack system
   private isAttacking = false;
-  private attackTime = 0;
+  private attackActiveTimer = 0;
+  private attackRecoveryTimer = 0;
   private attackCooldown = 0;
   private attackHitbox: Phaser.Geom.Rectangle | null = null;
   private slashSprite: Phaser.GameObjects.Sprite | null = null;
+  private currentSwingId = 0;
   
   // Invulnerability
   private invulnerable = false;
@@ -505,40 +508,94 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     body.setVelocityY(body.velocity.y * tuning.dashGravityFactor);
   }
 
-  // Attack system (preserved from original)
+  // Attack system - improved with proper hitbox timing and one-hit-per-swing
   private handleAttack(delta: number): void {
+    // Update cooldown
+    if (this.attackCooldown > 0) {
+      this.attackCooldown -= delta;
+    }
+    
+    // Handle active attack
     if (this.isAttacking) {
-      this.attackTime -= delta;
-      if (this.slashSprite) {
-        this.slashSprite.x = this.x + this.facing * PLAYER_CONFIG.attackRange;
-        this.slashSprite.y = this.y;
-        this.slashSprite.setAlpha(this.attackTime / PLAYER_CONFIG.attackDuration * 0.8);
+      // Update hitbox position to follow player
+      if (this.attackHitbox) {
+        const offsetX = this.facing * COMBAT_TUNING.hitboxOffsetX;
+        this.attackHitbox.x = this.x + offsetX - COMBAT_TUNING.hitboxWidth / 2;
+        this.attackHitbox.y = this.y - COMBAT_TUNING.hitboxHeight / 2;
       }
-      if (this.attackTime <= 0) {
+      
+      // Update slash sprite position
+      if (this.slashSprite) {
+        this.slashSprite.x = this.x + this.facing * COMBAT_TUNING.hitboxOffsetX;
+        this.slashSprite.y = this.y;
+      }
+      
+      // Active frame - check for hits
+      if (this.attackActiveTimer > 0) {
+        this.attackActiveTimer -= delta;
+        
+        // Check for hits during active frames
+        if (this.attackHitbox) {
+          this.gameScene.checkAttackHit(this.attackHitbox, this.currentSwingId);
+        }
+        
+        // Fade slash sprite
+        if (this.slashSprite) {
+          const progress = 1 - (this.attackActiveTimer / COMBAT_TUNING.attackActiveMs);
+          this.slashSprite.setAlpha(0.9 - progress * 0.5);
+        }
+      } else if (this.attackRecoveryTimer > 0) {
+        // Recovery frame - no hitbox
+        this.attackRecoveryTimer -= delta;
+        
+        if (this.slashSprite) {
+          this.slashSprite.setAlpha(Math.max(0, this.attackRecoveryTimer / COMBAT_TUNING.attackRecoveryMs * 0.4));
+        }
+      } else {
+        // Attack complete
         this.isAttacking = false;
+        this.attackHitbox = null;
         this.slashSprite?.destroy();
         this.slashSprite = null;
       }
     }
     
+    // Start new attack
     if (inputManager.justPressed('attack') && this.attackCooldown <= 0 && !this.isAttacking) {
-      this.isAttacking = true;
-      this.attackTime = PLAYER_CONFIG.attackDuration;
-      this.attackCooldown = PLAYER_CONFIG.attackCooldown;
-      
-      const offsetX = this.facing * PLAYER_CONFIG.attackRange;
-      this.attackHitbox = new Phaser.Geom.Rectangle(
-        this.x + offsetX - PLAYER_CONFIG.attackRange / 2,
-        this.y - PLAYER_CONFIG.height / 2,
-        PLAYER_CONFIG.attackRange,
-        PLAYER_CONFIG.height
-      );
-      
-      this.slashSprite = this.scene.add.sprite(this.x + offsetX, this.y, 'slash');
-      this.slashSprite.setFlipX(this.facing < 0);
-      this.slashSprite.setTint(COLORS.playerOutline);
-      this.gameScene.checkAttackHit(this.attackHitbox);
+      this.startAttack();
     }
+  }
+  
+  private startAttack(): void {
+    this.isAttacking = true;
+    this.attackActiveTimer = COMBAT_TUNING.attackActiveMs;
+    this.attackRecoveryTimer = COMBAT_TUNING.attackRecoveryMs;
+    this.attackCooldown = COMBAT_TUNING.attackCooldownMs;
+    this.currentSwingId = this.gameScene.getNextSwingId();
+    
+    // Create hitbox
+    const offsetX = this.facing * COMBAT_TUNING.hitboxOffsetX;
+    this.attackHitbox = new Phaser.Geom.Rectangle(
+      this.x + offsetX - COMBAT_TUNING.hitboxWidth / 2,
+      this.y - COMBAT_TUNING.hitboxHeight / 2,
+      COMBAT_TUNING.hitboxWidth,
+      COMBAT_TUNING.hitboxHeight
+    );
+    
+    // Create slash sprite
+    this.slashSprite = this.scene.add.sprite(
+      this.x + offsetX, 
+      this.y, 
+      'slash'
+    );
+    this.slashSprite.setFlipX(this.facing < 0);
+    this.slashSprite.setTint(COLORS.playerOutline);
+    this.slashSprite.setDepth(10);
+  }
+  
+  // Get current attack hitbox for debug drawing
+  getAttackHitbox(): Phaser.Geom.Rectangle | null {
+    return this.isAttacking ? this.attackHitbox : null;
   }
 
   private updateVisualState(): void {

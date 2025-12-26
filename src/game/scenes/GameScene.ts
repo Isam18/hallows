@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { COLORS, PLAYER_CONFIG, LevelConfig, EnemyConfig } from '../core/GameConfig';
+import { COLORS, PLAYER_CONFIG, LevelConfig } from '../core/GameConfig';
+import { COMBAT_TUNING, EnemyCombatConfig } from '../core/CombatConfig';
 import gameState from '../core/GameState';
 import inputManager from '../core/InputManager';
 import { Player } from '../entities/Player';
@@ -166,7 +167,7 @@ export class GameScene extends Phaser.Scene {
     
     // Enemies
     this.currentLevel.enemies.forEach(e => {
-      const config = (enemiesData as Record<string, EnemyConfig>)[e.type];
+      const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
       if (config) {
         const enemy = new Enemy(this, e.x, e.y, config);
         this.enemies.add(enemy);
@@ -288,31 +289,54 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setFollowOffset(-this.cameraLookAheadX, 0);
   }
 
-  // Player attack hit check
-  checkAttackHit(hitbox: Phaser.Geom.Rectangle): void {
+  // Current swing ID for tracking one-hit-per-swing
+  private currentSwingId = 0;
+  
+  // Player attack hit check - called by Player when attack hitbox is active
+  checkAttackHit(hitbox: Phaser.Geom.Rectangle, swingId: number): void {
     const damage = PLAYER_CONFIG.attackDamage + gameState.getCharmModifier('damageMod');
+    let hitSomething = false;
     
     this.enemies.getChildren().forEach((enemy) => {
       const e = enemy as Enemy;
-      if (Phaser.Geom.Rectangle.Overlaps(hitbox, e.getBounds())) {
-        e.takeDamage(damage, this.player.x);
-        this.applyHitstop();
+      if (!e.isDying() && !e.isInvulnerable()) {
+        if (Phaser.Geom.Rectangle.Overlaps(hitbox, e.getBounds())) {
+          if (e.takeDamage(damage, this.player.x, swingId)) {
+            hitSomething = true;
+          }
+        }
       }
     });
     
-    if (this.boss && Phaser.Geom.Rectangle.Overlaps(hitbox, this.boss.getBounds())) {
-      this.boss.takeDamage(damage, this.player.x);
-      this.applyHitstop();
-      this.emitUIEvent('bossHpChange', { 
-        hp: this.boss.getHp(), 
-        maxHp: this.boss.getMaxHp() 
-      });
+    if (this.boss && !this.boss.isDying()) {
+      if (Phaser.Geom.Rectangle.Overlaps(hitbox, this.boss.getBounds())) {
+        this.boss.takeDamage(damage, this.player.x);
+        hitSomething = true;
+        this.emitUIEvent('bossHpChange', { 
+          hp: this.boss.getHp(), 
+          maxHp: this.boss.getMaxHp() 
+        });
+      }
     }
+    
+    if (hitSomething) {
+      this.applyHitstop();
+    }
+  }
+  
+  // Get pickups group for enemy drops
+  getPickupsGroup(): Phaser.Physics.Arcade.Group {
+    return this.pickups;
+  }
+  
+  // Get new swing ID for attack tracking (prevents multi-hit per swing)
+  getNextSwingId(): number {
+    return ++this.currentSwingId;
   }
 
   private applyHitstop(): void {
     this.time.timeScale = 0.1;
-    this.time.delayedCall(PLAYER_CONFIG.hitstopDuration, () => {
+    this.time.delayedCall(COMBAT_TUNING.hitstopMs, () => {
       this.time.timeScale = 1;
     });
   }

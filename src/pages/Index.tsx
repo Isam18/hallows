@@ -7,6 +7,7 @@ import { DeathScreen } from '@/components/game/DeathScreen';
 import { BenchScreen } from '@/components/game/BenchScreen';
 import { VictoryScreen } from '@/components/game/VictoryScreen';
 import { DebugOverlay } from '@/components/game/DebugOverlay';
+import { CombatDebugOverlay } from '@/components/game/CombatDebugOverlay';
 
 const Index = () => {
   const gameContainer = useRef<HTMLDivElement>(null);
@@ -42,8 +43,9 @@ const Index = () => {
       {/* Game Canvas */}
       <div ref={gameContainer} className="absolute inset-0 flex items-center justify-center" />
 
-      {/* Debug Overlay - Always available via F1 */}
+      {/* Debug Overlays - F1 for movement, F2 for combat */}
       {gameLoaded && <DebugOverlay gameRef={gameRef.current} />}
+      {gameLoaded && <CombatDebugOverlay gameRef={gameRef.current} />}
 
       {/* UI Overlay */}
       {gameLoaded && uiState !== 'menu' && (

@@ -82,20 +82,8 @@ export interface CharmData {
   slots: number;
 }
 
-export interface EnemyConfig {
-  id: string;
-  name: string;
-  hp: number;
-  patrolSpeed: number;
-  aggroSpeed: number;
-  aggroRange: number;
-  contactDamage: number;
-  dropAmount: number;
-  width: number;
-  height: number;
-  color: string;
-  accentColor: string;
-}
+// Re-export EnemyCombatConfig as EnemyConfig for compatibility
+export type { EnemyCombatConfig as EnemyConfig } from './CombatConfig';
 
 export interface LevelConfig {
   id: string;
