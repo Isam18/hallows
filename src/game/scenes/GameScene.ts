@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { COLORS, PLAYER_CONFIG, LevelConfig } from '../core/GameConfig';
 import { COMBAT_TUNING, EnemyCombatConfig } from '../core/CombatConfig';
+import { DEATH_CONFIG } from '../core/DeathConfig';
 import gameState from '../core/GameState';
 import inputManager from '../core/InputManager';
 import { Player } from '../entities/Player';
@@ -51,14 +52,18 @@ export class GameScene extends Phaser.Scene {
   // Bench tracking
   private currentBench: Bench | null = null;
   private activeBenchConfig: import('../entities/Bench').BenchConfig | null = null;
+  
+  // Respawn tracking
+  private isRespawning = false;
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
-  init(data: { levelId: string; spawnId: string }): void {
+  init(data: { levelId: string; spawnId: string; respawning?: boolean }): void {
     this.levelId = data.levelId || 'fadingTown';
     this.spawnId = data.spawnId || 'default';
+    this.isRespawning = data.respawning || false;
     this.inBossArena = false;
     this.bossGateClosed = false;
   }
@@ -117,6 +122,12 @@ export class GameScene extends Phaser.Scene {
       levelId: this.levelId, 
       levelName: this.currentLevel.name 
     });
+    
+    // Apply respawn invulnerability if coming from death
+    if (this.isRespawning) {
+      this.applyRespawnInvulnerability();
+      this.isRespawning = false;
+    }
   }
 
   private buildLevel(): void {
@@ -522,13 +533,32 @@ export class GameScene extends Phaser.Scene {
     this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
   }
 
+  /**
+   * Handle player death - drop currency, show death screen
+   */
   handlePlayerDeath(): void {
+    // Guard against multiple death calls
+    if (gameState.getState() === 'death') return;
+    
     const playerData = gameState.getPlayerData();
     
-    // Drop shells at death location
-    gameState.dropShells(this.levelId, this.player.x, this.player.y);
+    // Drop shells at death location with room ID
+    gameState.dropShells(this.levelId, this.player.x, this.player.y, this.levelId);
     
+    // Destroy existing death marker if replacing
+    if (this.deathMarker) {
+      this.deathMarker.destroy();
+      this.deathMarker = null;
+    }
+    
+    // Play death animation on player
+    this.player.setTint(0xff4444);
+    this.player.setAlpha(0.7);
+    
+    // Set death state
     gameState.setState('death');
+    
+    // Emit death event
     this.emitUIEvent('playerDied', {
       shells: playerData.shells,
       x: this.player.x,
@@ -536,25 +566,40 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  /**
+   * Respawn player at last bench
+   */
   respawnPlayer(): void {
     const lastBench = gameState.getLastBench();
     
+    // Heal player
+    gameState.fullHeal();
+    gameState.setState('playing');
+    
     if (lastBench) {
       // Respawn at bench
-      gameState.fullHeal();
-      gameState.setState('playing');
       this.scene.restart({ 
         levelId: lastBench.levelId, 
-        spawnId: lastBench.spawnId 
+        spawnId: lastBench.spawnId,
+        respawning: true
       });
     } else {
       // No bench - restart from beginning
       gameState.resetRun();
-      gameState.setState('playing');
       this.scene.restart({ 
         levelId: 'fadingTown', 
-        spawnId: 'default' 
+        spawnId: 'default',
+        respawning: true
       });
+    }
+  }
+  
+  /**
+   * Apply respawn invulnerability to player
+   */
+  private applyRespawnInvulnerability(): void {
+    if (this.player && DEATH_CONFIG.respawnInvulnMs > 0) {
+      this.player.setRespawnInvulnerability(DEATH_CONFIG.respawnInvulnMs);
     }
   }
 

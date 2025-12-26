@@ -660,6 +660,32 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     this.invulnerable = true;
     this.invulnerabilityTime = duration;
   }
+  
+  /**
+   * Set respawn invulnerability with blink effect
+   */
+  setRespawnInvulnerability(duration: number): void {
+    this.invulnerable = true;
+    this.invulnerabilityTime = duration;
+    
+    // Create blink effect during respawn invuln
+    const blinkDuration = 80;
+    const numBlinks = Math.floor(duration / (blinkDuration * 2));
+    
+    for (let i = 0; i < numBlinks; i++) {
+      this.scene.time.delayedCall(i * blinkDuration * 2, () => {
+        if (this.active) this.setAlpha(0.3);
+      });
+      this.scene.time.delayedCall(i * blinkDuration * 2 + blinkDuration, () => {
+        if (this.active) this.setAlpha(1);
+      });
+    }
+    
+    // Ensure full alpha at end
+    this.scene.time.delayedCall(duration, () => {
+      if (this.active) this.setAlpha(1);
+    });
+  }
 
   // Public getters
   isInvulnerable(): boolean { return this.invulnerable; }
