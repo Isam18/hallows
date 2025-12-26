@@ -49,6 +49,7 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 400 },
-    "fromRuins": { "x": 1450, "y": 500 }
+    "fromRuins": { "x": 1450, "y": 500 },
+    "benchFadingTown": { "x": 830, "y": 500 }
   }
 }

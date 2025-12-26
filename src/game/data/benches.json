@@ -1,0 +1,41 @@
+{
+  "benchTypes": {
+    "basic_bench": {
+      "id": "basic_bench",
+      "displayName": "Resting Bench",
+      "healMode": "full",
+      "healAmount": 0,
+      "setsRespawn": true,
+      "opensCharmUI": true,
+      "enemyRespawnMode": "none",
+      "enemyRespawnDelayMs": 0,
+      "savesGame": false,
+      "restoresDash": true
+    },
+    "safe_bench": {
+      "id": "safe_bench",
+      "displayName": "Safe Haven",
+      "healMode": "full",
+      "healAmount": 0,
+      "setsRespawn": true,
+      "opensCharmUI": true,
+      "enemyRespawnMode": "none",
+      "enemyRespawnDelayMs": 0,
+      "savesGame": false,
+      "restoresDash": true
+    },
+    "combat_bench": {
+      "id": "combat_bench",
+      "displayName": "Training Grounds",
+      "healMode": "full",
+      "healAmount": 0,
+      "setsRespawn": true,
+      "opensCharmUI": true,
+      "enemyRespawnMode": "currentRoom",
+      "enemyRespawnDelayMs": 500,
+      "savesGame": false,
+      "restoresDash": true
+    }
+  },
+  "defaultBenchType": "basic_bench"
+}
