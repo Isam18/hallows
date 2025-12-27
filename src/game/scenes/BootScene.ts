@@ -240,6 +240,112 @@ export class BootScene extends Phaser.Scene {
     }
     hurtGraphics.generateTexture('spikyGrub_hurt', 36, 28);
     hurtGraphics.destroy();
+    
+    // Vengefly - Hollow Knight inspired flying enemy
+    this.createVengeflySprite();
+  }
+
+  private createVengeflySprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 20; // Center X
+    const cy = 18; // Center Y
+    
+    // === WINGS (translucent, behind body) ===
+    // Left wing - pale translucent
+    g.fillStyle(0xc8d0d8, 0.6);
+    g.fillEllipse(cx - 8, cy - 8, 18, 10);
+    g.lineStyle(1, 0x8090a0, 0.5);
+    g.strokeEllipse(cx - 8, cy - 8, 18, 10);
+    
+    // Right wing
+    g.fillStyle(0xc8d0d8, 0.6);
+    g.fillEllipse(cx + 8, cy - 8, 18, 10);
+    g.lineStyle(1, 0x8090a0, 0.5);
+    g.strokeEllipse(cx + 8, cy - 8, 18, 10);
+    
+    // Wing veins
+    g.lineStyle(0.5, 0x9aa0a8, 0.4);
+    g.lineBetween(cx - 12, cy - 10, cx - 4, cy - 6);
+    g.lineBetween(cx - 14, cy - 7, cx - 6, cy - 7);
+    g.lineBetween(cx + 12, cy - 10, cx + 4, cy - 6);
+    g.lineBetween(cx + 14, cy - 7, cx + 6, cy - 7);
+    
+    // === BODY (dark blue segmented) ===
+    // Main thorax - dark blue
+    g.fillStyle(0x3a4a68);
+    g.fillEllipse(cx, cy + 2, 16, 12);
+    
+    // Abdomen segments (behind)
+    g.fillStyle(0x2a3a58);
+    g.fillEllipse(cx + 8, cy + 6, 10, 8);
+    g.fillEllipse(cx + 14, cy + 8, 7, 6);
+    
+    // Segment lines for detail
+    g.lineStyle(1, 0x1a2a40);
+    g.lineBetween(cx - 2, cy - 2, cx - 2, cy + 8);
+    g.lineBetween(cx + 4, cy, cx + 4, cy + 10);
+    g.lineBetween(cx + 10, cy + 3, cx + 10, cy + 11);
+    
+    // Body highlight
+    g.fillStyle(0x4a5a78, 0.6);
+    g.fillEllipse(cx - 2, cy, 6, 4);
+    
+    // === LEGS (small, dangling) ===
+    g.lineStyle(1.5, 0x2a3a50);
+    // Front legs
+    g.lineBetween(cx - 4, cy + 6, cx - 8, cy + 14);
+    g.lineBetween(cx - 3, cy + 6, cx - 5, cy + 13);
+    // Back legs  
+    g.lineBetween(cx + 2, cy + 7, cx + 4, cy + 14);
+    g.lineBetween(cx + 6, cy + 8, cx + 9, cy + 15);
+    
+    // === HEAD (pale skull/mask) ===
+    // Skull base - pale cream/white
+    g.fillStyle(0xe8e0d8);
+    g.fillEllipse(cx - 10, cy + 2, 12, 10);
+    
+    // Pointed snout/beak
+    g.fillStyle(0xd8d0c8);
+    g.beginPath();
+    g.moveTo(cx - 16, cy + 2);
+    g.lineTo(cx - 24, cy + 4);
+    g.lineTo(cx - 16, cy + 6);
+    g.closePath();
+    g.fillPath();
+    
+    // Snout detail line
+    g.lineStyle(1, 0xa09080);
+    g.lineBetween(cx - 16, cy + 4, cx - 22, cy + 4);
+    
+    // Eye sockets - dark hollow
+    g.fillStyle(0x1a1a20);
+    g.fillEllipse(cx - 12, cy, 4, 5);
+    g.fillEllipse(cx - 8, cy + 1, 3, 4);
+    
+    // Skull outline
+    g.lineStyle(1.5, 0x2a2a30);
+    g.strokeEllipse(cx - 10, cy + 2, 12, 10);
+    
+    // Body outline
+    g.lineStyle(1.5, 0x1a2a40);
+    g.strokeEllipse(cx, cy + 2, 16, 12);
+    
+    g.generateTexture('vengefly', 44, 36);
+    g.destroy();
+    
+    // Vengefly hurt frame (white flash)
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    
+    // Simplified white silhouette for hurt flash
+    hg.fillStyle(0xffffff);
+    hg.fillEllipse(cx - 8, cy - 8, 18, 10); // Wings
+    hg.fillEllipse(cx + 8, cy - 8, 18, 10);
+    hg.fillEllipse(cx, cy + 2, 16, 12); // Body
+    hg.fillEllipse(cx + 8, cy + 6, 10, 8);
+    hg.fillEllipse(cx - 10, cy + 2, 12, 10); // Head
+    
+    hg.generateTexture('vengefly_hurt', 44, 36);
+    hg.destroy();
   }
 
   private createBossSprites(): void {
