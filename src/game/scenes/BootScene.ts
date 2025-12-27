@@ -2,6 +2,10 @@ import Phaser from 'phaser';
 import { COLORS, GAME_CONFIG } from '../core/GameConfig';
 import gameState from '../core/GameState';
 
+// Import enemy sprite images
+import mossCreepImg from '@/assets/moss-creep.png';
+import mosskinImg from '@/assets/mosskin.png';
+
 export class BootScene extends Phaser.Scene {
   constructor() {
     super({ key: 'BootScene' });
@@ -33,9 +37,47 @@ export class BootScene extends Phaser.Scene {
   private createPlaceholderSprites(): void {
     this.createPlayerSprites();
     this.createEnemySprites();
+    this.createGreenwayEnemySprites();
     this.createBossSprites();
     this.createPickupSprites();
     this.createEnvironmentSprites();
+  }
+  
+  private createGreenwayEnemySprites(): void {
+    // Load Mosskin sprite from image
+    this.load.image('mosskin', mosskinImg);
+    this.load.image('mossCreep', mossCreepImg);
+    
+    // Wait for loads to complete, then create hurt variants
+    this.load.once('complete', () => {
+      // Create hurt variants by generating white versions
+      this.createMosskinHurtSprite();
+      this.createMossCreepHurtSprite();
+    });
+    
+    this.load.start();
+  }
+  
+  private createMosskinHurtSprite(): void {
+    // Create a white flash version for hurt state
+    const g = this.make.graphics({ x: 0, y: 0 });
+    // Approximate mosskin shape - fluffy round body
+    g.fillStyle(0xffffff);
+    g.fillEllipse(24, 28, 40, 48);
+    // Tuft on top
+    g.fillEllipse(24, 6, 16, 12);
+    g.generateTexture('mosskin_hurt', 48, 56);
+    g.destroy();
+  }
+  
+  private createMossCreepHurtSprite(): void {
+    // Create a white flash version for hurt state
+    const g = this.make.graphics({ x: 0, y: 0 });
+    // Approximate moss creep shape - bushy round mound
+    g.fillStyle(0xffffff);
+    g.fillEllipse(40, 40, 70, 60);
+    g.generateTexture('mossCreep_hurt', 80, 80);
+    g.destroy();
   }
 
   private createPlayerSprites(): void {
