@@ -1,0 +1,563 @@
+import { LevelConfig, PlatformConfig, EnemySpawnConfig, TriggerConfig, PickupConfig } from '../core/GameConfig';
+
+export type GreenwayRoomType = 
+  | 'overgrownParkour'
+  | 'mosskinGauntlet'
+  | 'hiddenGrove'
+  | 'verticalThicket'
+  | 'restingGlade';
+
+export interface AcidPoolConfig {
+  x: number;
+  y: number;
+  width: number;
+  height?: number;
+}
+
+export interface BreakableVineConfig {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
+export interface GreenwayRoomData {
+  platforms: PlatformConfig[];
+  enemies: EnemySpawnConfig[];
+  pickups: PickupConfig[];
+  triggers: TriggerConfig[];
+  spawns: Record<string, { x: number; y: number }>;
+  acidPools?: AcidPoolConfig[];
+  breakableVines?: BreakableVineConfig[];
+}
+
+// Room dimensions
+const ROOM_WIDTH = 800;
+const ROOM_HEIGHT = 600;
+
+// Seeded random for reproducibility
+let seed = Date.now();
+function random(): number {
+  seed = (seed * 1103515245 + 12345) & 0x7fffffff;
+  return (seed / 0x7fffffff);
+}
+
+function randomInt(min: number, max: number): number {
+  return Math.floor(random() * (max - min + 1)) + min;
+}
+
+function randomChoice<T>(arr: T[]): T {
+  return arr[Math.floor(random() * arr.length)];
+}
+
+function shuffleArray<T>(arr: T[]): T[] {
+  const shuffled = [...arr];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+}
+
+/**
+ * Overgrown Parkour - Medium room with small mossy platforms over acid lake
+ */
+function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  const acidPools: AcidPoolConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  
+  // Large acid lake at bottom
+  acidPools.push({
+    x: xOffset + 20,
+    y: ROOM_HEIGHT - 50,
+    width: ROOM_WIDTH - 40,
+    height: 50
+  });
+  
+  // Entry/exit safe platforms
+  platforms.push(
+    { x: xOffset + 20, y: ROOM_HEIGHT - 80, width: 80, height: 20, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 80, width: 80, height: 20, type: 'platform' }
+  );
+  
+  // Scattered small platforms for jumping
+  const platformCount = randomInt(6, 9);
+  const usedPositions: Array<{ x: number; y: number }> = [];
+  
+  for (let i = 0; i < platformCount; i++) {
+    let px: number, py: number;
+    let attempts = 0;
+    
+    do {
+      px = xOffset + 120 + randomInt(0, ROOM_WIDTH - 280);
+      py = ROOM_HEIGHT - 120 - randomInt(0, 350);
+      attempts++;
+    } while (
+      usedPositions.some(p => Math.abs(p.x - px) < 100 && Math.abs(p.y - py) < 80) &&
+      attempts < 20
+    );
+    
+    usedPositions.push({ x: px, y: py });
+    
+    const width = randomInt(50, 90);
+    platforms.push({
+      x: px,
+      y: py,
+      width,
+      height: 18,
+      type: 'platform'
+    } as any);
+  }
+  
+  // Moss creeps on walls
+  enemies.push(
+    { type: 'mossCreep', x: xOffset + 20, y: randomInt(200, 400) },
+    { type: 'mossCreep', x: xOffset + ROOM_WIDTH - 20, y: randomInt(250, 450) }
+  );
+  
+  // Add some Mosskins on platforms
+  const mosskinCount = randomInt(1, 2);
+  for (let i = 0; i < mosskinCount; i++) {
+    if (usedPositions[i + 2]) {
+      enemies.push({
+        type: 'mosskin',
+        x: usedPositions[i + 2].x + 30,
+        y: usedPositions[i + 2].y - 30
+      });
+    }
+  }
+  
+  return {
+    platforms,
+    enemies,
+    acidPools,
+    pickups: [
+      { type: 'shells', x: xOffset + ROOM_WIDTH / 2, y: randomInt(150, 250), amount: randomInt(8, 15) }
+    ],
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 120 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 120 }
+    }
+  };
+}
+
+/**
+ * Mosskin Gauntlet - Long horizontal room, mostly acid floor, platforms with charging Mosskins
+ */
+function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  const acidPools: AcidPoolConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  
+  // Acid covering most of floor
+  acidPools.push({
+    x: xOffset + 100,
+    y: ROOM_HEIGHT - 40,
+    width: ROOM_WIDTH - 200,
+    height: 40
+  });
+  
+  // Safe ground at entry/exit
+  platforms.push(
+    { x: xOffset + 20, y: ROOM_HEIGHT - 50, width: 80, height: 50, type: 'ground' },
+    { x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 50, width: 80, height: 50, type: 'ground' }
+  );
+  
+  // Platform bridges over acid
+  const bridgeCount = randomInt(4, 6);
+  const spacing = (ROOM_WIDTH - 200) / bridgeCount;
+  
+  for (let i = 0; i < bridgeCount; i++) {
+    const px = xOffset + 100 + i * spacing + randomInt(-20, 20);
+    const py = ROOM_HEIGHT - randomInt(100, 180);
+    const width = randomInt(70, 100);
+    
+    platforms.push({
+      x: px,
+      y: py,
+      width,
+      height: 20,
+      type: 'platform'
+    } as any);
+    
+    // Mosskin on alternating platforms
+    if (i % 2 === 1) {
+      enemies.push({
+        type: 'mosskin',
+        x: px + width / 2,
+        y: py - 30
+      });
+    }
+  }
+  
+  // Upper escape route platforms
+  platforms.push(
+    { x: xOffset + 150, y: ROOM_HEIGHT - 280, width: 100, height: 18, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 250, y: ROOM_HEIGHT - 300, width: 100, height: 18, type: 'platform' }
+  );
+  
+  return {
+    platforms,
+    enemies,
+    acidPools,
+    pickups: [
+      { type: 'shells', x: xOffset + ROOM_WIDTH / 2 + randomInt(-50, 50), y: randomInt(200, 300), amount: randomInt(10, 18) }
+    ],
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 100 }
+    }
+  };
+}
+
+/**
+ * Hidden Grove - Small lush room with lots of Geo, hidden behind breakable vines
+ */
+function generateHiddenGrove(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const breakableVines: BreakableVineConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling and ground
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  platforms.push({ x: xOffset, y: ROOM_HEIGHT - 50, width: ROOM_WIDTH, height: 50, type: 'ground' });
+  
+  // Breakable vine wall at entrance
+  breakableVines.push({
+    x: xOffset + 80,
+    y: ROOM_HEIGHT - 200,
+    width: 30,
+    height: 150
+  });
+  
+  // Lush platforms inside
+  platforms.push(
+    { x: xOffset + 150, y: ROOM_HEIGHT - 130, width: 120, height: 20, type: 'platform' },
+    { x: xOffset + 350, y: ROOM_HEIGHT - 200, width: 100, height: 20, type: 'platform' },
+    { x: xOffset + 550, y: ROOM_HEIGHT - 280, width: 130, height: 20, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 150, y: ROOM_HEIGHT - 150, width: 100, height: 20, type: 'platform' }
+  );
+  
+  // Lots of shells (hidden reward)
+  const pickups: PickupConfig[] = [
+    { type: 'shells', x: xOffset + 200, y: ROOM_HEIGHT - 80, amount: 25 },
+    { type: 'shells', x: xOffset + 400, y: ROOM_HEIGHT - 230, amount: 30 },
+    { type: 'shells', x: xOffset + 600, y: ROOM_HEIGHT - 310, amount: 35 },
+    { type: 'shells', x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 180, amount: 40 }
+  ];
+  
+  return {
+    platforms,
+    enemies: [], // Safe hidden room
+    acidPools: [],
+    breakableVines,
+    pickups,
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 100 }
+    }
+  };
+}
+
+/**
+ * Vertical Thicket - Tall climbing room with narrow platforms and flying enemies
+ */
+function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  const acidPools: AcidPoolConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  
+  // Acid at very bottom
+  acidPools.push({
+    x: xOffset + 20,
+    y: ROOM_HEIGHT - 40,
+    width: ROOM_WIDTH - 40,
+    height: 40
+  });
+  
+  // Entry/exit platforms
+  platforms.push(
+    { x: xOffset + 20, y: ROOM_HEIGHT - 70, width: 70, height: 20, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 90, y: ROOM_HEIGHT - 70, width: 70, height: 20, type: 'platform' }
+  );
+  
+  // Ascending narrow platforms (zigzag pattern)
+  const levels = 6;
+  const heightStep = (ROOM_HEIGHT - 150) / levels;
+  
+  for (let i = 0; i < levels; i++) {
+    const leftSide = i % 2 === 0;
+    const px = leftSide 
+      ? xOffset + 50 + randomInt(0, 80) 
+      : xOffset + ROOM_WIDTH - 150 - randomInt(0, 80);
+    const py = ROOM_HEIGHT - 100 - (i * heightStep);
+    
+    platforms.push({
+      x: px,
+      y: py,
+      width: randomInt(60, 100),
+      height: 18,
+      type: 'platform'
+    } as any);
+  }
+  
+  // Flying enemies to knock player down
+  const flyerCount = randomInt(3, 5);
+  for (let i = 0; i < flyerCount; i++) {
+    enemies.push({
+      type: randomChoice(['vengefly', 'aspid']),
+      x: xOffset + randomInt(100, ROOM_WIDTH - 100),
+      y: randomInt(100, ROOM_HEIGHT - 200)
+    });
+  }
+  
+  // Moss creeps on walls
+  enemies.push(
+    { type: 'mossCreep', x: xOffset + 20, y: randomInt(150, 350) },
+    { type: 'mossCreep', x: xOffset + ROOM_WIDTH - 20, y: randomInt(200, 400) }
+  );
+  
+  return {
+    platforms,
+    enemies,
+    acidPools,
+    pickups: [
+      { type: 'shells', x: xOffset + ROOM_WIDTH / 2, y: 100, amount: randomInt(15, 25) }
+    ],
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 55, y: ROOM_HEIGHT - 110 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 55, y: ROOM_HEIGHT - 110 }
+    }
+  };
+}
+
+/**
+ * Resting Glade - Safe room with bench (mossy version)
+ */
+function generateRestingGlade(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling and ground
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  platforms.push({ x: xOffset, y: ROOM_HEIGHT - 50, width: ROOM_WIDTH, height: 50, type: 'ground' });
+  
+  // Decorative platforms
+  platforms.push(
+    { x: xOffset + 100, y: ROOM_HEIGHT - 150, width: 80, height: 18, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 180, y: ROOM_HEIGHT - 130, width: 80, height: 18, type: 'platform' }
+  );
+  
+  const benchX = xOffset + ROOM_WIDTH / 2 - 30;
+  
+  return {
+    platforms,
+    enemies: [], // Safe room
+    acidPools: [],
+    pickups: [],
+    triggers: [
+      {
+        id: `mossyBench_room${roomIndex}`,
+        type: 'bench',
+        x: benchX,
+        y: ROOM_HEIGHT - 95,
+        width: 60,
+        height: 45
+      }
+    ],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 100 },
+      [`mossyBench_room${roomIndex}`]: { x: benchX + 30, y: ROOM_HEIGHT - 100 }
+    }
+  };
+}
+
+/**
+ * Generate room order with variety
+ */
+function generateGreenwayRoomOrder(): GreenwayRoomType[] {
+  const roomPool: GreenwayRoomType[] = [
+    'overgrownParkour',
+    'mosskinGauntlet',
+    'hiddenGrove',
+    'verticalThicket',
+    'restingGlade',
+    'overgrownParkour',
+    'mosskinGauntlet',
+    'verticalThicket',
+    'overgrownParkour',
+    'mosskinGauntlet'
+  ];
+  
+  const shuffled = shuffleArray(roomPool);
+  
+  // First room should be Overgrown Parkour (tutorial for acid)
+  const parkourIdx = shuffled.findIndex(r => r === 'overgrownParkour');
+  if (parkourIdx > 0) {
+    [shuffled[0], shuffled[parkourIdx]] = [shuffled[parkourIdx], shuffled[0]];
+  }
+  
+  // Ensure resting glade is in middle
+  const gladeIdx = shuffled.findIndex(r => r === 'restingGlade');
+  if (gladeIdx !== 4 && gladeIdx !== 5) {
+    const targetIdx = 4;
+    [shuffled[targetIdx], shuffled[gladeIdx]] = [shuffled[gladeIdx], shuffled[targetIdx]];
+  }
+  
+  return shuffled;
+}
+
+/**
+ * Generate the complete Greenway level with 10 rooms
+ */
+export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[], breakableVines?: BreakableVineConfig[] } {
+  seed = Date.now();
+  
+  const rooms: GreenwayRoomData[] = [];
+  let totalWidth = 0;
+  
+  const roomOrder = generateGreenwayRoomOrder();
+  
+  // Generate 10 rooms
+  for (let i = 0; i < 10; i++) {
+    const roomType = roomOrder[i];
+    let roomData: GreenwayRoomData;
+    
+    switch (roomType) {
+      case 'overgrownParkour':
+        roomData = generateOvergrownParkour(i, totalWidth);
+        break;
+      case 'mosskinGauntlet':
+        roomData = generateMosskinGauntlet(i, totalWidth);
+        break;
+      case 'hiddenGrove':
+        roomData = generateHiddenGrove(i, totalWidth);
+        break;
+      case 'verticalThicket':
+        roomData = generateVerticalThicket(i, totalWidth);
+        break;
+      case 'restingGlade':
+        roomData = generateRestingGlade(i, totalWidth);
+        break;
+      default:
+        roomData = generateOvergrownParkour(i, totalWidth);
+    }
+    
+    rooms.push(roomData);
+    totalWidth += ROOM_WIDTH;
+  }
+  
+  // Combine all room data
+  const allPlatforms: PlatformConfig[] = [];
+  const allEnemies: EnemySpawnConfig[] = [];
+  const allPickups: PickupConfig[] = [];
+  const allTriggers: TriggerConfig[] = [];
+  const allSpawns: Record<string, { x: number; y: number }> = {};
+  const allAcidPools: AcidPoolConfig[] = [];
+  const allBreakableVines: BreakableVineConfig[] = [];
+  
+  rooms.forEach((room) => {
+    allPlatforms.push(...room.platforms);
+    allEnemies.push(...room.enemies);
+    allPickups.push(...room.pickups);
+    allTriggers.push(...room.triggers);
+    Object.assign(allSpawns, room.spawns);
+    if (room.acidPools) allAcidPools.push(...room.acidPools);
+    if (room.breakableVines) allBreakableVines.push(...room.breakableVines);
+  });
+  
+  // Add transitions between rooms
+  for (let i = 0; i < 9; i++) {
+    const xPos = (i + 1) * ROOM_WIDTH - 30;
+    
+    allTriggers.push({
+      id: `transition_greenway_room${i}_to_room${i + 1}`,
+      type: 'transition',
+      x: xPos,
+      y: ROOM_HEIGHT - 150,
+      width: 30,
+      height: 100,
+      target: 'greenwayGenerated',
+      targetSpawn: `room${i + 1}_entry`
+    });
+  }
+  
+  // Exit back to chain room at the start
+  allTriggers.push({
+    id: 'exitToChainRoom',
+    type: 'transition',
+    x: 0,
+    y: ROOM_HEIGHT - 150,
+    width: 30,
+    height: 100,
+    target: 'chainRoom',
+    targetSpawn: 'fromGreenway'
+  });
+  
+  return {
+    id: 'greenwayGenerated',
+    name: 'Greenway',
+    width: totalWidth,
+    height: ROOM_HEIGHT,
+    backgroundColor: '#0a1810',
+    spawnPoint: { x: 60, y: ROOM_HEIGHT - 120 },
+    platforms: allPlatforms,
+    enemies: allEnemies,
+    pickups: allPickups,
+    triggers: allTriggers,
+    spawns: {
+      default: { x: 60, y: ROOM_HEIGHT - 120 },
+      entrance: { x: 60, y: ROOM_HEIGHT - 120 },
+      fromChainRoom: { x: 60, y: ROOM_HEIGHT - 120 },
+      ...allSpawns
+    },
+    acidPools: allAcidPools,
+    breakableVines: allBreakableVines,
+    biome: 'greenway'
+  } as any;
+}
+
+export { ROOM_WIDTH as GREENWAY_ROOM_WIDTH, ROOM_HEIGHT as GREENWAY_ROOM_HEIGHT };

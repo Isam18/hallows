@@ -97,6 +97,20 @@ export interface BreakableConfig {
   y: number;
 }
 
+export interface AcidPoolConfig {
+  x: number;
+  y: number;
+  width: number;
+  height?: number;
+}
+
+export interface BreakableVineConfig {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+}
+
 export interface LevelConfig {
   id: string;
   name: string;
@@ -111,6 +125,9 @@ export interface LevelConfig {
   spawns: Record<string, { x: number; y: number }>;
   spikes?: SpikeConfig[];
   breakables?: BreakableConfig[];
+  acidPools?: AcidPoolConfig[];
+  breakableVines?: BreakableVineConfig[];
+  biome?: string;
   bossArena?: {
     x: number;
     y: number;
