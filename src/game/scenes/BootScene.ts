@@ -356,171 +356,202 @@ export class BootScene extends Phaser.Scene {
 
   private createHuskGuardSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    const cx = 32; // Center X (2x player size)
-    const cy = 40; // Center Y
+    const cx = 32;
+    const cy = 42;
     
-    // === BODY (bulky armored thorax) ===
-    // Main armored body - dark blue/grey
-    g.fillStyle(0x3a4a5a);
-    g.fillEllipse(cx, cy + 5, 50, 45);
+    // === BODY (hunched, beetle-like) ===
+    // Main carapace - dark desaturated blue-grey
+    g.fillStyle(0x2d3a48);
+    g.fillEllipse(cx, cy + 2, 52, 38);
     
-    // Armor plates - segmented look
-    g.fillStyle(0x4a5a6a);
-    g.fillEllipse(cx, cy - 5, 46, 30);
+    // Upper shell plates
+    g.fillStyle(0x3a4855);
+    g.fillEllipse(cx - 10, cy - 8, 28, 22);
+    g.fillEllipse(cx + 10, cy - 6, 26, 20);
     
-    // Armor highlights
-    g.fillStyle(0x5a6a7a, 0.7);
-    g.fillEllipse(cx - 8, cy - 10, 14, 12);
-    g.fillEllipse(cx + 8, cy - 10, 14, 12);
+    // Shell segment ridges
+    g.lineStyle(1.5, 0x1a2835);
+    g.lineBetween(cx - 18, cy - 12, cx - 18, cy + 15);
+    g.lineBetween(cx - 6, cy - 16, cx - 6, cy + 12);
+    g.lineBetween(cx + 6, cy - 14, cx + 6, cy + 14);
+    g.lineBetween(cx + 18, cy - 10, cx + 18, cy + 16);
     
-    // Armor segment lines
-    g.lineStyle(2, 0x2a3a4a);
-    g.lineBetween(cx - 15, cy - 15, cx - 15, cy + 20);
-    g.lineBetween(cx, cy - 20, cx, cy + 15);
-    g.lineBetween(cx + 15, cy - 15, cx + 15, cy + 20);
+    // Underbelly
+    g.fillStyle(0x1a2835);
+    g.fillEllipse(cx, cy + 18, 42, 16);
     
-    // Underbelly - darker
-    g.fillStyle(0x2a3a48);
-    g.fillEllipse(cx, cy + 20, 40, 20);
+    // === HEAD (pale mask, hollow eyes) ===
+    // Skull/mask - pale bone color like Hollow Knight
+    g.fillStyle(0xd8d4cc);
+    g.fillEllipse(cx - 18, cy - 2, 20, 24);
     
-    // === HELMET HEAD ===
-    // Main helmet - distinctive shape
-    g.fillStyle(0x4a5a68);
-    g.fillEllipse(cx, cy - 30, 36, 28);
+    // Head shell attachment
+    g.fillStyle(0x3a4855);
+    g.fillEllipse(cx - 10, cy - 8, 14, 18);
     
-    // Helmet crest
-    g.fillStyle(0x3a4a58);
+    // Eye sockets - deep black voids
+    g.fillStyle(0x0a0a10);
+    g.fillEllipse(cx - 22, cy - 8, 6, 10);
+    g.fillEllipse(cx - 16, cy - 6, 5, 8);
+    
+    // Snout/mandible
+    g.fillStyle(0xc8c4bc);
     g.beginPath();
-    g.moveTo(cx, cy - 50);
-    g.lineTo(cx - 10, cy - 30);
-    g.lineTo(cx + 10, cy - 30);
+    g.moveTo(cx - 28, cy);
+    g.lineTo(cx - 36, cy + 6);
+    g.lineTo(cx - 28, cy + 8);
     g.closePath();
     g.fillPath();
     
-    // Face plate - pale mask
-    g.fillStyle(0xd0d8e0);
-    g.fillEllipse(cx, cy - 28, 22, 18);
+    // Head outline
+    g.lineStyle(1.5, 0x1a1a20);
+    g.strokeEllipse(cx - 18, cy - 2, 20, 24);
     
-    // Eye slits - dark hollow
-    g.fillStyle(0x1a1a20);
-    g.fillEllipse(cx - 6, cy - 30, 5, 8);
-    g.fillEllipse(cx + 6, cy - 30, 5, 8);
-    
-    // Mouth guard
-    g.fillStyle(0x3a4a58);
-    g.fillRect(cx - 8, cy - 22, 16, 6);
-    g.lineStyle(1, 0x2a3a48);
-    g.lineBetween(cx - 6, cy - 22, cx - 6, cy - 16);
-    g.lineBetween(cx, cy - 22, cx, cy - 16);
-    g.lineBetween(cx + 6, cy - 22, cx + 6, cy - 16);
-    
-    // === LEGS (sturdy) ===
-    g.fillStyle(0x3a4a5a);
+    // === LEGS (thick, armored) ===
+    g.fillStyle(0x2d3a48);
     // Front legs
-    g.fillRect(cx - 18, cy + 22, 8, 20);
-    g.fillRect(cx + 10, cy + 22, 8, 20);
+    g.fillRect(cx - 14, cy + 18, 7, 22);
+    g.fillRect(cx - 4, cy + 20, 6, 20);
     // Back legs
-    g.fillRect(cx - 12, cy + 25, 6, 18);
-    g.fillRect(cx + 6, cy + 25, 6, 18);
+    g.fillRect(cx + 6, cy + 19, 6, 21);
+    g.fillRect(cx + 14, cy + 18, 7, 22);
     
-    // Leg armor
-    g.fillStyle(0x4a5a6a);
-    g.fillRect(cx - 18, cy + 22, 8, 6);
-    g.fillRect(cx + 10, cy + 22, 8, 6);
+    // Leg joints
+    g.fillStyle(0x3a4855);
+    g.fillCircle(cx - 10, cy + 20, 4);
+    g.fillCircle(cx - 1, cy + 22, 3);
+    g.fillCircle(cx + 9, cy + 21, 3);
+    g.fillCircle(cx + 17, cy + 20, 4);
     
-    // === CLUB ARM (attack weapon) ===
-    g.fillStyle(0x3a4a58);
-    g.fillRect(cx + 22, cy - 10, 10, 35);
-    // Club head
-    g.fillStyle(0x4a5a68);
-    g.fillEllipse(cx + 27, cy + 28, 14, 10);
+    // === WEAPON ARM (large club/mace) ===
+    // Arm
+    g.fillStyle(0x2d3a48);
+    g.fillRect(cx + 20, cy - 15, 8, 40);
     
-    // === OUTLINES ===
-    g.lineStyle(2, 0x1a2a38);
-    g.strokeEllipse(cx, cy + 5, 50, 45);
-    g.strokeEllipse(cx, cy - 30, 36, 28);
+    // Club head - heavy, spiked
+    g.fillStyle(0x3a4855);
+    g.fillEllipse(cx + 24, cy + 28, 16, 12);
+    g.fillStyle(0x4a5865);
+    g.fillEllipse(cx + 24, cy + 26, 12, 8);
+    
+    // Club spikes
+    g.fillStyle(0x2d3a48);
+    g.fillTriangle(cx + 18, cy + 32, cx + 14, cy + 38, cx + 22, cy + 38);
+    g.fillTriangle(cx + 30, cy + 32, cx + 26, cy + 38, cx + 34, cy + 38);
+    
+    // === BODY OUTLINE ===
+    g.lineStyle(2, 0x1a2530);
+    g.strokeEllipse(cx, cy + 2, 52, 38);
     
     g.generateTexture('huskGuard', 64, 80);
     g.destroy();
     
-    // Husk Guard hurt frame
+    // Husk Guard hurt frame (white flash)
     const hg = this.make.graphics({ x: 0, y: 0 });
     hg.fillStyle(0xffffff);
-    hg.fillEllipse(cx, cy + 5, 50, 45);
-    hg.fillEllipse(cx, cy - 30, 36, 28);
-    hg.fillRect(cx - 18, cy + 22, 8, 20);
-    hg.fillRect(cx + 10, cy + 22, 8, 20);
-    hg.fillRect(cx + 22, cy - 10, 10, 35);
-    hg.fillEllipse(cx + 27, cy + 28, 14, 10);
+    hg.fillEllipse(cx, cy + 2, 52, 38);
+    hg.fillEllipse(cx - 18, cy - 2, 20, 24);
+    hg.fillRect(cx - 14, cy + 18, 7, 22);
+    hg.fillRect(cx + 14, cy + 18, 7, 22);
+    hg.fillRect(cx + 20, cy - 15, 8, 40);
+    hg.fillEllipse(cx + 24, cy + 28, 16, 12);
     hg.generateTexture('huskGuard_hurt', 64, 80);
     hg.destroy();
   }
 
   private createInfectedHuskSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    const cx = 20;
-    const cy = 18;
+    const cx = 30;  // Larger sprite
+    const cy = 26;
     
-    // === CURLED UP BODY ===
-    // Main body - hunched over
-    g.fillStyle(0x4a5a6a);
-    g.fillEllipse(cx, cy + 4, 32, 24);
+    // === CURLED UP BODY (bigger, more detailed) ===
+    // Main body - hunched, fetal position
+    g.fillStyle(0x3a4855);
+    g.fillEllipse(cx, cy + 6, 48, 36);
     
-    // Head tucked in
-    g.fillStyle(0x5a6a7a);
-    g.fillEllipse(cx - 6, cy - 4, 16, 14);
+    // Upper back shell
+    g.fillStyle(0x4a5865);
+    g.fillEllipse(cx - 4, cy - 4, 36, 26);
     
-    // Arms wrapped around
-    g.fillStyle(0x4a5a6a);
-    g.fillEllipse(cx + 8, cy, 10, 18);
+    // Head tucked down
+    g.fillStyle(0xd0ccc4);  // Pale mask
+    g.fillEllipse(cx - 14, cy + 2, 20, 18);
     
-    // === INFECTION PUSTULES (orange glow) ===
+    // Hollow eyes
+    g.fillStyle(0x0a0a10);
+    g.fillEllipse(cx - 18, cy - 2, 5, 7);
+    g.fillEllipse(cx - 12, cy, 4, 6);
+    
+    // Arms wrapped around body
+    g.fillStyle(0x3a4855);
+    g.fillEllipse(cx + 10, cy + 2, 14, 24);
+    g.fillEllipse(cx - 6, cy + 14, 20, 10);
+    
+    // Legs tucked
+    g.fillStyle(0x2d3848);
+    g.fillRect(cx - 8, cy + 18, 8, 14);
+    g.fillRect(cx + 4, cy + 20, 7, 12);
+    
+    // === INFECTION PUSTULES (glowing orange blisters) ===
     // Large central pustule
-    g.fillStyle(0xff6633);
-    g.fillCircle(cx + 2, cy + 2, 5);
-    g.fillStyle(0xffaa66, 0.8);
-    g.fillCircle(cx + 2, cy + 1, 3);
+    g.fillStyle(0xff5522);
+    g.fillCircle(cx + 4, cy, 7);
+    g.fillStyle(0xff8844, 0.9);
+    g.fillCircle(cx + 4, cy - 1, 5);
+    g.fillStyle(0xffbb77, 0.7);
+    g.fillCircle(cx + 3, cy - 2, 2);
     
     // Secondary pustules
-    g.fillStyle(0xff7744);
-    g.fillCircle(cx - 8, cy + 6, 3);
-    g.fillCircle(cx + 10, cy + 8, 3);
-    g.fillCircle(cx - 4, cy - 6, 2);
+    g.fillStyle(0xff6633);
+    g.fillCircle(cx - 10, cy + 10, 5);
+    g.fillCircle(cx + 14, cy + 8, 4);
+    g.fillCircle(cx - 2, cy - 10, 4);
+    g.fillCircle(cx + 18, cy + 2, 3);
     
     // Pustule highlights
-    g.fillStyle(0xffcc88, 0.7);
-    g.fillCircle(cx - 8, cy + 5, 1.5);
-    g.fillCircle(cx + 10, cy + 7, 1.5);
+    g.fillStyle(0xffcc99, 0.8);
+    g.fillCircle(cx - 10, cy + 9, 2);
+    g.fillCircle(cx + 14, cy + 7, 1.5);
+    g.fillCircle(cx - 2, cy - 11, 1.5);
     
-    // Small infection spots
-    g.fillStyle(0xff8855, 0.6);
-    g.fillCircle(cx + 5, cy - 2, 1.5);
-    g.fillCircle(cx - 10, cy + 2, 1.5);
-    g.fillCircle(cx + 12, cy + 2, 1.5);
+    // Small infection spots spreading
+    g.fillStyle(0xff7744, 0.7);
+    g.fillCircle(cx + 8, cy - 6, 2);
+    g.fillCircle(cx - 16, cy + 6, 2);
+    g.fillCircle(cx + 20, cy + 12, 2);
+    g.fillCircle(cx - 4, cy + 8, 1.5);
     
-    // === DETAILS ===
-    // Body segment lines
-    g.lineStyle(1, 0x3a4a5a);
-    g.lineBetween(cx - 10, cy, cx - 10, cy + 10);
-    g.lineBetween(cx + 4, cy - 2, cx + 4, cy + 12);
+    // Infection veins/tendrils
+    g.lineStyle(1, 0xff6633, 0.5);
+    g.lineBetween(cx + 4, cy + 5, cx + 8, cy + 14);
+    g.lineBetween(cx - 8, cy + 8, cx - 14, cy + 16);
+    g.lineBetween(cx + 14, cy + 10, cx + 18, cy + 18);
+    
+    // === BODY DETAILS ===
+    // Shell segment lines
+    g.lineStyle(1.5, 0x2a3545);
+    g.lineBetween(cx - 16, cy - 6, cx - 16, cy + 16);
+    g.lineBetween(cx - 4, cy - 12, cx - 4, cy + 10);
+    g.lineBetween(cx + 8, cy - 8, cx + 8, cy + 14);
     
     // Outline
-    g.lineStyle(1.5, 0x2a3a4a);
-    g.strokeEllipse(cx, cy + 4, 32, 24);
+    g.lineStyle(2, 0x1a2530);
+    g.strokeEllipse(cx, cy + 6, 48, 36);
     
-    g.generateTexture('infectedHusk', 44, 36);
+    g.generateTexture('infectedHusk', 64, 52);
     g.destroy();
     
     // Infected Husk hurt frame
     const hg = this.make.graphics({ x: 0, y: 0 });
     hg.fillStyle(0xffffff);
-    hg.fillEllipse(cx, cy + 4, 32, 24);
-    hg.fillEllipse(cx - 6, cy - 4, 16, 14);
-    hg.fillStyle(0xffddaa);
-    hg.fillCircle(cx + 2, cy + 2, 5);
-    hg.fillCircle(cx - 8, cy + 6, 3);
-    hg.fillCircle(cx + 10, cy + 8, 3);
-    hg.generateTexture('infectedHusk_hurt', 44, 36);
+    hg.fillEllipse(cx, cy + 6, 48, 36);
+    hg.fillEllipse(cx - 14, cy + 2, 20, 18);
+    hg.fillStyle(0xffddbb);
+    hg.fillCircle(cx + 4, cy, 7);
+    hg.fillCircle(cx - 10, cy + 10, 5);
+    hg.fillCircle(cx + 14, cy + 8, 4);
+    hg.fillCircle(cx - 2, cy - 10, 4);
+    hg.generateTexture('infectedHusk_hurt', 64, 52);
     hg.destroy();
   }
 
