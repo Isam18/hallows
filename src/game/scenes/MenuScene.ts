@@ -169,7 +169,7 @@ export class MenuScene extends Phaser.Scene {
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
       this.scene.start('GameScene', { 
-        levelId: 'forgottenCrossroads', 
+        levelId: 'fadingTown', 
         spawnId: 'default',
         debugMode: this.debugMode
       });
