@@ -458,6 +458,9 @@ export class GameScene extends Phaser.Scene {
       // Update bench proximity and prompts
       this.updateBenchProximity(delta);
       
+      // Update chain room interactions
+      this.updateChainRoomInteractions();
+      
       // Update parallax background
       if (this.parallaxBg) {
         this.parallaxBg.update();
@@ -988,6 +991,41 @@ export class GameScene extends Phaser.Scene {
   private chainZone: Phaser.GameObjects.Zone | null = null;
   private shopZone: Phaser.GameObjects.Zone | null = null;
   private endDoorZone: Phaser.GameObjects.Zone | null = null;
+  private greenwayDoorZone: Phaser.GameObjects.Zone | null = null;
+  
+  // Interaction tracking (for checking input in update loop)
+  private chainPromptText: Phaser.GameObjects.Text | null = null;
+  private shopPromptText: Phaser.GameObjects.Text | null = null;
+  private greenwayPromptText: Phaser.GameObjects.Text | null = null;
+  
+  private updateChainRoomInteractions(): void {
+    // Check chain interaction
+    if (this.chainZone && this.chainPromptText) {
+      const inRange = this.physics.overlap(this.player, this.chainZone);
+      this.chainPromptText.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.emitUIEvent('climbChain', null);
+      }
+    }
+    
+    // Check shop interaction
+    if (this.shopZone && this.shopPromptText) {
+      const inRange = this.physics.overlap(this.player, this.shopZone);
+      this.shopPromptText.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.emitUIEvent('openShop', null);
+      }
+    }
+    
+    // Check greenway door interaction
+    if (this.greenwayDoorZone && this.greenwayPromptText) {
+      const inRange = this.physics.overlap(this.player, this.greenwayDoorZone);
+      this.greenwayPromptText.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.emitUIEvent('showGreenwayDialog', null);
+      }
+    }
+  }
   
   private createChainVisual(x: number, y: number, width: number, height: number): void {
     // Create the giant chain visual
@@ -1021,31 +1059,16 @@ export class GameScene extends Phaser.Scene {
     this.chainZone = this.add.zone(chainCenterX, y + height - 100, width + 40, 150);
     this.physics.add.existing(this.chainZone, true);
     
-    // Prompt text
-    const promptText = this.add.text(chainCenterX, y + height - 30, '[INTERACT]', {
+    // Prompt text - store reference for update loop
+    this.chainPromptText = this.add.text(chainCenterX, y + height - 30, '[INTERACT]', {
       fontSize: '14px',
       color: '#ffffff',
       backgroundColor: '#00000088',
       padding: { x: 8, y: 4 }
     });
-    promptText.setOrigin(0.5);
-    promptText.setDepth(100);
-    promptText.setVisible(false);
-    
-    // Check overlap with player
-    this.physics.add.overlap(this.player, this.chainZone, () => {
-      promptText.setVisible(true);
-      if (inputManager.justPressed('interact')) {
-        this.emitUIEvent('climbChain', null);
-      }
-    });
-    
-    // Hide prompt when not overlapping
-    this.events.on('update', () => {
-      if (this.chainZone && !this.physics.overlap(this.player, this.chainZone)) {
-        promptText.setVisible(false);
-      }
-    });
+    this.chainPromptText.setOrigin(0.5);
+    this.chainPromptText.setDepth(100);
+    this.chainPromptText.setVisible(false);
   }
   
   private createShopNPC(x: number, y: number): void {
@@ -1080,29 +1103,16 @@ export class GameScene extends Phaser.Scene {
     this.shopZone = this.add.zone(npcX, npcY, 100, 100);
     this.physics.add.existing(this.shopZone, true);
     
-    // Prompt
-    const promptText = this.add.text(npcX, npcY + 50, '[SHOP]', {
+    // Prompt - store reference for update loop
+    this.shopPromptText = this.add.text(npcX, npcY + 50, '[SHOP]', {
       fontSize: '14px',
       color: '#d4a84b',
       backgroundColor: '#00000088',
       padding: { x: 8, y: 4 }
     });
-    promptText.setOrigin(0.5);
-    promptText.setDepth(100);
-    promptText.setVisible(false);
-    
-    this.physics.add.overlap(this.player, this.shopZone, () => {
-      promptText.setVisible(true);
-      if (inputManager.justPressed('interact')) {
-        this.emitUIEvent('openShop', null);
-      }
-    });
-    
-    this.events.on('update', () => {
-      if (this.shopZone && !this.physics.overlap(this.player, this.shopZone)) {
-        promptText.setVisible(false);
-      }
-    });
+    this.shopPromptText.setOrigin(0.5);
+    this.shopPromptText.setDepth(100);
+    this.shopPromptText.setVisible(false);
   }
   
   private createEndDoor(x: number, y: number, width: number, height: number): void {
@@ -1142,8 +1152,6 @@ export class GameScene extends Phaser.Scene {
     });
   }
   
-  private greenwayDoorZone: Phaser.GameObjects.Zone | null = null;
-  
   private createGreenwayDoor(x: number, y: number, width: number, height: number): void {
     // Heavy stone door with green/moss glow
     const doorX = x + width / 2;
@@ -1178,33 +1186,20 @@ export class GameScene extends Phaser.Scene {
       vine.setDepth(8);
     }
     
-    // Prompt text
-    const promptText = this.add.text(doorX, doorY + 60, '[ENTER]', {
+    // Prompt text - store reference for update loop
+    this.greenwayPromptText = this.add.text(doorX, doorY + 60, '[ENTER]', {
       fontSize: '14px',
       color: '#55dd88',
       backgroundColor: '#00000088',
       padding: { x: 8, y: 4 }
     });
-    promptText.setOrigin(0.5);
-    promptText.setDepth(100);
-    promptText.setVisible(false);
+    this.greenwayPromptText.setOrigin(0.5);
+    this.greenwayPromptText.setDepth(100);
+    this.greenwayPromptText.setVisible(false);
     
     // Interaction zone
     this.greenwayDoorZone = this.add.zone(doorX, doorY, width + 40, height + 40);
     this.physics.add.existing(this.greenwayDoorZone, true);
-    
-    this.physics.add.overlap(this.player, this.greenwayDoorZone, () => {
-      promptText.setVisible(true);
-      if (inputManager.justPressed('interact')) {
-        this.emitUIEvent('showGreenwayDialog', null);
-      }
-    });
-    
-    this.events.on('update', () => {
-      if (this.greenwayDoorZone && !this.physics.overlap(this.player, this.greenwayDoorZone)) {
-        promptText.setVisible(false);
-      }
-    });
   }
   
   // Greenway environment visuals
