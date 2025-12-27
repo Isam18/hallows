@@ -13,6 +13,7 @@ import { HuskGuard } from '../entities/HuskGuard';
 import { InfectedHusk } from '../entities/InfectedHusk';
 import { Mosskin } from '../entities/Mosskin';
 import { MossCreep } from '../entities/MossCreep';
+import { MossWarrior } from '../entities/MossWarrior';
 import { Boss } from '../entities/Boss';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
@@ -348,6 +349,10 @@ export class GameScene extends Phaser.Scene {
           const surface = (e as any).surface || 'floor';
           const mossCreep = new MossCreep(this, e.x, e.y, config, surface);
           this.enemies.add(mossCreep);
+        } else if (e.type === 'mossWarrior') {
+          // Elite Moss Warrior - dual-state enemy
+          const mossWarrior = new MossWarrior(this, e.x, e.y, config);
+          this.enemies.add(mossWarrior);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || (config as any).isFlying) {
@@ -356,7 +361,11 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'aspid') {
           // Force Aspid if explicitly specified
           this.flyingSpawner!.spawnAt(e.x, e.y, 'aspid');
-        } else if (e.type === 'huskGuard' || (config as any).isElite) {
+        } else if (e.type === 'huskGuard') {
+          const huskGuard = new HuskGuard(this, e.x, e.y, config);
+          this.enemies.add(huskGuard);
+        } else if ((config as any).isElite && e.type !== 'mossWarrior') {
+          // Other elite enemies use HuskGuard behavior
           const huskGuard = new HuskGuard(this, e.x, e.y, config);
           this.enemies.add(huskGuard);
         } else if (e.type === 'infectedHusk' || (config as any).isPassive) {
@@ -514,6 +523,12 @@ export class GameScene extends Phaser.Scene {
     // Update player
     if (gameState.getState() === 'playing' || gameState.getState() === 'boss') {
       this.player.update(time, delta);
+      
+      // Track last safe position for acid pool respawn
+      if (this.player.isOnGround()) {
+        this.lastSafeX = this.player.x;
+        this.lastSafeY = this.player.y;
+      }
       
       // Update camera look-ahead based on player facing
       this.updateCameraLookAhead();

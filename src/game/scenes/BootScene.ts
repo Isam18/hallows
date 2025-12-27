@@ -47,6 +47,9 @@ export class BootScene extends Phaser.Scene {
     // Create MossCreep - bushy green mound with glowing orange eyes
     this.createMossCreepSprite();
     this.createMossCreepHurtSprite();
+    
+    // Create MossWarrior - elite enemy with bush and warrior forms
+    this.createMossWarriorSprites();
   }
   
   private createMosskinSprite(): void {
@@ -233,6 +236,189 @@ export class BootScene extends Phaser.Scene {
     g.fillEllipse(cx + 6, cy + 6, 5, 4);
     
     g.generateTexture('mossCreep_hurt', 64, 40);
+    g.destroy();
+  }
+  
+  private createMossWarriorSprites(): void {
+    // Bush form (camouflaged state)
+    this.createMossWarriorBushSprite();
+    
+    // Warrior form (combat state)
+    this.createMossWarriorSprite();
+    this.createMossWarriorHurtSprite();
+  }
+  
+  private createMossWarriorBushSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 30;
+    const cy = 20;
+    
+    // Large leafy bush - looks like static environment
+    // Base shadow
+    g.fillStyle(0x0a0c0a, 0.4);
+    g.fillEllipse(cx, cy + 18, 60, 10);
+    
+    // Main bush body - dark green layers
+    g.fillStyle(0x1a3a1c);
+    g.fillEllipse(cx, cy + 8, 58, 32);
+    
+    // Leafy texture layers
+    g.fillStyle(0x2a4a2c);
+    g.fillEllipse(cx - 18, cy + 2, 18, 16);
+    g.fillEllipse(cx + 18, cy + 4, 17, 15);
+    g.fillEllipse(cx, cy - 4, 22, 18);
+    
+    g.fillStyle(0x3a5a3c);
+    g.fillEllipse(cx - 12, cy - 6, 14, 12);
+    g.fillEllipse(cx + 10, cy - 8, 16, 13);
+    g.fillEllipse(cx - 22, cy + 6, 12, 10);
+    g.fillEllipse(cx + 22, cy + 4, 13, 11);
+    
+    // Top foliage bumps
+    g.fillStyle(0x4a6a4c);
+    g.fillEllipse(cx - 8, cy - 10, 12, 10);
+    g.fillEllipse(cx + 6, cy - 12, 14, 11);
+    g.fillEllipse(cx - 16, cy - 2, 10, 9);
+    g.fillEllipse(cx + 16, cy - 4, 11, 9);
+    
+    // Hidden eye slits (barely visible when looking closely)
+    g.fillStyle(0x0a1a0c);
+    g.fillEllipse(cx - 6, cy + 10, 5, 2);
+    g.fillEllipse(cx + 6, cy + 10, 5, 2);
+    
+    // Tiny eye gleam (hint that it's alive)
+    g.fillStyle(0xffcc00, 0.2);
+    g.fillCircle(cx - 5, cy + 10, 1.5);
+    g.fillCircle(cx + 5, cy + 10, 1.5);
+    
+    g.generateTexture('mossWarrior_bush', 60, 40);
+    g.destroy();
+  }
+  
+  private createMossWarriorSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 32;
+    const cy = 45;
+    
+    // Tall warrior form - inspired by Moss Knight
+    // Body - tall leafy humanoid
+    g.fillStyle(0x2a4a2c);
+    g.fillRoundedRect(cx - 18, cy - 35, 36, 65, 4);
+    
+    // Shoulder pads / leafy armor
+    g.fillStyle(0x3a5a3c);
+    g.fillEllipse(cx - 20, cy - 25, 16, 12);
+    g.fillEllipse(cx + 20, cy - 25, 16, 12);
+    
+    // Chest armor plates
+    g.fillStyle(0x4a6a4c);
+    g.fillRoundedRect(cx - 14, cy - 30, 28, 20, 3);
+    
+    // Head - beetle-like with moss
+    g.fillStyle(0x3a5a3c);
+    g.fillEllipse(cx, cy - 40, 26, 22);
+    
+    // Mossy head details
+    g.fillStyle(0x5a7a5c);
+    g.fillEllipse(cx - 8, cy - 46, 10, 8);
+    g.fillEllipse(cx + 8, cy - 46, 10, 8);
+    g.fillEllipse(cx, cy - 48, 12, 10);
+    
+    // Antennae
+    g.fillStyle(0x2a3a2c);
+    g.fillTriangle(cx - 8, cy - 50, cx - 12, cy - 64, cx - 4, cy - 52);
+    g.fillTriangle(cx + 8, cy - 50, cx + 12, cy - 64, cx + 4, cy - 52);
+    
+    // Face mask - dark
+    g.fillStyle(0x1a2a1c);
+    g.fillEllipse(cx, cy - 38, 18, 14);
+    
+    // Eyes - glowing
+    g.fillStyle(0xffcc00, 0.6);
+    g.fillEllipse(cx - 5, cy - 38, 7, 5);
+    g.fillEllipse(cx + 5, cy - 38, 7, 5);
+    
+    g.fillStyle(0xffdd22);
+    g.fillEllipse(cx - 5, cy - 38, 5, 4);
+    g.fillEllipse(cx + 5, cy - 38, 5, 4);
+    
+    // Eye shine
+    g.fillStyle(0xffffcc);
+    g.fillCircle(cx - 6, cy - 39, 1.5);
+    g.fillCircle(cx + 4, cy - 39, 1.5);
+    
+    // Shield (left side) - large wooden with moss
+    g.fillStyle(0x5a4a3a);
+    g.fillRoundedRect(cx - 36, cy - 30, 18, 45, 3);
+    
+    // Shield moss patches
+    g.fillStyle(0x4a6a4c);
+    g.fillEllipse(cx - 28, cy - 20, 12, 8);
+    g.fillEllipse(cx - 30, cy, 10, 10);
+    g.fillEllipse(cx - 26, cy + 10, 8, 8);
+    
+    // Shield edge
+    g.lineStyle(2, 0x3a3a2a);
+    g.strokeRoundedRect(cx - 36, cy - 30, 18, 45, 3);
+    
+    // Sword arm (right side) - leaf blade
+    g.fillStyle(0x4a6a4c);
+    g.fillRoundedRect(cx + 18, cy - 20, 6, 40, 2);
+    
+    // Sword blade
+    g.fillStyle(0x6a8a6c);
+    g.beginPath();
+    g.moveTo(cx + 24, cy - 15);
+    g.lineTo(cx + 28, cy - 35);
+    g.lineTo(cx + 34, cy - 38);
+    g.lineTo(cx + 30, cy - 15);
+    g.closePath();
+    g.fillPath();
+    
+    // Blade edge highlight
+    g.lineStyle(1, 0x8aaa8c);
+    g.lineBetween(cx + 28, cy - 35, cx + 34, cy - 38);
+    
+    // Legs
+    g.fillStyle(0x2a3a2c);
+    g.fillRoundedRect(cx - 14, cy + 22, 10, 20, 2);
+    g.fillRoundedRect(cx + 4, cy + 22, 10, 20, 2);
+    
+    // Feet
+    g.fillStyle(0x3a4a3c);
+    g.fillEllipse(cx - 9, cy + 40, 12, 6);
+    g.fillEllipse(cx + 9, cy + 40, 12, 6);
+    
+    g.generateTexture('mossWarrior', 68, 90);
+    g.destroy();
+  }
+  
+  private createMossWarriorHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 32;
+    const cy = 45;
+    
+    // White flash version of warrior
+    g.fillStyle(0xffffff);
+    g.fillRoundedRect(cx - 18, cy - 35, 36, 65, 4);
+    
+    // Shoulder shapes
+    g.fillStyle(0xeeffee);
+    g.fillEllipse(cx - 20, cy - 25, 16, 12);
+    g.fillEllipse(cx + 20, cy - 25, 16, 12);
+    
+    // Head
+    g.fillEllipse(cx, cy - 40, 26, 22);
+    
+    // Shield
+    g.fillStyle(0xddddcc);
+    g.fillRoundedRect(cx - 36, cy - 30, 18, 45, 3);
+    
+    // Sword
+    g.fillStyle(0xeeffee);
+    g.fillRoundedRect(cx + 18, cy - 20, 6, 40, 2);
+    
+    g.generateTexture('mossWarrior_hurt', 68, 90);
     g.destroy();
   }
 
