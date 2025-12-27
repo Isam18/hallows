@@ -702,96 +702,173 @@ export class BootScene extends Phaser.Scene {
   }
 
   private createBasicHuskSprites(): void {
-    // Create two visual variants (Skin A and Skin B) for variety
-    this.createBasicHuskVariant('A', 0x5a6a78, 0x4a5a68); // Blue-gray
-    this.createBasicHuskVariant('B', 0x6a5a58, 0x5a4a48); // Brown-gray
+    // Create two visual variants (Skin A and Skin B) inspired by Hollow Knight husks
+    // Variant A: More rounded/bug-like (like the crawlid reference)
+    // Variant B: Taller/humanoid (like the standing husk reference)
+    this.createBasicHuskVariantA();
+    this.createBasicHuskVariantB();
   }
 
-  private createBasicHuskVariant(variant: string, primaryColor: number, secondaryColor: number): void {
+  private createBasicHuskVariantA(): void {
+    // Variant A: Round segmented bug-like husk (inspired by crawlid image)
     const g = this.make.graphics({ x: 0, y: 0 });
-    const cx = 20; // Center X
-    const cy = 24; // Center Y
+    const cx = 22;
+    const cy = 22;
     
-    // === BODY (humanoid husk shape) ===
-    // Main torso - hunched posture
-    g.fillStyle(primaryColor);
-    g.fillEllipse(cx, cy + 4, 28, 32);
+    // === SEGMENTED BODY (round, bug-like) ===
+    // Back segments - dark blue-gray
+    g.fillStyle(0x5a6878);
+    g.fillEllipse(cx + 6, cy + 8, 20, 18);
+    g.fillStyle(0x4a5868);
+    g.fillEllipse(cx + 2, cy + 6, 22, 20);
+    g.fillStyle(0x5a6878);
+    g.fillEllipse(cx - 4, cy + 4, 18, 18);
     
-    // Chest/shoulder area
-    g.fillStyle(secondaryColor);
-    g.fillEllipse(cx, cy - 4, 32, 20);
+    // Main body - rounded segments
+    g.fillStyle(0x6a7888);
+    g.fillEllipse(cx, cy + 4, 26, 22);
     
-    // === HEAD (skull-like) ===
-    g.fillStyle(0xd8d0c8);
-    g.fillEllipse(cx, cy - 14, 18, 16);
+    // Segment lines (horizontal stripes like the reference)
+    g.lineStyle(1.5, 0x4a5868);
+    g.beginPath();
+    g.arc(cx, cy + 4, 10, Math.PI * 0.15, Math.PI * 0.85);
+    g.strokePath();
+    g.beginPath();
+    g.arc(cx + 2, cy + 6, 8, Math.PI * 0.2, Math.PI * 0.8);
+    g.strokePath();
+    g.beginPath();
+    g.arc(cx + 4, cy + 8, 6, Math.PI * 0.25, Math.PI * 0.75);
+    g.strokePath();
     
-    // Face details - hollow eyes
+    // === HEAD/MASK (pale, round with hollow eyes) ===
+    g.fillStyle(0xe8e0d8); // Pale cream/white mask
+    g.fillEllipse(cx - 8, cy, 14, 14);
+    
+    // Eye sockets - large, hollow, dark
     g.fillStyle(0x1a1a20);
-    g.fillEllipse(cx - 4, cy - 15, 4, 5);
-    g.fillEllipse(cx + 4, cy - 15, 4, 5);
+    g.fillEllipse(cx - 10, cy - 2, 5, 6);
+    g.fillEllipse(cx - 5, cy - 1, 4, 5);
     
-    // Mouth/jaw
-    g.fillStyle(0x0a0a10);
-    g.fillEllipse(cx, cy - 10, 8, 4);
-    
-    // === ARMS (dangling, claw-like) ===
-    g.fillStyle(primaryColor);
-    // Left arm
+    // Small snout/nose protrusion
+    g.fillStyle(0xd8d0c8);
     g.beginPath();
-    g.moveTo(cx - 14, cy);
-    g.lineTo(cx - 20, cy + 16);
-    g.lineTo(cx - 16, cy + 18);
-    g.lineTo(cx - 12, cy + 4);
-    g.closePath();
-    g.fillPath();
-    // Right arm
-    g.beginPath();
-    g.moveTo(cx + 14, cy);
-    g.lineTo(cx + 20, cy + 16);
-    g.lineTo(cx + 16, cy + 18);
-    g.lineTo(cx + 12, cy + 4);
+    g.moveTo(cx - 14, cy + 2);
+    g.lineTo(cx - 18, cy + 4);
+    g.lineTo(cx - 14, cy + 6);
     g.closePath();
     g.fillPath();
     
-    // Claws
-    g.fillStyle(0xc0b8b0);
-    g.fillTriangle(cx - 20, cy + 16, cx - 24, cy + 22, cx - 18, cy + 20);
-    g.fillTriangle(cx + 20, cy + 16, cx + 24, cy + 22, cx + 18, cy + 20);
+    // === TINY LEGS (stubby, dark) ===
+    g.fillStyle(0x2a3040);
+    // Front legs
+    g.fillEllipse(cx - 6, cy + 14, 4, 6);
+    g.fillEllipse(cx + 2, cy + 15, 4, 5);
+    // Back legs
+    g.fillEllipse(cx + 8, cy + 14, 4, 6);
     
-    // === LEGS (stubby) ===
-    g.fillStyle(secondaryColor);
-    g.fillEllipse(cx - 6, cy + 18, 10, 12);
-    g.fillEllipse(cx + 6, cy + 18, 10, 12);
-    
-    // Feet
-    g.fillStyle(0x3a3a40);
-    g.fillEllipse(cx - 8, cy + 24, 12, 6);
-    g.fillEllipse(cx + 8, cy + 24, 12, 6);
-    
-    // === DETAILS ===
-    // Body segments/cracks
-    g.lineStyle(1, 0x3a4a58);
-    g.lineBetween(cx - 8, cy - 2, cx - 10, cy + 10);
-    g.lineBetween(cx + 8, cy - 2, cx + 10, cy + 10);
-    g.lineBetween(cx, cy + 2, cx, cy + 14);
-    
-    // Outline
+    // === OUTLINES ===
     g.lineStyle(1.5, 0x2a3a48);
-    g.strokeEllipse(cx, cy + 4, 28, 32);
-    g.strokeEllipse(cx, cy - 14, 18, 16);
+    g.strokeEllipse(cx, cy + 4, 26, 22);
+    g.lineStyle(1, 0x3a3a40);
+    g.strokeEllipse(cx - 8, cy, 14, 14);
     
-    g.generateTexture(`basicHusk${variant}`, 48, 52);
+    g.generateTexture('basicHuskA', 44, 44);
     g.destroy();
     
-    // Hurt frame (white flash)
+    // Hurt frame
     const hg = this.make.graphics({ x: 0, y: 0 });
     hg.fillStyle(0xffffff);
-    hg.fillEllipse(cx, cy + 4, 28, 32);
-    hg.fillEllipse(cx, cy - 4, 32, 20);
-    hg.fillEllipse(cx, cy - 14, 18, 16);
-    hg.fillEllipse(cx - 6, cy + 18, 10, 12);
-    hg.fillEllipse(cx + 6, cy + 18, 10, 12);
-    hg.generateTexture(`basicHusk${variant}_hurt`, 48, 52);
+    hg.fillEllipse(cx, cy + 4, 26, 22);
+    hg.fillEllipse(cx - 8, cy, 14, 14);
+    hg.generateTexture('basicHuskA_hurt', 44, 44);
+    hg.destroy();
+  }
+
+  private createBasicHuskVariantB(): void {
+    // Variant B: Tall standing husk (inspired by standing husk image)
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 18;
+    const cy = 26;
+    
+    // === LONG THIN LEGS (dark, spindly) ===
+    g.lineStyle(3, 0x2a2a35);
+    // Left leg
+    g.lineBetween(cx - 6, cy + 10, cx - 10, cy + 24);
+    g.lineBetween(cx - 10, cy + 24, cx - 8, cy + 28);
+    // Right leg
+    g.lineBetween(cx + 6, cy + 10, cx + 10, cy + 24);
+    g.lineBetween(cx + 10, cy + 24, cx + 8, cy + 28);
+    
+    // Feet (small triangles)
+    g.fillStyle(0x2a2a35);
+    g.fillTriangle(cx - 12, cy + 28, cx - 4, cy + 28, cx - 8, cy + 26);
+    g.fillTriangle(cx + 12, cy + 28, cx + 4, cy + 28, cx + 8, cy + 26);
+    
+    // === SEGMENTED BODY (oval, striped) ===
+    // Main body - blue-gray
+    g.fillStyle(0x6a7080);
+    g.fillEllipse(cx, cy + 4, 22, 26);
+    
+    // Segment stripes (horizontal lines)
+    g.lineStyle(1.5, 0x4a5060);
+    g.lineBetween(cx - 8, cy - 4, cx + 8, cy - 4);
+    g.lineBetween(cx - 10, cy, cx + 10, cy);
+    g.lineBetween(cx - 10, cy + 4, cx + 10, cy + 4);
+    g.lineBetween(cx - 9, cy + 8, cx + 9, cy + 8);
+    g.lineBetween(cx - 7, cy + 12, cx + 7, cy + 12);
+    
+    // Body highlight
+    g.fillStyle(0x7a8090, 0.5);
+    g.fillEllipse(cx - 3, cy, 8, 12);
+    
+    // === HEAD/MASK (pale, angular like the reference) ===
+    // Mask shape - more angular/pointed
+    g.fillStyle(0xe8e0d8);
+    g.beginPath();
+    g.moveTo(cx, cy - 22); // Top point
+    g.lineTo(cx - 10, cy - 10);
+    g.lineTo(cx - 8, cy - 4);
+    g.lineTo(cx + 8, cy - 4);
+    g.lineTo(cx + 10, cy - 10);
+    g.closePath();
+    g.fillPath();
+    
+    // Eye sockets - large hollow dark eyes
+    g.fillStyle(0x1a1a20);
+    g.fillEllipse(cx - 4, cy - 12, 5, 6);
+    g.fillEllipse(cx + 4, cy - 12, 5, 6);
+    
+    // Mask outline
+    g.lineStyle(1, 0x3a3a40);
+    g.beginPath();
+    g.moveTo(cx, cy - 22);
+    g.lineTo(cx - 10, cy - 10);
+    g.lineTo(cx - 8, cy - 4);
+    g.lineTo(cx + 8, cy - 4);
+    g.lineTo(cx + 10, cy - 10);
+    g.closePath();
+    g.strokePath();
+    
+    // === BODY OUTLINE ===
+    g.lineStyle(1.5, 0x3a4050);
+    g.strokeEllipse(cx, cy + 4, 22, 26);
+    
+    g.generateTexture('basicHuskB', 40, 56);
+    g.destroy();
+    
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillEllipse(cx, cy + 4, 22, 26);
+    hg.beginPath();
+    hg.moveTo(cx, cy - 22);
+    hg.lineTo(cx - 10, cy - 10);
+    hg.lineTo(cx - 8, cy - 4);
+    hg.lineTo(cx + 8, cy - 4);
+    hg.lineTo(cx + 10, cy - 10);
+    hg.closePath();
+    hg.fillPath();
+    hg.generateTexture('basicHuskB_hurt', 40, 56);
     hg.destroy();
   }
 
