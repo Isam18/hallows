@@ -33,7 +33,7 @@ export class BasicHusk extends Phaser.Physics.Arcade.Sprite {
   
   // Charge settings (1.8x player speed = ~270)
   private readonly CHARGE_SPEED = 270;
-  private readonly WINDUP_DURATION = 500; // 0.5 seconds
+  private readonly WINDUP_DURATION = 3000; // 3 seconds windup
   private readonly PAUSE_DURATION = 400; // Brief pause after miss
   
   // Visual variant (skin A or B)
