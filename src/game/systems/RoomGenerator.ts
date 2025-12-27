@@ -328,52 +328,106 @@ function generateInfectedCuldesac(roomIndex: number, xOffset: number): RoomData 
   };
 }
 
+// Boss Arena dimensions - larger than regular rooms
+const BOSS_ARENA_WIDTH = 1200;
+const BOSS_ARENA_HEIGHT = 700;
+
 /**
- * Generate the Boss Room (FIXED - no randomization)
+ * Generate the False Champion Boss Arena (FIXED - no randomization)
+ * Features: Wide horizontal room, high ceiling, lock-in gates, background pillars
  */
 function generateBossRoom(roomIndex: number, xOffset: number): RoomData {
   const platforms: PlatformConfig[] = [];
   
-  // Large arena floor
+  // Large arena floor - wide horizontal room
   platforms.push({
-    x: xOffset, y: ROOM_HEIGHT - 50, width: ROOM_WIDTH, height: 50, type: 'ground'
+    x: xOffset, y: BOSS_ARENA_HEIGHT - 60, width: BOSS_ARENA_WIDTH, height: 60, type: 'ground'
   });
   
-  // Walls
-  platforms.push(
-    { x: xOffset, y: 0, width: 25, height: ROOM_HEIGHT - 50, type: 'wall' },
-    { x: xOffset + ROOM_WIDTH - 25, y: 0, width: 25, height: ROOM_HEIGHT - 50, type: 'wall' }
-  );
-  
-  // Ceiling
+  // High ceiling
   platforms.push({
-    x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall'
+    x: xOffset, y: 0, width: BOSS_ARENA_WIDTH, height: 30, type: 'wall'
   });
   
-  // Fixed combat platforms for consistent boss fight
+  // Side walls with gate slots
+  // Left wall (with gate position marked)
   platforms.push(
-    { x: xOffset + 150, y: ROOM_HEIGHT - 180, width: 120, height: 20, type: 'platform' },
-    { x: xOffset + 530, y: ROOM_HEIGHT - 180, width: 120, height: 20, type: 'platform' },
-    { x: xOffset + 340, y: ROOM_HEIGHT - 280, width: 120, height: 20, type: 'platform' }
+    { x: xOffset, y: 0, width: 30, height: 200, type: 'wall' },
+    { x: xOffset, y: 350, width: 30, height: BOSS_ARENA_HEIGHT - 410, type: 'wall' }
   );
+  
+  // Right wall (with gate position marked)
+  platforms.push(
+    { x: xOffset + BOSS_ARENA_WIDTH - 30, y: 0, width: 30, height: 200, type: 'wall' },
+    { x: xOffset + BOSS_ARENA_WIDTH - 30, y: 350, width: 30, height: BOSS_ARENA_HEIGHT - 410, type: 'wall' }
+  );
+  
+  // Combat platforms - spread across wide arena
+  platforms.push(
+    // Lower side platforms for escape
+    { x: xOffset + 80, y: BOSS_ARENA_HEIGHT - 180, width: 150, height: 25, type: 'platform' },
+    { x: xOffset + BOSS_ARENA_WIDTH - 230, y: BOSS_ARENA_HEIGHT - 180, width: 150, height: 25, type: 'platform' },
+    
+    // Mid-height platforms
+    { x: xOffset + 250, y: BOSS_ARENA_HEIGHT - 300, width: 130, height: 25, type: 'platform' },
+    { x: xOffset + BOSS_ARENA_WIDTH - 380, y: BOSS_ARENA_HEIGHT - 300, width: 130, height: 25, type: 'platform' },
+    
+    // High center platform
+    { x: xOffset + (BOSS_ARENA_WIDTH / 2) - 75, y: BOSS_ARENA_HEIGHT - 420, width: 150, height: 25, type: 'platform' }
+  );
+  
+  // Background pillars (decorative markers in triggers)
+  const pillarTriggers: TriggerConfig[] = [];
+  const pillarPositions = [150, 350, 550, 750, 950, 1050];
+  pillarPositions.forEach((px, i) => {
+    pillarTriggers.push({
+      id: `pillar_${i}`,
+      type: 'decoration',
+      x: xOffset + px,
+      y: 100,
+      width: 40,
+      height: BOSS_ARENA_HEIGHT - 160
+    });
+  });
   
   return {
     platforms,
-    enemies: [], // Boss spawned separately
+    enemies: [], // Boss spawned separately via enterBossArena
     pickups: [],
     triggers: [
+      // Boss trigger zone - center of arena
       {
         id: 'bossGate',
         type: 'bossGate',
-        x: xOffset + 350,
-        y: ROOM_HEIGHT - 100,
+        x: xOffset + (BOSS_ARENA_WIDTH / 2) - 50,
+        y: BOSS_ARENA_HEIGHT - 150,
         width: 100,
-        height: 50
-      }
+        height: 100
+      },
+      // Left gate (slams down)
+      {
+        id: 'leftGate',
+        type: 'gate',
+        x: xOffset + 30,
+        y: 200,
+        width: 30,
+        height: 150
+      },
+      // Right gate (slams down)
+      {
+        id: 'rightGate',
+        type: 'gate',
+        x: xOffset + BOSS_ARENA_WIDTH - 60,
+        y: 200,
+        width: 30,
+        height: 150
+      },
+      ...pillarTriggers
     ],
     spawns: {
-      [`room${roomIndex}_entry`]: { x: xOffset + 100, y: ROOM_HEIGHT - 100 },
-      bossSpawn: { x: xOffset + 600, y: ROOM_HEIGHT - 150 }
+      [`room${roomIndex}_entry`]: { x: xOffset + 100, y: BOSS_ARENA_HEIGHT - 120 },
+      bossSpawn: { x: xOffset + BOSS_ARENA_WIDTH - 200, y: BOSS_ARENA_HEIGHT - 180 },
+      arenaCenter: { x: xOffset + BOSS_ARENA_WIDTH / 2, y: BOSS_ARENA_HEIGHT - 120 }
     }
   };
 }
@@ -458,7 +512,8 @@ export function generateForgottenCrossroads(): LevelConfig {
   // Add fixed boss room at the end
   const bossRoom = generateBossRoom(10, totalWidth);
   rooms.push(bossRoom);
-  totalWidth += ROOM_WIDTH;
+  const bossRoomStartX = totalWidth;
+  totalWidth += BOSS_ARENA_WIDTH;
   
   // Combine all room data
   const allPlatforms: PlatformConfig[] = [];
@@ -499,7 +554,7 @@ export function generateForgottenCrossroads(): LevelConfig {
     id: 'forgottenCrossroads',
     name: 'Forgotten Crossroads',
     width: totalWidth,
-    height: ROOM_HEIGHT,
+    height: BOSS_ARENA_HEIGHT, // Use taller boss arena height for whole level
     backgroundColor: '#0a0e18',
     spawnPoint: { x: 100, y: ROOM_HEIGHT - 100 },
     platforms: allPlatforms,
@@ -511,13 +566,13 @@ export function generateForgottenCrossroads(): LevelConfig {
       ...allSpawns
     },
     bossArena: {
-      x: 10 * ROOM_WIDTH,
+      x: bossRoomStartX,
       y: 0,
-      width: ROOM_WIDTH,
-      height: ROOM_HEIGHT,
-      bossSpawn: { x: 10 * ROOM_WIDTH + 600, y: ROOM_HEIGHT - 150 }
+      width: BOSS_ARENA_WIDTH,
+      height: BOSS_ARENA_HEIGHT,
+      bossSpawn: { x: bossRoomStartX + BOSS_ARENA_WIDTH - 200, y: BOSS_ARENA_HEIGHT - 180 }
     }
   };
 }
 
-export { ROOM_WIDTH, ROOM_HEIGHT };
+export { ROOM_WIDTH, ROOM_HEIGHT, BOSS_ARENA_WIDTH, BOSS_ARENA_HEIGHT };

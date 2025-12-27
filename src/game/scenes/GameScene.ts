@@ -392,8 +392,18 @@ export class GameScene extends Phaser.Scene {
       }
     });
     
+    // Check boss hitbox (use getHitRect)
     if (this.boss && !this.boss.isDying()) {
-      if (Phaser.Geom.Rectangle.Overlaps(hitbox, this.boss.getBounds())) {
+      // Check head hitbox first (when staggered and exposed)
+      const headBounds = this.boss.getHeadBounds();
+      if (headBounds && Phaser.Geom.Rectangle.Overlaps(hitbox, headBounds)) {
+        this.boss.takeDamage(damage, this.player.x);
+        hitSomething = true;
+        this.emitUIEvent('bossHpChange', { 
+          hp: this.boss.getHp(), 
+          maxHp: this.boss.getMaxHp() 
+        });
+      } else if (Phaser.Geom.Rectangle.Overlaps(hitbox, this.boss.getHitRect())) {
         this.boss.takeDamage(damage, this.player.x);
         hitSomething = true;
         this.emitUIEvent('bossHpChange', { 
@@ -551,6 +561,9 @@ export class GameScene extends Phaser.Scene {
       () => this.handlePlayerBossContact()
     );
     
+    // Create and close gates
+    this.createBossGates(arena.x, arena.y, arena.width, arena.height);
+    
     // Close gate
     this.bossGateClosed = true;
     
@@ -558,6 +571,40 @@ export class GameScene extends Phaser.Scene {
     this.emitUIEvent('bossStart', {
       name: this.boss.getName(),
       maxHp: this.boss.getMaxHp(),
+    });
+  }
+  
+  private bossLeftGate: Phaser.GameObjects.Rectangle | null = null;
+  private bossRightGate: Phaser.GameObjects.Rectangle | null = null;
+  
+  private createBossGates(arenaX: number, arenaY: number, arenaWidth: number, arenaHeight: number): void {
+    // Create gate visuals that slam down
+    const gateColor = 0x444455;
+    const gateHeight = 200;
+    
+    // Left gate
+    this.bossLeftGate = this.add.rectangle(arenaX + 30, arenaY - gateHeight, 30, gateHeight, gateColor);
+    this.physics.add.existing(this.bossLeftGate, true);
+    this.walls.add(this.bossLeftGate);
+    
+    // Right gate
+    this.bossRightGate = this.add.rectangle(arenaX + arenaWidth - 30, arenaY - gateHeight, 30, gateHeight, gateColor);
+    this.physics.add.existing(this.bossRightGate, true);
+    this.walls.add(this.bossRightGate);
+    
+    // Animate gates slamming down
+    this.tweens.add({
+      targets: [this.bossLeftGate, this.bossRightGate],
+      y: arenaY + gateHeight / 2,
+      duration: 500,
+      ease: 'Bounce.easeOut',
+      onComplete: () => {
+        this.cameras.main.shake(200, 0.02);
+        // Pass gates to boss for opening later
+        if (this.boss && this.bossLeftGate && this.bossRightGate) {
+          this.boss.lockGates(this.bossLeftGate, this.bossRightGate);
+        }
+      }
     });
   }
 
