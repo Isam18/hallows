@@ -23,8 +23,8 @@ export class FlyingEnemySpawner {
   private enemyGroup: Phaser.Physics.Arcade.Group;
   
   // Spawn weights
-  private static readonly VENGEFLY_CHANCE = 0.75;
-  private static readonly ASPID_CHANCE = 0.25;
+  private static readonly VENGEFLY_CHANCE = 0.40;
+  private static readonly ASPID_CHANCE = 0.60;
 
   constructor(scene: Phaser.Scene, enemyGroup: Phaser.Physics.Arcade.Group) {
     this.scene = scene;
