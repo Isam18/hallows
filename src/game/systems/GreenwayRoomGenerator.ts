@@ -105,8 +105,8 @@ function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayR
     { x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 80, width: 80, height: 20, type: 'platform' }
   );
   
-  // Scattered small platforms for jumping
-  const platformCount = randomInt(6, 9);
+  // Scattered platforms for jumping - tighter spacing for manageable parkour
+  const platformCount = randomInt(8, 11);
   const usedPositions: Array<{ x: number; y: number }> = [];
   
   for (let i = 0; i < platformCount; i++) {
@@ -114,17 +114,17 @@ function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayR
     let attempts = 0;
     
     do {
-      px = xOffset + 120 + randomInt(0, ROOM_WIDTH - 280);
-      py = ROOM_HEIGHT - 120 - randomInt(0, 350);
+      px = xOffset + 100 + randomInt(0, ROOM_WIDTH - 240);
+      py = ROOM_HEIGHT - 100 - randomInt(0, 300);
       attempts++;
     } while (
-      usedPositions.some(p => Math.abs(p.x - px) < 100 && Math.abs(p.y - py) < 80) &&
+      usedPositions.some(p => Math.abs(p.x - px) < 70 && Math.abs(p.y - py) < 50) &&
       attempts < 20
     );
     
     usedPositions.push({ x: px, y: py });
     
-    const width = randomInt(50, 90);
+    const width = randomInt(60, 100);
     platforms.push({
       x: px,
       y: py,
