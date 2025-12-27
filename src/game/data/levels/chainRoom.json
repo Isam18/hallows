@@ -1,0 +1,49 @@
+{
+  "id": "chainRoom",
+  "name": "The Chain Room",
+  "width": 800,
+  "height": 900,
+  "backgroundColor": "#0a0810",
+  "spawnPoint": { "x": 100, "y": 800 },
+  "platforms": [
+    { "x": 0, "y": 850, "width": 800, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 800, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 820, "type": "wall" },
+    { "x": 770, "y": 30, "width": 30, "height": 820, "type": "wall" },
+    { "x": 150, "y": 700, "width": 120, "height": 20, "type": "platform" },
+    { "x": 530, "y": 700, "width": 120, "height": 20, "type": "platform" },
+    { "x": 300, "y": 550, "width": 200, "height": 20, "type": "platform" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "giantChain",
+      "type": "chain",
+      "x": 370,
+      "y": 100,
+      "width": 60,
+      "height": 750
+    },
+    {
+      "id": "charmShop",
+      "type": "shop",
+      "x": 580,
+      "y": 780,
+      "width": 80,
+      "height": 70
+    },
+    {
+      "id": "exitDoor",
+      "type": "endDoor",
+      "x": 720,
+      "y": 750,
+      "width": 50,
+      "height": 100
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 800 },
+    "fromBoss": { "x": 100, "y": 800 }
+  }
+}

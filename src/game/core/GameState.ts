@@ -14,6 +14,12 @@ class GameStateManager {
     droppedShells: null,
   };
   
+  // Owned charms (purchased from shop)
+  private ownedCharms: Set<string> = new Set();
+  
+  // Boss defeated flag
+  private bossDefeated = false;
+  
   // Death drop record (more detailed than droppedShells)
   private deathDropRecord: DeathDropRecord | null = null;
   
@@ -222,17 +228,58 @@ class GameStateManager {
     return [...this.playerData.equippedCharms];
   }
   
+  getOwnedCharms(): string[] {
+    return [...this.ownedCharms];
+  }
+  
+  ownsCharm(charmId: string): boolean {
+    return this.ownedCharms.has(charmId);
+  }
+  
   getAvailableCharms(): CharmData[] {
     return charmsData.charms;
+  }
+  
+  getShopCharms(): CharmData[] {
+    const shopCharmIds = (charmsData as any).shopCharms || [];
+    return charmsData.charms.filter(c => shopCharmIds.includes(c.id));
   }
   
   getMaxCharmSlots(): number {
     return charmsData.maxSlots;
   }
   
+  /**
+   * Buy a charm from the shop
+   */
+  buyCharm(charmId: string): boolean {
+    const charm = charmsData.charms.find(c => c.id === charmId);
+    if (!charm) return false;
+    
+    // Check if already owned
+    if (this.ownedCharms.has(charmId)) return false;
+    
+    // Check if player has enough geo
+    const price = (charm as any).price || 0;
+    if (this.playerData.shells < price) return false;
+    
+    // Deduct geo and add to owned
+    this.playerData.shells -= price;
+    this.ownedCharms.add(charmId);
+    
+    this.emit('shellsChange', this.playerData.shells);
+    this.emit('charmPurchased', charmId);
+    
+    return true;
+  }
+  
   equipCharm(charmId: string): boolean {
     const charm = charmsData.charms.find(c => c.id === charmId);
     if (!charm) return false;
+    
+    // Must own the charm to equip it (or it's a free charm with price 0)
+    const price = (charm as any).price || 0;
+    if (price > 0 && !this.ownedCharms.has(charmId)) return false;
     
     const currentSlots = this.getUsedSlots();
     if (currentSlots + charm.slots > charmsData.maxSlots) return false;
@@ -301,6 +348,16 @@ class GameStateManager {
     return modifier;
   }
   
+  // Boss state
+  setBossDefeated(defeated: boolean): void {
+    this.bossDefeated = defeated;
+    this.emit('bossDefeated', defeated);
+  }
+  
+  isBossDefeated(): boolean {
+    return this.bossDefeated;
+  }
+  
   // Reset for new run
   resetRun(): void {
     this.playerData = {
@@ -311,8 +368,10 @@ class GameStateManager {
       lastBench: null,
       droppedShells: null,
     };
-    // Clear death drop record
+    // Clear death drop record and owned charms
     this.deathDropRecord = null;
+    this.ownedCharms.clear();
+    this.bossDefeated = false;
     this.emit('runReset', null);
   }
   

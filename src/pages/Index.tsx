@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { createGame } from '@/game';
 import gameState from '@/game/core/GameState';
 import { GameHUD } from '@/components/game/GameHUD';
@@ -8,6 +8,9 @@ import { BenchScreen } from '@/components/game/BenchScreen';
 import { VictoryScreen } from '@/components/game/VictoryScreen';
 import { DebugOverlay } from '@/components/game/DebugOverlay';
 import { CombatDebugOverlay } from '@/components/game/CombatDebugOverlay';
+import { CharmShop } from '@/components/game/CharmShop';
+import { ClimbingOverlay } from '@/components/game/ClimbingOverlay';
+import { ToBeContinued } from '@/components/game/ToBeContinued';
 
 const Index = () => {
   const gameContainer = useRef<HTMLDivElement>(null);
@@ -15,6 +18,48 @@ const Index = () => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [uiState, setUiState] = useState<string>('menu');
   const [playerData, setPlayerData] = useState(gameState.getPlayerData());
+  
+  // Additional UI states
+  const [showShop, setShowShop] = useState(false);
+  const [showClimbing, setShowClimbing] = useState(false);
+  const [showEnding, setShowEnding] = useState(false);
+
+  // Handle victory continue - transition to chain room
+  const handleVictoryContinue = useCallback(() => {
+    gameState.setBossDefeated(true);
+    gameState.setState('playing');
+    
+    // Get the game scene and transition to chain room
+    const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
+    if (gameScene) {
+      gameScene.transitionToLevel?.('chainRoom', 'fromBoss');
+    }
+  }, []);
+
+  // Handle shop close
+  const handleShopClose = useCallback(() => {
+    setShowShop(false);
+    gameState.setState('playing');
+  }, []);
+
+  // Handle climbing complete
+  const handleClimbingComplete = useCallback(() => {
+    setShowClimbing(false);
+    gameState.setState('playing');
+  }, []);
+
+  // Handle ending - return to shop or main menu
+  const handleEndingStay = useCallback(() => {
+    setShowEnding(false);
+    gameState.setState('playing');
+  }, []);
+
+  const handleEndingMainMenu = useCallback(() => {
+    setShowEnding(false);
+    gameState.resetRun();
+    gameRef.current?.scene.stop('GameScene');
+    gameRef.current?.scene.start('MenuScene');
+  }, []);
 
   useEffect(() => {
     if (gameContainer.current && !gameRef.current) {
@@ -28,10 +73,35 @@ const Index = () => {
       const unsubHp = gameState.on('hpChange', () => setPlayerData(gameState.getPlayerData()));
       const unsubShells = gameState.on('shellsChange', () => setPlayerData(gameState.getPlayerData()));
 
+      // Poll for UI events from game scene
+      const pollInterval = setInterval(() => {
+        const lastEvent = gameRef.current?.registry.get('lastUIEvent');
+        if (lastEvent) {
+          const { event, timestamp } = lastEvent;
+          
+          // Only process recent events (within 100ms)
+          if (Date.now() - timestamp < 100) {
+            if (event === 'openShop') {
+              setShowShop(true);
+              gameState.setState('bench'); // Pause gameplay
+            } else if (event === 'climbChain') {
+              setShowClimbing(true);
+              gameState.setState('bench');
+            } else if (event === 'showEnding') {
+              setShowEnding(true);
+              gameState.setState('bench');
+            }
+            // Clear the event
+            gameRef.current?.registry.set('lastUIEvent', null);
+          }
+        }
+      }, 50);
+
       return () => {
         unsubState();
         unsubHp();
         unsubShells();
+        clearInterval(pollInterval);
         gameRef.current?.destroy(true);
         gameRef.current = null;
       };
@@ -55,10 +125,15 @@ const Index = () => {
           )}
           {uiState === 'paused' && <PauseMenu gameRef={gameRef} />}
           {uiState === 'death' && <DeathScreen gameRef={gameRef} />}
-          {uiState === 'bench' && <BenchScreen gameRef={gameRef} />}
-          {uiState === 'victory' && <VictoryScreen />}
+          {uiState === 'bench' && !showShop && !showClimbing && !showEnding && <BenchScreen gameRef={gameRef} />}
+          {uiState === 'victory' && <VictoryScreen onContinue={handleVictoryContinue} />}
         </div>
       )}
+
+      {/* Special UI Overlays */}
+      {showShop && <CharmShop onClose={handleShopClose} />}
+      {showClimbing && <ClimbingOverlay onComplete={handleClimbingComplete} />}
+      {showEnding && <ToBeContinued onMainMenu={handleEndingMainMenu} onStay={handleEndingStay} />}
     </div>
   );
 };
