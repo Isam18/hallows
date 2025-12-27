@@ -21,11 +21,15 @@
     { "x": 1780, "y": 700, "width": 160, "height": 25, "type": "platform", "mossy": true }
   ],
   "enemies": [
-    { "type": "vengefly", "x": 500, "y": 400 },
-    { "type": "vengefly", "x": 900, "y": 350 },
-    { "type": "aspid", "x": 1200, "y": 400 },
-    { "type": "crawler", "x": 700, "y": 830 },
-    { "type": "crawler", "x": 1400, "y": 830 }
+    { "type": "mosskin", "x": 300, "y": 660 },
+    { "type": "mosskin", "x": 750, "y": 660 },
+    { "type": "mosskin", "x": 1400, "y": 610 },
+    { "type": "mossCreep", "x": 450, "y": 555, "surface": "floor" },
+    { "type": "mossCreep", "x": 950, "y": 595, "surface": "floor" },
+    { "type": "mossCreep", "x": 1150, "y": 475, "surface": "floor" },
+    { "type": "mossCreep", "x": 1600, "y": 525, "surface": "floor" },
+    { "type": "mossCreep", "x": 30, "y": 600, "surface": "wall_left" },
+    { "type": "mossCreep", "x": 1970, "y": 500, "surface": "wall_right" }
   ],
   "pickups": [
     { "type": "shells", "x": 1100, "y": 470, "amount": 25 },
