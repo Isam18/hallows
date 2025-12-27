@@ -25,6 +25,7 @@ import { generateForgottenCrossroads } from '../systems/RoomGenerator';
 // Import level data
 import fadingTownData from '../data/levels/fadingTown.json';
 import ruinedCrossroadsData from '../data/levels/ruinedCrossroads.json';
+import chainRoomData from '../data/levels/chainRoom.json';
 import enemiesData from '../data/enemies.json';
 
 // Generate the Forgotten Crossroads level
@@ -34,6 +35,7 @@ const LEVELS: Record<string, LevelConfig> = {
   fadingTown: fadingTownData as LevelConfig,
   ruinedCrossroads: ruinedCrossroadsData as LevelConfig,
   forgottenCrossroads: forgottenCrossroadsData,
+  chainRoom: chainRoomData as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -281,6 +283,15 @@ export class GameScene extends Phaser.Scene {
           targetSpawn: 'arena',
         });
         this.portals.add(portal);
+      } else if (t.type === 'chain') {
+        // Giant chain - create visual and interaction zone
+        this.createChainVisual(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'shop') {
+        // Charm shop NPC
+        this.createShopNPC(t.x, t.y);
+      } else if (t.type === 'endDoor') {
+        // End game door
+        this.createEndDoor(t.x, t.y, t.width, t.height);
       }
     });
     
@@ -963,5 +974,163 @@ export class GameScene extends Phaser.Scene {
   giveShells(amount: number): void {
     gameState.addShells(amount);
     this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+  }
+  
+  // Chain Room elements
+  private chainZone: Phaser.GameObjects.Zone | null = null;
+  private shopZone: Phaser.GameObjects.Zone | null = null;
+  private endDoorZone: Phaser.GameObjects.Zone | null = null;
+  
+  private createChainVisual(x: number, y: number, width: number, height: number): void {
+    // Create the giant chain visual
+    const chainCenterX = x + width / 2;
+    
+    // Chain background (dark iron)
+    const chainBg = this.add.rectangle(chainCenterX, y + height / 2, width - 10, height, 0x3a3a40);
+    chainBg.setDepth(5);
+    
+    // Chain links
+    const linkCount = Math.floor(height / 30);
+    for (let i = 0; i < linkCount; i++) {
+      const linkY = y + 15 + i * 30;
+      const link = this.add.ellipse(chainCenterX, linkY, width - 20, 25, 0x555560);
+      link.setStrokeStyle(3, 0x666670);
+      link.setDepth(6);
+    }
+    
+    // Chain glow effect
+    const glow = this.add.rectangle(chainCenterX, y + height / 2, width + 20, height + 20, 0x5599dd, 0.1);
+    glow.setDepth(4);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.05, to: 0.15 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1
+    });
+    
+    // Create interaction zone
+    this.chainZone = this.add.zone(chainCenterX, y + height - 100, width + 40, 150);
+    this.physics.add.existing(this.chainZone, true);
+    
+    // Prompt text
+    const promptText = this.add.text(chainCenterX, y + height - 30, '[INTERACT]', {
+      fontSize: '14px',
+      color: '#ffffff',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    });
+    promptText.setOrigin(0.5);
+    promptText.setDepth(100);
+    promptText.setVisible(false);
+    
+    // Check overlap with player
+    this.physics.add.overlap(this.player, this.chainZone, () => {
+      promptText.setVisible(true);
+      if (inputManager.justPressed('interact')) {
+        this.emitUIEvent('climbChain', null);
+      }
+    });
+    
+    // Hide prompt when not overlapping
+    this.events.on('update', () => {
+      if (this.chainZone && !this.physics.overlap(this.player, this.chainZone)) {
+        promptText.setVisible(false);
+      }
+    });
+  }
+  
+  private createShopNPC(x: number, y: number): void {
+    // Create shop NPC visual
+    const npcX = x + 40;
+    const npcY = y + 35;
+    
+    // NPC body
+    const npcBody = this.add.ellipse(npcX, npcY, 40, 50, 0x6a5a50);
+    npcBody.setDepth(10);
+    
+    // NPC head/mask
+    const npcHead = this.add.ellipse(npcX, npcY - 30, 30, 25, 0xe8e0d8);
+    npcHead.setDepth(11);
+    
+    // Eyes
+    this.add.circle(npcX - 6, npcY - 32, 4, 0x1a1a20).setDepth(12);
+    this.add.circle(npcX + 6, npcY - 32, 4, 0x1a1a20).setDepth(12);
+    
+    // Shop sign
+    const signBg = this.add.rectangle(npcX, npcY - 70, 80, 25, 0x2a2a30);
+    signBg.setDepth(10);
+    const signText = this.add.text(npcX, npcY - 70, 'CHARMS', {
+      fontSize: '12px',
+      color: '#d4a84b',
+      fontStyle: 'bold'
+    });
+    signText.setOrigin(0.5);
+    signText.setDepth(11);
+    
+    // Interaction zone
+    this.shopZone = this.add.zone(npcX, npcY, 100, 100);
+    this.physics.add.existing(this.shopZone, true);
+    
+    // Prompt
+    const promptText = this.add.text(npcX, npcY + 50, '[SHOP]', {
+      fontSize: '14px',
+      color: '#d4a84b',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    });
+    promptText.setOrigin(0.5);
+    promptText.setDepth(100);
+    promptText.setVisible(false);
+    
+    this.physics.add.overlap(this.player, this.shopZone, () => {
+      promptText.setVisible(true);
+      if (inputManager.justPressed('interact')) {
+        this.emitUIEvent('openShop', null);
+      }
+    });
+    
+    this.events.on('update', () => {
+      if (this.shopZone && !this.physics.overlap(this.player, this.shopZone)) {
+        promptText.setVisible(false);
+      }
+    });
+  }
+  
+  private createEndDoor(x: number, y: number, width: number, height: number): void {
+    // Heavy stone door visual
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+    
+    // Door frame
+    const frame = this.add.rectangle(doorX, doorY, width + 20, height + 10, 0x2a2a30);
+    frame.setDepth(5);
+    
+    // Door panels
+    const door = this.add.rectangle(doorX, doorY, width, height, 0x4a4a50);
+    door.setDepth(6);
+    
+    // Door details
+    this.add.rectangle(doorX - 8, doorY, 3, height - 20, 0x3a3a40).setDepth(7);
+    this.add.rectangle(doorX + 8, doorY, 3, height - 20, 0x3a3a40).setDepth(7);
+    
+    // Mysterious glow
+    const glow = this.add.rectangle(doorX, doorY, width + 30, height + 20, 0x5599dd, 0.1);
+    glow.setDepth(4);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.05, to: 0.2 },
+      duration: 3000,
+      yoyo: true,
+      repeat: -1
+    });
+    
+    // Interaction zone
+    this.endDoorZone = this.add.zone(doorX, doorY, width + 20, height + 20);
+    this.physics.add.existing(this.endDoorZone, true);
+    
+    this.physics.add.overlap(this.player, this.endDoorZone, () => {
+      this.emitUIEvent('showEnding', null);
+    });
   }
 }

@@ -1,9 +1,43 @@
 {
   "charms": [
     {
+      "id": "waywardCompass",
+      "name": "Wayward Compass",
+      "description": "Shows player coordinates on screen",
+      "price": 10,
+      "effect": {
+        "type": "showCoords",
+        "value": 1
+      },
+      "slots": 1
+    },
+    {
+      "id": "thornsOfAgony",
+      "name": "Thorns of Agony",
+      "description": "When hit, release a burst of damage to nearby enemies",
+      "price": 50,
+      "effect": {
+        "type": "thornsDamage",
+        "value": 1
+      },
+      "slots": 2
+    },
+    {
+      "id": "quickSlash",
+      "name": "Quick Slash",
+      "description": "Decreases cooldown between sword swings by 30%",
+      "price": 100,
+      "effect": {
+        "type": "attackCooldownMod",
+        "value": 0.7
+      },
+      "slots": 2
+    },
+    {
       "id": "strengthenedNail",
       "name": "Strengthened Nail",
       "description": "+1 damage to melee attacks",
+      "price": 0,
       "effect": {
         "type": "damageMod",
         "value": 1
@@ -14,6 +48,7 @@
       "id": "quickDash",
       "name": "Quick Dash",
       "description": "Reduces dash cooldown by 30%",
+      "price": 0,
       "effect": {
         "type": "dashCooldownMod",
         "value": 0.7
@@ -24,6 +59,7 @@
       "id": "toughShell",
       "name": "Tough Shell",
       "description": "+2 maximum HP",
+      "price": 0,
       "effect": {
         "type": "maxHpMod",
         "value": 2
@@ -31,5 +67,6 @@
       "slots": 1
     }
   ],
-  "maxSlots": 2
+  "maxSlots": 4,
+  "shopCharms": ["waywardCompass", "thornsOfAgony", "quickSlash"]
 }
