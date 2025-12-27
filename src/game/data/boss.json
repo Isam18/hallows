@@ -2,7 +2,7 @@
   "falseChampion": {
     "id": "falseChampion",
     "name": "False Champion",
-    "maxHp": 60,
+    "maxHp": 210,
     "staggerThreshold": 12,
     "staggerDuration": 3500,
     "staggerRecoveryRageTime": 2000,
