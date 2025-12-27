@@ -601,67 +601,321 @@ export class BootScene extends Phaser.Scene {
   }
 
   private createBossSprites(): void {
-    // Load False Champion sprites from images
-    this.load.image('falseChampion', '/src/assets/boss-normal.png');
-    this.load.image('falseChampion_staggered', '/src/assets/boss-staggered.png');
+    // False Champion - Armored beetle knight inspired by False Knight
+    // Idle frame
+    this.createFalseChampionFrame('falseChampion_idle', 0, 0);
+    // Walk frames
+    this.createFalseChampionFrame('falseChampion_walk_0', 0, -2);
+    this.createFalseChampionFrame('falseChampion_walk_1', 0, 2);
+    // Attack frames (mace raised/down)
+    this.createFalseChampionAttackFrame('falseChampion_attack_0', 0); // Mace up
+    this.createFalseChampionAttackFrame('falseChampion_attack_1', 1); // Mace down
+    // Jump frame
+    this.createFalseChampionJumpFrame('falseChampion_jump');
+    // Staggered frame (fallen over with maggot exposed)
+    this.createFalseChampionStaggeredFrame('falseChampion_staggered');
     
-    // Fallback procedural sprite for elderGrub (legacy)
-    const bossGraphics = this.make.graphics({ x: 0, y: 0 });
-    
-    // Main body
-    bossGraphics.fillStyle(0xc0c4c8);
-    bossGraphics.fillEllipse(45, 40, 85, 65);
-    
-    // Underbelly shadow
-    bossGraphics.fillStyle(0x707880);
-    bossGraphics.fillEllipse(45, 50, 75, 35);
-    
-    // Large spines
-    bossGraphics.fillStyle(0x2a5577);
-    for (let i = 0; i < 7; i++) {
-      const x = 10 + i * 11;
-      const h = i === 3 ? 22 : 16;
-      bossGraphics.fillTriangle(x, 8, x - 5, 8 + h, x + 5, 8 + h);
-    }
-    
-    // Spine highlights
-    bossGraphics.fillStyle(0x4488bb);
-    for (let i = 0; i < 7; i++) {
-      const x = 10 + i * 11;
-      const h = i === 3 ? 12 : 8;
-      bossGraphics.fillTriangle(x, 10, x - 2, 10 + h, x + 2, 10 + h);
-    }
-    
-    // Eyes
-    bossGraphics.fillStyle(0x220000);
-    bossGraphics.fillCircle(28, 35, 10);
-    bossGraphics.fillCircle(62, 35, 10);
-    
-    bossGraphics.fillStyle(0xcc2222);
-    bossGraphics.fillCircle(28, 35, 7);
-    bossGraphics.fillCircle(62, 35, 7);
-    
-    bossGraphics.fillStyle(0xff4444);
-    bossGraphics.fillCircle(30, 33, 3);
-    bossGraphics.fillCircle(64, 33, 3);
-    
-    bossGraphics.lineStyle(3, 0x1a1e2a);
-    bossGraphics.strokeEllipse(45, 40, 85, 65);
-    
-    bossGraphics.generateTexture('elderGrub', 90, 75);
-    bossGraphics.destroy();
-    
-    // Boss projectile spike
+    // Boss projectile spike / falling rock
     const spikeGraphics = this.make.graphics({ x: 0, y: 0 });
-    spikeGraphics.fillStyle(0x3a7799);
-    spikeGraphics.fillTriangle(10, 0, 0, 24, 20, 24);
-    spikeGraphics.fillStyle(0x5599cc);
-    spikeGraphics.fillTriangle(10, 4, 5, 20, 15, 20);
-    spikeGraphics.lineStyle(2, 0x1a1e2a);
-    spikeGraphics.strokeTriangle(10, 0, 0, 24, 20, 24);
-    spikeGraphics.generateTexture('spike', 20, 24);
+    spikeGraphics.fillStyle(0x555566);
+    spikeGraphics.fillTriangle(15, 0, 0, 30, 30, 30);
+    spikeGraphics.fillStyle(0x666677);
+    spikeGraphics.fillTriangle(15, 6, 6, 26, 24, 26);
+    spikeGraphics.lineStyle(2, 0x333344);
+    spikeGraphics.strokeTriangle(15, 0, 0, 30, 30, 30);
+    spikeGraphics.generateTexture('fallingRock', 30, 30);
     spikeGraphics.destroy();
   }
+  
+  private createFalseChampionFrame(key: string, xOffset: number, yOffset: number): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 50 + xOffset;
+    const cy = 55 + yOffset;
+    
+    // === ARMORED BODY (bulky beetle shell) ===
+    // Main armor shell - dark blue-grey
+    g.fillStyle(0x4a5a6a);
+    g.fillEllipse(cx, cy + 5, 70, 55);
+    
+    // Armor plates/segments
+    g.fillStyle(0x5a6a7a);
+    g.fillEllipse(cx, cy - 5, 64, 40);
+    
+    // Armor highlights
+    g.fillStyle(0x6a7a8a, 0.6);
+    g.fillEllipse(cx - 10, cy - 10, 20, 16);
+    g.fillEllipse(cx + 10, cy - 10, 20, 16);
+    
+    // Segment lines
+    g.lineStyle(2, 0x3a4a5a);
+    g.lineBetween(cx - 20, cy - 18, cx - 20, cy + 20);
+    g.lineBetween(cx, cy - 22, cx, cy + 15);
+    g.lineBetween(cx + 20, cy - 18, cx + 20, cy + 20);
+    
+    // === HELMET (horned) ===
+    g.fillStyle(0x4a5868);
+    g.fillEllipse(cx, cy - 30, 44, 32);
+    
+    // Horns - curved upward
+    g.fillStyle(0x3a4858);
+    // Left horn
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 45);
+    g.lineTo(cx - 25, cy - 65);
+    g.lineTo(cx - 12, cy - 40);
+    g.closePath();
+    g.fillPath();
+    // Right horn
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 45);
+    g.lineTo(cx + 25, cy - 65);
+    g.lineTo(cx + 12, cy - 40);
+    g.closePath();
+    g.fillPath();
+    
+    // Face visor - darker
+    g.fillStyle(0x2a3a48);
+    g.fillRect(cx - 16, cy - 35, 32, 18);
+    
+    // Eye slits - glowing
+    g.fillStyle(0x1a1a20);
+    g.fillEllipse(cx - 8, cy - 28, 6, 10);
+    g.fillEllipse(cx + 8, cy - 28, 6, 10);
+    
+    // === LEGS (sturdy) ===
+    g.fillStyle(0x4a5a68);
+    g.fillRect(cx - 22, cy + 25, 12, 25);
+    g.fillRect(cx + 10, cy + 25, 12, 25);
+    
+    // === MACE ARM (right side) ===
+    // Arm
+    g.fillStyle(0x4a5a68);
+    g.fillRect(cx + 30, cy - 10, 14, 40);
+    // Mace handle
+    g.fillStyle(0x3a3a40);
+    g.fillRect(cx + 42, cy - 5, 8, 50);
+    // Mace head
+    g.fillStyle(0x5a5a66);
+    g.fillCircle(cx + 46, cy + 48, 18);
+    // Mace spikes
+    g.fillStyle(0x4a4a55);
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const sx = cx + 46 + Math.cos(angle) * 18;
+      const sy = cy + 48 + Math.sin(angle) * 18;
+      g.fillCircle(sx, sy, 5);
+    }
+    
+    // === OUTLINES ===
+    g.lineStyle(2.5, 0x2a3a48);
+    g.strokeEllipse(cx, cy + 5, 70, 55);
+    g.strokeEllipse(cx, cy - 30, 44, 32);
+    
+    g.generateTexture(key, 100, 110);
+    g.destroy();
+  }
+  
+  private createFalseChampionAttackFrame(key: string, phase: number): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 50;
+    const cy = 55;
+    
+    // Body (same as idle)
+    g.fillStyle(0x4a5a6a);
+    g.fillEllipse(cx, cy + 5, 70, 55);
+    g.fillStyle(0x5a6a7a);
+    g.fillEllipse(cx, cy - 5, 64, 40);
+    
+    // Helmet
+    g.fillStyle(0x4a5868);
+    g.fillEllipse(cx, cy - 30, 44, 32);
+    g.fillStyle(0x3a4858);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 45);
+    g.lineTo(cx - 25, cy - 65);
+    g.lineTo(cx - 12, cy - 40);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 45);
+    g.lineTo(cx + 25, cy - 65);
+    g.lineTo(cx + 12, cy - 40);
+    g.closePath();
+    g.fillPath();
+    
+    g.fillStyle(0x2a3a48);
+    g.fillRect(cx - 16, cy - 35, 32, 18);
+    g.fillStyle(0xff4444); // Angry red eyes during attack
+    g.fillEllipse(cx - 8, cy - 28, 5, 8);
+    g.fillEllipse(cx + 8, cy - 28, 5, 8);
+    
+    // Legs
+    g.fillStyle(0x4a5a68);
+    g.fillRect(cx - 22, cy + 25, 12, 25);
+    g.fillRect(cx + 10, cy + 25, 12, 25);
+    
+    // Mace - different position based on phase
+    if (phase === 0) {
+      // Mace raised high
+      g.fillStyle(0x4a5a68);
+      g.fillRect(cx + 25, cy - 40, 14, 30);
+      g.fillStyle(0x3a3a40);
+      g.fillRect(cx + 28, cy - 70, 8, 40);
+      g.fillStyle(0x5a5a66);
+      g.fillCircle(cx + 32, cy - 75, 18);
+      g.fillStyle(0x4a4a55);
+      for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        g.fillCircle(cx + 32 + Math.cos(angle) * 18, cy - 75 + Math.sin(angle) * 18, 5);
+      }
+    } else {
+      // Mace smashing down
+      g.fillStyle(0x4a5a68);
+      g.fillRect(cx + 30, cy, 14, 35);
+      g.fillStyle(0x3a3a40);
+      g.fillRect(cx + 33, cy + 30, 8, 35);
+      g.fillStyle(0xffaa44); // Glowing mace on impact
+      g.fillCircle(cx + 37, cy + 68, 20);
+      g.fillStyle(0xff6622);
+      for (let i = 0; i < 6; i++) {
+        const angle = (i / 6) * Math.PI * 2;
+        g.fillCircle(cx + 37 + Math.cos(angle) * 20, cy + 68 + Math.sin(angle) * 20, 6);
+      }
+    }
+    
+    g.lineStyle(2.5, 0x2a3a48);
+    g.strokeEllipse(cx, cy + 5, 70, 55);
+    
+    g.generateTexture(key, 100, 110);
+    g.destroy();
+  }
+  
+  private createFalseChampionJumpFrame(key: string): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 50;
+    const cy = 50;
+    
+    // Compact body for jump
+    g.fillStyle(0x4a5a6a);
+    g.fillEllipse(cx, cy + 8, 65, 50);
+    g.fillStyle(0x5a6a7a);
+    g.fillEllipse(cx, cy, 60, 38);
+    
+    // Helmet
+    g.fillStyle(0x4a5868);
+    g.fillEllipse(cx, cy - 25, 44, 32);
+    g.fillStyle(0x3a4858);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 40);
+    g.lineTo(cx - 25, cy - 60);
+    g.lineTo(cx - 12, cy - 35);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 40);
+    g.lineTo(cx + 25, cy - 60);
+    g.lineTo(cx + 12, cy - 35);
+    g.closePath();
+    g.fillPath();
+    
+    g.fillStyle(0x2a3a48);
+    g.fillRect(cx - 16, cy - 30, 32, 16);
+    g.fillStyle(0xff6644);
+    g.fillEllipse(cx - 8, cy - 24, 5, 7);
+    g.fillEllipse(cx + 8, cy - 24, 5, 7);
+    
+    // Legs tucked
+    g.fillStyle(0x4a5a68);
+    g.fillRect(cx - 18, cy + 28, 10, 15);
+    g.fillRect(cx + 8, cy + 28, 10, 15);
+    
+    // Mace held forward
+    g.fillStyle(0x3a3a40);
+    g.fillRect(cx + 25, cy - 10, 8, 45);
+    g.fillStyle(0x5a5a66);
+    g.fillCircle(cx + 29, cy + 38, 16);
+    
+    g.lineStyle(2.5, 0x2a3a48);
+    g.strokeEllipse(cx, cy + 8, 65, 50);
+    
+    g.generateTexture(key, 100, 100);
+    g.destroy();
+  }
+  
+  private createFalseChampionStaggeredFrame(key: string): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 60;
+    const cy = 50;
+    
+    // Armor shell fallen over (rotated)
+    g.fillStyle(0x4a5a6a);
+    g.fillEllipse(cx + 10, cy + 15, 75, 50);
+    g.fillStyle(0x5a6a7a);
+    g.fillEllipse(cx + 8, cy + 8, 68, 40);
+    
+    // Segment lines (tilted)
+    g.lineStyle(2, 0x3a4a5a);
+    g.lineBetween(cx - 10, cy, cx - 5, cy + 30);
+    g.lineBetween(cx + 10, cy - 5, cx + 15, cy + 25);
+    g.lineBetween(cx + 30, cy, cx + 35, cy + 30);
+    
+    // Helmet fallen to side
+    g.fillStyle(0x4a5868);
+    g.fillEllipse(cx - 25, cy + 10, 40, 30);
+    
+    // Horns pointing sideways
+    g.fillStyle(0x3a4858);
+    g.beginPath();
+    g.moveTo(cx - 40, cy);
+    g.lineTo(cx - 60, cy - 15);
+    g.lineTo(cx - 35, cy + 8);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx - 40, cy + 20);
+    g.lineTo(cx - 55, cy + 35);
+    g.lineTo(cx - 35, cy + 18);
+    g.closePath();
+    g.fillPath();
+    
+    // === EXPOSED MAGGOT HEAD (vulnerable) ===
+    // Pale fleshy head poking out
+    g.fillStyle(0xe8ddd0);
+    g.fillEllipse(cx + 45, cy - 5, 30, 25);
+    
+    // Worried expression
+    g.fillStyle(0x1a1a20);
+    g.fillEllipse(cx + 40, cy - 8, 5, 7);
+    g.fillEllipse(cx + 52, cy - 8, 5, 7);
+    
+    // Open mouth (distressed)
+    g.fillStyle(0x2a2a30);
+    g.fillEllipse(cx + 46, cy + 5, 8, 6);
+    
+    // Blush marks
+    g.fillStyle(0xffaaaa, 0.4);
+    g.fillEllipse(cx + 38, cy, 6, 4);
+    g.fillEllipse(cx + 54, cy, 6, 4);
+    
+    // Mace dropped
+    g.fillStyle(0x3a3a40);
+    g.fillRect(cx + 50, cy + 30, 6, 35);
+    g.fillStyle(0x5a5a66);
+    g.fillCircle(cx + 53, cy + 68, 14);
+    
+    // Legs flailing
+    g.fillStyle(0x4a5a68);
+    g.fillRect(cx - 5, cy + 35, 10, 18);
+    g.fillRect(cx + 20, cy + 38, 10, 15);
+    
+    g.lineStyle(2, 0x2a3a48);
+    g.strokeEllipse(cx + 10, cy + 15, 75, 50);
+    g.strokeEllipse(cx + 45, cy - 5, 30, 25);
+    
+    g.generateTexture(key, 120, 100);
+    g.destroy();
+  }
+
 
   private createPickupSprites(): void {
     // Shell pickup - refined gem/shell look

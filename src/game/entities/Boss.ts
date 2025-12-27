@@ -56,8 +56,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   private arenaLeft = 0;
   private arenaRight = 0;
 
+  // Animation tracking
+  private animTimer = 0;
+  private walkFrame = 0;
+  private attackFrame = 0;
+
   constructor(scene: GameScene, x: number, y: number) {
-    super(scene, x, y, 'falseChampion');
+    super(scene, x, y, 'falseChampion_idle');
     this.gameScene = scene;
     this.bossMaxHp = CFG.maxHp;
     this.bossHp = this.bossMaxHp;
@@ -68,13 +73,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     
     this.setSize(CFG.width, CFG.height);
     this.setCollideWorldBounds(true);
-    this.clearTint(); // Use actual sprite colors
+    this.clearTint();
     this.setScale(CFG.scale);
     
-    // Hide mace sprite - the image already has the mace
+    // No separate mace sprite - it's part of the character
     this.maceSprite = null;
     
-    // Set up arena bounds (assuming 1200px wide arena)
+    // Set up arena bounds
     this.arenaLeft = x - 500;
     this.arenaRight = x + 500;
 
@@ -86,15 +91,13 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     
     this.stateTimer += delta;
     this.cooldown -= delta;
+    this.animTimer += delta;
     
     // Update facing toward player
     if (this.bossState === 'idle') {
       this.facing = player.x > this.x ? 1 : -1;
       this.setFlipX(this.facing < 0);
     }
-    
-    // Update mace position
-    this.updateMacePosition();
     
     // Check head exposure conditions
     this.checkHeadExposure(time);
@@ -107,6 +110,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     switch (this.bossState) {
       case 'idle':
         body.setVelocityX(0);
+        // Idle animation - slight bounce
+        this.setTexture('falseChampion_idle');
         if (this.cooldown <= 0) {
           this.chooseNextAttack(player);
         }
@@ -126,13 +131,15 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         
       case 'staggered':
         body.setVelocityX(0);
-        // Use staggered sprite - fallen over with exposed maggot
+        this.setTexture('falseChampion_staggered');
         if (this.stateTimer > CFG.staggerDuration) {
           this.recoverFromStagger();
         }
         break;
         
       case 'recovering':
+        // Stand back up animation
+        this.setTexture('falseChampion_idle');
         if (this.stateTimer > CFG.staggerRecoveryRageTime) {
           this.bossState = 'rageTantrum';
           this.stateTimer = 0;
@@ -165,6 +172,9 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.stateTimer = 0;
     this.leapPhase = 'rising';
     
+    // Use jump sprite
+    this.setTexture('falseChampion_jump');
+    
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityY(-CFG.attackPatterns.leapSmash.jumpHeight);
     
@@ -180,6 +190,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     
     switch (this.leapPhase) {
       case 'rising':
+        this.setTexture('falseChampion_jump');
         if (body.velocity.y >= 0) {
           this.leapPhase = 'hanging';
           this.stateTimer = 0;
@@ -193,6 +204,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         // Track player position
         const targetX = player.x;
         this.x += (targetX - this.x) * 0.05;
+        // Mace raised
+        this.setTexture('falseChampion_attack_0');
         
         if (this.stateTimer > cfg.hangTime) {
           this.leapPhase = 'falling';
@@ -202,6 +215,8 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         break;
         
       case 'falling':
+        // Mace down for impact
+        this.setTexture('falseChampion_attack_1');
         if (body.blocked.down) {
           this.leapPhase = 'landed';
           this.createShockwave();
@@ -211,6 +226,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         break;
         
       case 'landed':
+        this.setTexture('falseChampion_idle');
         if (this.stateTimer > 300) {
           this.removeShockwave();
           this.bossState = 'idle';
@@ -263,6 +279,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     const cfg = CFG.attackPatterns.maceCombo;
     this.comboSwingTimer += delta;
     
+    // Animate attack frames
+    const swingPhase = (this.comboSwingTimer % cfg.swingDelay) / cfg.swingDelay;
+    if (swingPhase < 0.5) {
+      this.setTexture('falseChampion_attack_0'); // Wind up
+    } else {
+      this.setTexture('falseChampion_attack_1'); // Swing down
+    }
+    
     if (this.comboSwingTimer >= cfg.swingDelay && this.comboSwingsRemaining > 0) {
       // Perform swing
       this.performMaceSwing();
@@ -285,13 +309,11 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   }
 
   private performMaceSwing(): void {
-    // Flash mace
-    if (this.maceSprite) {
-      this.maceSprite.setFillStyle(0xffffff);
-      this.scene.time.delayedCall(100, () => {
-        if (this.maceSprite) this.maceSprite.setFillStyle(0x555555);
-      });
-    }
+    // Visual flash effect
+    this.setTint(0xffaaaa);
+    this.scene.time.delayedCall(100, () => {
+      if (!this.dead) this.clearTint();
+    });
     
     // Check hit
     const player = this.gameScene.player;
@@ -316,6 +338,10 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     // Move to center
     const centerX = (this.arenaLeft + this.arenaRight) / 2;
     body.setVelocityX((centerX - this.x) * 0.05);
+    
+    // Alternate attack frames rapidly for tantrum
+    const smashFrame = Math.floor(this.tantrumTimer / 150) % 2;
+    this.setTexture(smashFrame === 0 ? 'falseChampion_attack_0' : 'falseChampion_attack_1');
     
     // Smash left and right
     if (Math.floor(this.tantrumTimer / cfg.smashInterval) % 2 === 0) {
@@ -387,14 +413,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     });
   }
 
-  private updateMacePosition(): void {
-    if (this.maceSprite) {
-      this.maceSprite.setPosition(
-        this.x + (this.facing * 70 * CFG.scale / 2),
-        this.y
-      );
-    }
-  }
+  // Mace is now part of the sprite, no separate update needed
 
   private checkHeadExposure(time: number): void {
     const timePassed = (time - this.fightStartTime) / 1000;
