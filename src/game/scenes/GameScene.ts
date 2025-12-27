@@ -26,6 +26,7 @@ import { generateForgottenCrossroads } from '../systems/RoomGenerator';
 import fadingTownData from '../data/levels/fadingTown.json';
 import ruinedCrossroadsData from '../data/levels/ruinedCrossroads.json';
 import chainRoomData from '../data/levels/chainRoom.json';
+import greenwayData from '../data/levels/greenway.json';
 import enemiesData from '../data/enemies.json';
 
 // Generate the Forgotten Crossroads level
@@ -36,6 +37,7 @@ const LEVELS: Record<string, LevelConfig> = {
   ruinedCrossroads: ruinedCrossroadsData as LevelConfig,
   forgottenCrossroads: forgottenCrossroadsData,
   chainRoom: chainRoomData as LevelConfig,
+  greenway: greenwayData as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -118,10 +120,13 @@ export class GameScene extends Phaser.Scene {
     this.benches = this.physics.add.staticGroup();
     this.portals = this.physics.add.staticGroup();
     
-    // Create visual effects for Forgotten Crossroads style levels
+    // Create visual effects based on level biome
+    const biome = (this.currentLevel as any).biome || 'crossroads';
     if (this.levelId === 'forgottenCrossroads' || this.levelId === 'ruinedCrossroads') {
       this.parallaxBg = new ParallaxBackground(this);
       this.dustParticles = new DustParticles(this);
+    } else if (biome === 'greenway' || this.levelId === 'greenway') {
+      this.createGreenwayEnvironment();
     }
     
     // Build level
@@ -290,8 +295,11 @@ export class GameScene extends Phaser.Scene {
         // Charm shop NPC
         this.createShopNPC(t.x, t.y);
       } else if (t.type === 'endDoor') {
-        // End game door
+        // End game door (legacy)
         this.createEndDoor(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'greenwayDoor') {
+        // Door to Greenway with dialogue
+        this.createGreenwayDoor(t.x, t.y, t.width, t.height);
       }
     });
     
@@ -1132,5 +1140,182 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(this.player, this.endDoorZone, () => {
       this.emitUIEvent('showEnding', null);
     });
+  }
+  
+  private greenwayDoorZone: Phaser.GameObjects.Zone | null = null;
+  
+  private createGreenwayDoor(x: number, y: number, width: number, height: number): void {
+    // Heavy stone door with green/moss glow
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+    
+    // Door frame
+    const frame = this.add.rectangle(doorX, doorY, width + 20, height + 10, 0x2a3a2a);
+    frame.setDepth(5);
+    
+    // Door panels with mossy tint
+    const door = this.add.rectangle(doorX, doorY, width, height, 0x4a5a4a);
+    door.setDepth(6);
+    
+    // Door details - vine-like lines
+    this.add.rectangle(doorX - 8, doorY, 3, height - 20, 0x3a4a3a).setDepth(7);
+    this.add.rectangle(doorX + 8, doorY, 3, height - 20, 0x3a4a3a).setDepth(7);
+    
+    // Green glow
+    const glow = this.add.rectangle(doorX, doorY, width + 30, height + 20, 0x55dd88, 0.1);
+    glow.setDepth(4);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.05, to: 0.2 },
+      duration: 3000,
+      yoyo: true,
+      repeat: -1
+    });
+    
+    // Vines decoration
+    for (let i = 0; i < 3; i++) {
+      const vine = this.add.ellipse(doorX - 20 + i * 20, doorY - 40, 4, 30, 0x55aa55);
+      vine.setDepth(8);
+    }
+    
+    // Prompt text
+    const promptText = this.add.text(doorX, doorY + 60, '[ENTER]', {
+      fontSize: '14px',
+      color: '#55dd88',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    });
+    promptText.setOrigin(0.5);
+    promptText.setDepth(100);
+    promptText.setVisible(false);
+    
+    // Interaction zone
+    this.greenwayDoorZone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(this.greenwayDoorZone, true);
+    
+    this.physics.add.overlap(this.player, this.greenwayDoorZone, () => {
+      promptText.setVisible(true);
+      if (inputManager.justPressed('interact')) {
+        this.emitUIEvent('showGreenwayDialog', null);
+      }
+    });
+    
+    this.events.on('update', () => {
+      if (this.greenwayDoorZone && !this.physics.overlap(this.player, this.greenwayDoorZone)) {
+        promptText.setVisible(false);
+      }
+    });
+  }
+  
+  // Greenway environment visuals
+  private createGreenwayEnvironment(): void {
+    const width = this.currentLevel.width;
+    const height = this.currentLevel.height;
+    
+    // Background gradient - deep green
+    const bgGradient = this.add.graphics();
+    bgGradient.fillGradientStyle(0x0a1810, 0x0a1810, 0x142818, 0x142818, 1);
+    bgGradient.fillRect(0, 0, width, height);
+    bgGradient.setDepth(-10);
+    
+    // Hanging vines in background
+    for (let i = 0; i < 20; i++) {
+      const vineX = Phaser.Math.Between(50, width - 50);
+      const vineLength = Phaser.Math.Between(80, 200);
+      const vine = this.add.rectangle(vineX, vineLength / 2, 3, vineLength, 0x3a6a3a);
+      vine.setAlpha(0.3 + Math.random() * 0.3);
+      vine.setDepth(-5);
+      
+      // Animate vine sway
+      this.tweens.add({
+        targets: vine,
+        x: vine.x + Phaser.Math.Between(-5, 5),
+        duration: 2000 + Math.random() * 2000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    }
+    
+    // Leaf particles
+    for (let i = 0; i < 15; i++) {
+      const leafX = Phaser.Math.Between(0, width);
+      const leafY = Phaser.Math.Between(0, height);
+      const leaf = this.add.ellipse(leafX, leafY, 6, 4, 0x6ec472);
+      leaf.setAlpha(0.4 + Math.random() * 0.3);
+      leaf.setDepth(1);
+      
+      // Float animation
+      this.tweens.add({
+        targets: leaf,
+        x: leaf.x + Phaser.Math.Between(-30, 30),
+        y: leaf.y + Phaser.Math.Between(20, 50),
+        alpha: 0,
+        duration: 4000 + Math.random() * 3000,
+        onComplete: () => {
+          leaf.setPosition(Phaser.Math.Between(0, width), -10);
+          leaf.setAlpha(0.4 + Math.random() * 0.3);
+          this.tweens.add({
+            targets: leaf,
+            x: leaf.x + Phaser.Math.Between(-30, 30),
+            y: height + 20,
+            alpha: 0,
+            duration: 5000 + Math.random() * 3000,
+            repeat: -1
+          });
+        }
+      });
+    }
+    
+    // Glowing moss spots on ground
+    for (let i = 0; i < 10; i++) {
+      const mossX = Phaser.Math.Between(100, width - 100);
+      const moss = this.add.ellipse(mossX, height - 60, 40, 15, 0x4a8a4a, 0.3);
+      moss.setDepth(-4);
+      
+      // Pulse glow
+      this.tweens.add({
+        targets: moss,
+        alpha: 0.15,
+        duration: 1500 + Math.random() * 1000,
+        yoyo: true,
+        repeat: -1
+      });
+    }
+    
+    // Add moss to platforms (visual only)
+    this.currentLevel.platforms.forEach(p => {
+      if ((p as any).mossy && p.type === 'platform') {
+        // Moss top layer
+        const mossTop = this.add.rectangle(
+          p.x + p.width / 2,
+          p.y + 5,
+          p.width + 10,
+          10,
+          0x5a9a5a
+        );
+        mossTop.setDepth(3);
+        
+        // Small glowing plants
+        for (let i = 0; i < 3; i++) {
+          const plantX = p.x + 10 + i * (p.width / 3);
+          const plant = this.add.ellipse(plantX, p.y - 5, 4, 8, 0x7acc7a);
+          plant.setDepth(4);
+          
+          this.tweens.add({
+            targets: plant,
+            scaleY: 1.2,
+            duration: 1000 + Math.random() * 500,
+            yoyo: true,
+            repeat: -1
+          });
+        }
+      }
+    });
+  }
+  
+  // Transition to Greenway (called from React UI)
+  transitionToGreenway(): void {
+    this.transitionToLevel('greenway', 'entrance');
   }
 }

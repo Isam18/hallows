@@ -65,8 +65,33 @@
         "value": 2
       },
       "slots": 1
+    },
+    {
+      "id": "steadyBody",
+      "name": "Steady Body",
+      "description": "No recoil when hitting enemies",
+      "price": 60,
+      "effect": {
+        "type": "noRecoil",
+        "value": 1
+      },
+      "slots": 1,
+      "zone": "greenway"
+    },
+    {
+      "id": "gatheringSwarm",
+      "name": "Gathering Swarm",
+      "description": "Geo flies toward the player automatically",
+      "price": 80,
+      "effect": {
+        "type": "geoMagnet",
+        "value": 1
+      },
+      "slots": 1,
+      "zone": "greenway"
     }
   ],
   "maxSlots": 4,
-  "shopCharms": ["waywardCompass", "thornsOfAgony", "quickSlash"]
+  "shopCharms": ["waywardCompass", "thornsOfAgony", "quickSlash"],
+  "greenwayCharms": ["steadyBody", "gatheringSwarm"]
 }
