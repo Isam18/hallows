@@ -303,20 +303,31 @@ function generateHiddenGrove(roomIndex: number, xOffset: number): GreenwayRoomDa
 
 /**
  * Vertical Thicket - Tall climbing room with narrow platforms and flying enemies
+ * Entry from bottom-left, exit at top-right leading to next room
  */
 function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRoomData {
   const platforms: PlatformConfig[] = [];
   const enemies: EnemySpawnConfig[] = [];
   const acidPools: AcidPoolConfig[] = [];
+  const triggers: TriggerConfig[] = [];
   
-  // Walls
-  platforms.push(
-    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
-    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
-  );
+  // Left wall (full height)
+  platforms.push({ x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' });
   
-  // Ceiling
-  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  // Right wall with gap at top for exit
+  platforms.push({ x: xOffset + ROOM_WIDTH - 20, y: 80, width: 20, height: ROOM_HEIGHT - 80, type: 'wall' });
+  
+  // Ceiling with gap on right side for exit
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH - 100, height: 25, type: 'wall' });
+  
+  // Top exit platform
+  platforms.push({ 
+    x: xOffset + ROOM_WIDTH - 100, 
+    y: 60, 
+    width: 100, 
+    height: 20, 
+    type: 'platform' 
+  });
   
   // Acid at very bottom
   acidPools.push({
@@ -326,21 +337,18 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
     height: 40
   });
   
-  // Entry/exit platforms
-  platforms.push(
-    { x: xOffset + 20, y: ROOM_HEIGHT - 70, width: 70, height: 20, type: 'platform' },
-    { x: xOffset + ROOM_WIDTH - 90, y: ROOM_HEIGHT - 70, width: 70, height: 20, type: 'platform' }
-  );
+  // Entry platform at bottom-left
+  platforms.push({ x: xOffset + 20, y: ROOM_HEIGHT - 70, width: 70, height: 20, type: 'platform' });
   
-  // Ascending narrow platforms (zigzag pattern)
-  const levels = 6;
+  // Ascending narrow platforms (zigzag pattern leading to top-right)
+  const levels = 7;
   const heightStep = (ROOM_HEIGHT - 150) / levels;
   
   for (let i = 0; i < levels; i++) {
     const leftSide = i % 2 === 0;
     const px = leftSide 
       ? xOffset + 50 + randomInt(0, 80) 
-      : xOffset + ROOM_WIDTH - 150 - randomInt(0, 80);
+      : xOffset + ROOM_WIDTH - 170 - randomInt(0, 60);
     const py = ROOM_HEIGHT - 100 - (i * heightStep);
     
     platforms.push({
@@ -351,6 +359,15 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
       type: 'platform'
     } as any);
   }
+  
+  // Final platform near top-right exit
+  platforms.push({
+    x: xOffset + ROOM_WIDTH - 180,
+    y: 120,
+    width: 80,
+    height: 18,
+    type: 'platform'
+  } as any);
   
   // Flying enemies to knock player down
   const flyerCount = randomInt(3, 5);
@@ -368,6 +385,18 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
     { type: 'mossCreep', x: xOffset + ROOM_WIDTH - 20, y: randomInt(200, 400) }
   );
   
+  // Top-right exit trigger to next room
+  triggers.push({
+    id: `verticalThicket_topExit_${roomIndex}`,
+    type: 'transition',
+    x: xOffset + ROOM_WIDTH - 30,
+    y: 30,
+    width: 30,
+    height: 80,
+    target: 'greenwayGenerated',
+    targetSpawn: `room${roomIndex + 1}_entry`
+  });
+  
   return {
     platforms,
     enemies,
@@ -375,10 +404,10 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
     pickups: [
       { type: 'shells', x: xOffset + ROOM_WIDTH / 2, y: 100, amount: randomInt(15, 25) }
     ],
-    triggers: [],
+    triggers,
     spawns: {
       [`room${roomIndex}_entry`]: { x: xOffset + 55, y: ROOM_HEIGHT - 110 },
-      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 55, y: ROOM_HEIGHT - 110 }
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: 90 }
     }
   };
 }
