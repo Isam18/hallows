@@ -321,9 +321,22 @@ function generateInfectedCuldesac(roomIndex: number, xOffset: number): RoomData 
       // Big reward at the end
       { type: 'shells', x: xOffset + ROOM_WIDTH - 90, y: randomInt(60, 140), amount: randomInt(40, 60) }
     ],
-    triggers: [],
+    triggers: [
+      // Return portal at entrance to escape
+      {
+        id: `culdesac_return_${roomIndex}`,
+        type: 'transition',
+        x: xOffset + 25,
+        y: ROOM_HEIGHT - 150,
+        width: 30,
+        height: 100,
+        target: 'forgottenCrossroads',
+        targetSpawn: `room${roomIndex - 1}_exit`
+      }
+    ],
     spawns: {
-      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 }
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 },
+      [`room${roomIndex}_exit`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 }
     }
   };
 }
