@@ -45,10 +45,11 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
   
   // Original position for shake effect
   private originalX = 0;
+  private originalY = 0;
   
-  // Animation
-  private bobOffset = 0;
-  private bobSpeed = 0.003;
+  // Animation tweens
+  private breathTween: Phaser.Tweens.Tween | null = null;
+  private idleTween: Phaser.Tweens.Tween | null = null;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig) {
     super(scene, x, y, 'mosskin');
@@ -56,6 +57,7 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
     this.cfg = { ...DEFAULT_ENEMY_CONFIG, ...config };
     this.currentHp = this.cfg.hp;
     this.originalX = x;
+    this.originalY = y;
     
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -73,8 +75,45 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
     this.patrolDir = Math.random() > 0.5 ? 1 : -1;
     this.setFlipX(this.patrolDir < 0);
     
-    // Random bob phase
-    this.bobOffset = Math.random() * Math.PI * 2;
+    // Start breathing animation
+    this.startBreathingAnimation();
+    this.startIdleAnimation();
+  }
+  
+  private startBreathingAnimation(): void {
+    // Breathing - subtle scale pulsing
+    this.breathTween = this.scene.tweens.add({
+      targets: this,
+      scaleX: { from: 1, to: 1.08 },
+      scaleY: { from: 1, to: 0.94 },
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  }
+  
+  private startIdleAnimation(): void {
+    // Gentle bobbing up and down
+    this.idleTween = this.scene.tweens.add({
+      targets: this,
+      y: this.y - 3,
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  }
+  
+  private stopAnimations(): void {
+    if (this.breathTween) {
+      this.breathTween.stop();
+      this.breathTween = null;
+    }
+    if (this.idleTween) {
+      this.idleTween.stop();
+      this.idleTween = null;
+    }
   }
 
   update(time: number, delta: number, player: Player): void {
@@ -118,12 +157,24 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
     
     // Handle windup state
     if (this.aiState === 'windup') {
+      // Stop idle animations during windup
+      this.stopAnimations();
+      
       if (this.windupTimer <= 0) {
         // Start charging in the direction of the player
         this.chargeDir = player.x > this.x ? 1 : -1;
         this.aiState = 'charge';
         this.hitPlayerDuringCharge = false;
         this.setFlipX(this.chargeDir < 0);
+        
+        // Squash for charge
+        this.scene.tweens.add({
+          targets: this,
+          scaleX: 1.3,
+          scaleY: 0.7,
+          duration: 100,
+          ease: 'Power2'
+        });
       }
       return;
     }
@@ -224,14 +275,11 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
   }
 
   private updateVisuals(): void {
-    // Idle bobbing animation
-    this.bobOffset += this.bobSpeed * 16;
-    const bobY = Math.sin(this.bobOffset) * 2;
-    
     // Hurt flash
     if (this.hurtFlashTimer > 0) {
       this.setTexture('mosskin_hurt');
       this.setTint(0xffffff);
+      this.stopAnimations();
     } else if (this.invulnTimer > 0) {
       this.setTexture('mosskin');
       this.clearTint();
@@ -242,22 +290,35 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
       this.setAlpha(1);
     }
     
-    // Shake during windup - more intense
+    // Shake during windup - intense shaking with scale
     if (this.aiState === 'windup') {
-      const shake = Math.sin(Date.now() * 0.1) * 4;
-      this.setX(this.originalX + shake);
-      // Slight red tint during windup to show anger
-      this.setTint(0xffcccc);
-      // Scale up slightly during windup
-      this.setScale(1.05 + Math.sin(Date.now() * 0.02) * 0.05);
+      const shake = Math.sin(Date.now() * 0.15) * 5;
+      this.x = this.originalX + shake;
+      // Angry red tint during windup
+      this.setTint(0xffaaaa);
+      // Pulsing scale during windup
+      const pulse = 1.1 + Math.sin(Date.now() * 0.03) * 0.1;
+      this.setScale(pulse, 2 - pulse);
     } else if (this.aiState === 'charge') {
-      // Squash effect during charge
-      this.setScale(1.1, 0.9);
+      // Stretched squash during charge
+      this.setScale(1.25, 0.8);
+      this.originalX = this.x;
+    } else if (this.aiState === 'pause') {
+      // Recovering - bounce back to normal
+      this.setScale(0.9, 1.1);
+      this.originalX = this.x;
+      // Restart idle animations if stopped
+      if (!this.breathTween) {
+        this.startBreathingAnimation();
+      }
+    } else if (this.aiState === 'patrol') {
+      // Restart animations if they were stopped
+      if (!this.breathTween) {
+        this.startBreathingAnimation();
+        this.startIdleAnimation();
+      }
       this.originalX = this.x;
     } else {
-      // Normal bob + scale
-      this.setScale(1);
-      this.y += bobY * 0.1;
       this.originalX = this.x;
     }
   }
