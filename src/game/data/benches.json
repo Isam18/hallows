@@ -35,6 +35,20 @@
       "enemyRespawnDelayMs": 500,
       "savesGame": false,
       "restoresDash": true
+    },
+    "mossy_bench": {
+      "id": "mossy_bench",
+      "displayName": "Mossy Charm Bench",
+      "healMode": "full",
+      "healAmount": 0,
+      "setsRespawn": true,
+      "opensCharmUI": true,
+      "enemyRespawnMode": "none",
+      "enemyRespawnDelayMs": 0,
+      "savesGame": true,
+      "restoresDash": true,
+      "hasShop": true,
+      "zone": "greenway"
     }
   },
   "defaultBenchType": "basic_bench"

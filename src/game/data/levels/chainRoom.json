@@ -34,8 +34,8 @@
       "height": 70
     },
     {
-      "id": "exitDoor",
-      "type": "endDoor",
+      "id": "greenwayDoor",
+      "type": "greenwayDoor",
       "x": 720,
       "y": 750,
       "width": 50,
@@ -54,6 +54,7 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 800 },
-    "fromBoss": { "x": 100, "y": 800 }
+    "fromBoss": { "x": 100, "y": 800 },
+    "fromGreenway": { "x": 700, "y": 800 }
   }
 }

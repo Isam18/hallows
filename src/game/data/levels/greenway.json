@@ -1,0 +1,62 @@
+{
+  "id": "greenway",
+  "name": "Greenway",
+  "width": 2000,
+  "height": 900,
+  "backgroundColor": "#0a1810",
+  "spawnPoint": { "x": 100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 850, "width": 2000, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 2000, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 820, "type": "wall" },
+    { "x": 1970, "y": 30, "width": 30, "height": 820, "type": "wall" },
+    
+    { "x": 150, "y": 700, "width": 180, "height": 25, "type": "platform", "mossy": true },
+    { "x": 400, "y": 580, "width": 150, "height": 25, "type": "platform", "mossy": true },
+    { "x": 620, "y": 700, "width": 200, "height": 25, "type": "platform", "mossy": true },
+    { "x": 900, "y": 620, "width": 160, "height": 25, "type": "platform", "mossy": true },
+    { "x": 1100, "y": 500, "width": 140, "height": 25, "type": "platform", "mossy": true },
+    { "x": 1300, "y": 650, "width": 180, "height": 25, "type": "platform", "mossy": true },
+    { "x": 1550, "y": 550, "width": 200, "height": 25, "type": "platform", "mossy": true },
+    { "x": 1780, "y": 700, "width": 160, "height": 25, "type": "platform", "mossy": true }
+  ],
+  "enemies": [
+    { "type": "vengefly", "x": 500, "y": 400 },
+    { "type": "vengefly", "x": 900, "y": 350 },
+    { "type": "aspid", "x": 1200, "y": 400 },
+    { "type": "crawler", "x": 700, "y": 830 },
+    { "type": "crawler", "x": 1400, "y": 830 }
+  ],
+  "pickups": [
+    { "type": "shells", "x": 1100, "y": 470, "amount": 25 },
+    { "type": "shells", "x": 1600, "y": 520, "amount": 30 }
+  ],
+  "triggers": [
+    {
+      "id": "mossyBench",
+      "type": "bench",
+      "x": 200,
+      "y": 670,
+      "width": 80,
+      "height": 30,
+      "benchTypeId": "mossy_bench",
+      "roomId": "greenway"
+    },
+    {
+      "id": "exitToCrossroads",
+      "type": "transition",
+      "x": 30,
+      "y": 750,
+      "width": 30,
+      "height": 100,
+      "target": "chainRoom",
+      "targetSpawn": "fromGreenway"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 700 },
+    "entrance": { "x": 100, "y": 700 },
+    "benchMossyBench": { "x": 240, "y": 700 }
+  },
+  "biome": "greenway"
+}
