@@ -19,6 +19,7 @@ class GameStateManager {
   
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
   private debugMode = false;
+  private instakillMode = false;
   
   // State getters
   getState(): GameState {
@@ -43,6 +44,15 @@ class GameStateManager {
   setDebugMode(enabled: boolean): void {
     this.debugMode = enabled;
     this.emit('debugModeChange', enabled);
+  }
+  
+  isInstakillMode(): boolean {
+    return this.instakillMode;
+  }
+  
+  setInstakillMode(enabled: boolean): void {
+    this.instakillMode = enabled;
+    this.emit('instakillModeChange', enabled);
   }
   
   // Player data operations
