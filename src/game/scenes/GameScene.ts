@@ -462,6 +462,12 @@ export class GameScene extends Phaser.Scene {
         e.update(time, delta, this.player);
       });
       
+      // Update portals cooldown
+      this.portals.getChildren().forEach((portal) => {
+        const p = portal as Portal;
+        p.update(delta);
+      });
+      
       // Update boss
       if (this.boss && this.inBossArena) {
         this.boss.update(time, delta, this.player);
