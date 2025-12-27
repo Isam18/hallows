@@ -54,6 +54,25 @@
     "height": 22,
     "isFlying": true
   },
+  "aspid": {
+    "id": "aspid",
+    "displayName": "Aspid",
+    "hp": 3,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 35,
+    "moveSpeedAggro": 80,
+    "aggroRangePx": 200,
+    "deaggroRangePx": 300,
+    "knockbackOnHit": { "x": 90, "y": 50 },
+    "hitstunMs": 180,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 5, "max": 10 },
+    "hurtFlashMs": 150,
+    "spriteKey": "aspid",
+    "width": 30,
+    "height": 26,
+    "isFlying": true
+  },
   "huskGuard": {
     "id": "huskGuard",
     "displayName": "Husk Guard",

@@ -528,8 +528,10 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.dead = true;
     this.bossState = 'dead';
     
-    // Clean up
-    if (this.maceSprite) this.maceSprite.destroy();
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0, 0);
+    
+    // Clean up attacks
     if (this.shockwave) this.shockwave.destroy();
     if (this.headHitbox) this.headHitbox.destroy();
     this.fallingRocks.forEach(r => r.destroy());
@@ -537,50 +539,203 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     // Open gates
     this.openGates();
     
-    // Explosion effect - orange infection particles
-    this.createDeathExplosion();
+    // === PHASE 1: THE SCREAM (freeze and shriek) ===
+    this.setTexture('falseChampion_staggered');
     
-    // Fade out
+    // Look upward effect
     this.scene.tweens.add({
       targets: this,
-      alpha: 0,
-      scaleX: 4,
-      scaleY: 0.3,
-      angle: 0,
-      duration: 1500,
-      onComplete: () => {
-        this.gameScene.handleBossDefeated();
-        this.destroy();
-      }
+      angle: -15,
+      duration: 300,
+      ease: 'Power2'
+    });
+    
+    // Shriek visual effect - expanding rings
+    for (let i = 0; i < 3; i++) {
+      this.scene.time.delayedCall(i * 200, () => {
+        const shriekRing = this.scene.add.circle(this.x, this.y - 30, 20, 0xff6600, 0.6);
+        this.scene.tweens.add({
+          targets: shriekRing,
+          radius: 100 + i * 30,
+          alpha: 0,
+          duration: 400,
+          ease: 'Power2',
+          onComplete: () => shriekRing.destroy()
+        });
+      });
+    }
+    
+    // Camera shake for scream
+    this.scene.cameras.main.shake(600, 0.02);
+    
+    // === PHASE 2: THE EXPLOSION (after 800ms) ===
+    this.scene.time.delayedCall(800, () => {
+      this.createDeathExplosion();
+    });
+    
+    // === PHASE 3: THE COLLAPSE (after 2800ms) ===
+    this.scene.time.delayedCall(2800, () => {
+      // Fall over with heavy thud
+      this.scene.tweens.add({
+        targets: this,
+        angle: 90,
+        y: this.y + 30,
+        duration: 400,
+        ease: 'Bounce.easeOut',
+        onComplete: () => {
+          // Screen shake for impact
+          this.scene.cameras.main.shake(300, 0.04);
+          
+          // === PHASE 4: THE CORPSE (permanent) ===
+          this.createCorpse();
+          
+          // === PHASE 5: REVEAL SECRET PATH ===
+          this.scene.time.delayedCall(1000, () => {
+            this.revealSecretPath();
+            this.gameScene.handleBossDefeated();
+          });
+        }
+      });
     });
   }
 
   private createDeathExplosion(): void {
-    // Create burst of orange particles
-    for (let i = 0; i < 30; i++) {
-      const particle = this.scene.add.rectangle(
-        this.x + Phaser.Math.Between(-50, 50),
-        this.y + Phaser.Math.Between(-50, 50),
-        Phaser.Math.Between(8, 20),
-        Phaser.Math.Between(8, 20),
-        0xff6600
+    // Create burst of orange infection particles for 2 seconds
+    const explosionDuration = 2000;
+    const particleInterval = 50;
+    let elapsed = 0;
+    
+    const timer = this.scene.time.addEvent({
+      delay: particleInterval,
+      callback: () => {
+        elapsed += particleInterval;
+        
+        // Burst of particles
+        for (let i = 0; i < 5; i++) {
+          const particle = this.scene.add.rectangle(
+            this.x + Phaser.Math.Between(-40, 40),
+            this.y + Phaser.Math.Between(-50, 30),
+            Phaser.Math.Between(10, 25),
+            Phaser.Math.Between(10, 25),
+            Phaser.Math.Between(0, 1) > 0.5 ? 0xff6600 : 0xff8844
+          );
+          
+          this.scene.tweens.add({
+            targets: particle,
+            x: particle.x + Phaser.Math.Between(-150, 150),
+            y: particle.y + Phaser.Math.Between(-200, 50),
+            alpha: 0,
+            scale: 0,
+            rotation: Phaser.Math.Between(-3, 3),
+            duration: Phaser.Math.Between(600, 1200),
+            ease: 'Cubic.easeOut',
+            onComplete: () => particle.destroy()
+          });
+        }
+        
+        // Screen shake during explosion
+        this.scene.cameras.main.shake(100, 0.015);
+        
+        if (elapsed >= explosionDuration) {
+          timer.destroy();
+        }
+      },
+      loop: true
+    });
+    
+    // Flash effect
+    this.scene.cameras.main.flash(400, 255, 100, 0);
+  }
+
+  private createCorpse(): void {
+    // Create permanent corpse visual behind where boss dies
+    const corpseX = this.x;
+    const corpseY = this.y + 20;
+    
+    // Armor shell corpse - darker, static
+    const corpseBody = this.scene.add.ellipse(corpseX + 10, corpseY, 90, 50, 0x3a4a5a);
+    corpseBody.setDepth(-1);
+    
+    // Helmet fallen
+    const corpseHelmet = this.scene.add.ellipse(corpseX - 30, corpseY - 10, 50, 35, 0x3a4858);
+    corpseHelmet.setDepth(-1);
+    
+    // Mace dropped nearby
+    const maceDrop = this.scene.add.circle(corpseX + 60, corpseY + 15, 18, 0x4a4a55);
+    maceDrop.setDepth(-1);
+    
+    // Add some infection goo leaking
+    for (let i = 0; i < 5; i++) {
+      const goo = this.scene.add.circle(
+        corpseX + Phaser.Math.Between(-40, 40),
+        corpseY + Phaser.Math.Between(-10, 20),
+        Phaser.Math.Between(5, 12),
+        0xff6600,
+        0.6
       );
-      
-      this.scene.tweens.add({
-        targets: particle,
-        x: particle.x + Phaser.Math.Between(-200, 200),
-        y: particle.y + Phaser.Math.Between(-200, 100),
-        alpha: 0,
-        scale: 0,
-        duration: Phaser.Math.Between(800, 1500),
-        ease: 'Cubic.easeOut',
-        onComplete: () => particle.destroy()
-      });
+      goo.setDepth(-1);
     }
     
-    // Big screen shake
-    this.scene.cameras.main.shake(500, 0.04);
-    this.scene.cameras.main.flash(300, 255, 100, 0);
+    // Hide the actual boss sprite
+    this.setVisible(false);
+    this.setActive(false);
+  }
+
+  private revealSecretPath(): void {
+    // Create crumbling wall effect at back of arena
+    const wallX = this.arenaRight - 30;
+    const wallY = this.y - 50;
+    
+    // Create wall chunks that fall away
+    for (let row = 0; row < 4; row++) {
+      for (let col = 0; col < 2; col++) {
+        const chunk = this.scene.add.rectangle(
+          wallX + col * 40,
+          wallY + row * 50,
+          35,
+          45,
+          0x555566
+        );
+        
+        // Delay based on position for cascading effect
+        this.scene.time.delayedCall((row + col) * 150, () => {
+          this.scene.physics.add.existing(chunk);
+          const chunkBody = chunk.body as Phaser.Physics.Arcade.Body;
+          chunkBody.setVelocity(
+            Phaser.Math.Between(-50, 100),
+            Phaser.Math.Between(-100, 50)
+          );
+          chunkBody.setAngularVelocity(Phaser.Math.Between(-200, 200));
+          
+          // Camera shake for each chunk
+          this.scene.cameras.main.shake(80, 0.01);
+          
+          // Fade and destroy
+          this.scene.tweens.add({
+            targets: chunk,
+            alpha: 0,
+            duration: 1000,
+            delay: 500,
+            onComplete: () => chunk.destroy()
+          });
+        });
+      }
+    }
+    
+    // Create portal/path reveal after chunks fall
+    this.scene.time.delayedCall(1500, () => {
+      const secretPortal = this.scene.add.rectangle(wallX, wallY + 50, 50, 150, 0x5599dd, 0.6);
+      secretPortal.setDepth(-0.5);
+      
+      // Glow animation
+      this.scene.tweens.add({
+        targets: secretPortal,
+        alpha: 0.3,
+        duration: 1000,
+        yoyo: true,
+        repeat: -1
+      });
+    });
   }
 
   // Gate management for lock-in mechanic
