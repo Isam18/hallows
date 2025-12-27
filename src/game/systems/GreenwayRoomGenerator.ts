@@ -369,11 +369,11 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
     type: 'platform'
   } as any);
   
-  // Flying enemies to knock player down
+  // Flying enemies to knock player down - use Squits in Greenway
   const flyerCount = randomInt(3, 5);
   for (let i = 0; i < flyerCount; i++) {
     enemies.push({
-      type: randomChoice(['vengefly', 'aspid']),
+      type: 'squit',
       x: xOffset + randomInt(100, ROOM_WIDTH - 100),
       y: randomInt(100, ROOM_HEIGHT - 200)
     });
@@ -681,12 +681,11 @@ function generateInfectedOvergrowth(roomIndex: number, xOffset: number): Greenwa
     { x: xOffset + ROOM_WIDTH / 2 - 40, y: ROOM_HEIGHT - 300, width: 80, height: 18, type: 'platform' }
   );
   
-  // Flying enemies - 75% Vengefly, 25% Aspid
+  // Flying enemies - use Squits in Greenway
   const flyerCount = randomInt(3, 5);
   for (let i = 0; i < flyerCount; i++) {
-    const isAspid = random() < 0.25;
     enemies.push({
-      type: isAspid ? 'aspid' : 'vengefly',
+      type: 'squit',
       x: xOffset + 100 + randomInt(0, ROOM_WIDTH - 200),
       y: randomInt(100, ROOM_HEIGHT - 250)
     });
@@ -761,9 +760,9 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
   
   const roomOrder = generateGreenwayRoomOrder();
   
-  // Generate 10 rooms
-  for (let i = 0; i < 10; i++) {
-    const roomType = roomOrder[i];
+  // Generate 20 rooms (extended Greenway with Moss Titan at room 20)
+  for (let i = 0; i < 20; i++) {
+    const roomType = roomOrder[i % roomOrder.length];
     let roomData: GreenwayRoomData;
     
     switch (roomType) {
@@ -820,8 +819,16 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     if (room.movingPlatforms) allMovingPlatforms.push(...room.movingPlatforms);
   });
   
+  // Add Moss Titan boss in room 20 (last room)
+  const bossRoomX = 19 * ROOM_WIDTH;
+  allEnemies.push({
+    type: 'mossTitan',
+    x: bossRoomX + ROOM_WIDTH / 2,
+    y: ROOM_HEIGHT - 150
+  });
+  
   // Add transitions between rooms
-  for (let i = 0; i < 9; i++) {
+  for (let i = 0; i < 19; i++) {
     const xPos = (i + 1) * ROOM_WIDTH - 30;
     
     allTriggers.push({
