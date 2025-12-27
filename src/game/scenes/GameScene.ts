@@ -7,6 +7,8 @@ import inputManager from '../core/InputManager';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { Vengefly } from '../entities/Vengefly';
+import { HuskGuard } from '../entities/HuskGuard';
+import { InfectedHusk } from '../entities/InfectedHusk';
 import { Boss } from '../entities/Boss';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
@@ -188,10 +190,16 @@ export class GameScene extends Phaser.Scene {
     this.currentLevel.enemies.forEach(e => {
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
       if (config) {
-        // Use Vengefly class for flying enemies
+        // Use appropriate class based on enemy type
         if (e.type === 'vengefly' || (config as any).isFlying) {
           const vengefly = new Vengefly(this, e.x, e.y, config);
           this.enemies.add(vengefly);
+        } else if (e.type === 'huskGuard' || (config as any).isElite) {
+          const huskGuard = new HuskGuard(this, e.x, e.y, config);
+          this.enemies.add(huskGuard);
+        } else if (e.type === 'infectedHusk' || (config as any).isPassive) {
+          const infectedHusk = new InfectedHusk(this, e.x, e.y, config);
+          this.enemies.add(infectedHusk);
         } else {
           const enemy = new Enemy(this, e.x, e.y, config);
           this.enemies.add(enemy);
@@ -288,9 +296,9 @@ export class GameScene extends Phaser.Scene {
       // Update camera look-ahead based on player facing
       this.updateCameraLookAhead();
       
-      // Update enemies (both ground and flying types)
+      // Update enemies (all types: ground, flying, elite, passive)
       this.enemies.getChildren().forEach((enemy) => {
-        const e = enemy as Enemy | Vengefly;
+        const e = enemy as Enemy | Vengefly | HuskGuard | InfectedHusk;
         e.update(time, delta, this.player);
       });
       

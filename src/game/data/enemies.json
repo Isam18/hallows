@@ -53,5 +53,43 @@
     "width": 26,
     "height": 22,
     "isFlying": true
+  },
+  "huskGuard": {
+    "id": "huskGuard",
+    "displayName": "Husk Guard",
+    "hp": 10,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 25,
+    "moveSpeedAggro": 50,
+    "aggroRangePx": 150,
+    "deaggroRangePx": 250,
+    "knockbackOnHit": { "x": 40, "y": 20 },
+    "hitstunMs": 100,
+    "invulnOnHitMs": 100,
+    "dropShells": { "min": 15, "max": 25 },
+    "hurtFlashMs": 120,
+    "spriteKey": "huskGuard",
+    "width": 48,
+    "height": 64,
+    "isElite": true
+  },
+  "infectedHusk": {
+    "id": "infectedHusk",
+    "displayName": "Infected Husk",
+    "hp": 3,
+    "contactDamage": 0,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 0,
+    "deaggroRangePx": 0,
+    "knockbackOnHit": { "x": 0, "y": 0 },
+    "hitstunMs": 0,
+    "invulnOnHitMs": 0,
+    "dropShells": { "min": 0, "max": 0 },
+    "hurtFlashMs": 100,
+    "spriteKey": "infectedHusk",
+    "width": 32,
+    "height": 28,
+    "isPassive": true
   }
 }
