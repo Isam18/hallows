@@ -21,7 +21,9 @@
   "enemies": [
     { "type": "spikyGrub", "x": 300, "y": 520 },
     { "type": "spikyGrub", "x": 600, "y": 520 },
-    { "type": "spikyGrub", "x": 900, "y": 520 }
+    { "type": "spikyGrub", "x": 900, "y": 520 },
+    { "type": "vengefly", "x": 500, "y": 280 },
+    { "type": "vengefly", "x": 1000, "y": 300 }
   ],
   "pickups": [
     { "type": "shells", "x": 500, "y": 350, "amount": 10 },
