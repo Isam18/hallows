@@ -458,57 +458,129 @@ export class BootScene extends Phaser.Scene {
 
   private createInfectedHuskSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    const cx = 35;  // Larger canvas
+    const cx = 35;
     const cy = 30;
     
-    // === CURLED UP BODY ===
-    // Main body - hunched over (1.75x larger)
+    // === SHADOW/GROUND ===
+    g.fillStyle(0x1a2a3a, 0.3);
+    g.fillEllipse(cx, cy + 26, 40, 8);
+    
+    // === CURLED UP BODY (layered for depth) ===
+    // Back shell layer - darker
+    g.fillStyle(0x3a4a58);
+    g.fillEllipse(cx + 2, cy + 10, 58, 44);
+    
+    // Main body - hunched over
     g.fillStyle(0x4a5a6a);
     g.fillEllipse(cx, cy + 7, 56, 42);
     
+    // Body highlight (top)
+    g.fillStyle(0x5a6a7a, 0.6);
+    g.fillEllipse(cx - 4, cy - 2, 30, 18);
+    
     // Head tucked in
     g.fillStyle(0x5a6a7a);
-    g.fillEllipse(cx - 10, cy - 7, 28, 24);
+    g.fillEllipse(cx - 12, cy - 6, 28, 24);
     
-    // Arms wrapped around
+    // Head detail - face area
+    g.fillStyle(0x6a7a8a);
+    g.fillEllipse(cx - 14, cy - 4, 18, 16);
+    
+    // Hollow eyes (empty, sorrowful)
+    g.fillStyle(0x1a1a20);
+    g.fillEllipse(cx - 18, cy - 6, 5, 7);
+    g.fillEllipse(cx - 10, cy - 5, 4, 6);
+    
+    // Arms wrapped around body
     g.fillStyle(0x4a5a6a);
     g.fillEllipse(cx + 14, cy, 18, 32);
+    g.fillStyle(0x3a4a5a);
+    g.fillEllipse(cx + 16, cy + 4, 12, 24);
     
-    // === INFECTION PUSTULES (orange glow) ===
-    // Large central pustule
-    g.fillStyle(0xff6633);
-    g.fillCircle(cx + 4, cy + 4, 9);
-    g.fillStyle(0xffaa66, 0.8);
-    g.fillCircle(cx + 4, cy + 2, 5);
+    // Visible fingers/claws gripping
+    g.fillStyle(0x5a6a7a);
+    g.fillEllipse(cx + 6, cy + 14, 6, 4);
+    g.fillEllipse(cx + 4, cy + 18, 5, 3);
+    g.fillEllipse(cx + 8, cy + 20, 5, 3);
     
-    // Secondary pustules
-    g.fillStyle(0xff7744);
-    g.fillCircle(cx - 14, cy + 10, 5);
-    g.fillCircle(cx + 18, cy + 14, 5);
-    g.fillCircle(cx - 7, cy - 10, 4);
+    // Legs curled underneath
+    g.fillStyle(0x3a4a58);
+    g.fillEllipse(cx - 8, cy + 20, 20, 12);
+    g.fillEllipse(cx + 8, cy + 22, 16, 10);
     
-    // Pustule highlights
-    g.fillStyle(0xffcc88, 0.7);
-    g.fillCircle(cx - 14, cy + 8, 2.5);
-    g.fillCircle(cx + 18, cy + 12, 2.5);
-    
-    // Small infection spots
-    g.fillStyle(0xff8855, 0.6);
-    g.fillCircle(cx + 9, cy - 4, 2.5);
-    g.fillCircle(cx - 18, cy + 4, 2.5);
-    g.fillCircle(cx + 22, cy + 4, 2.5);
-    g.fillCircle(cx - 4, cy + 18, 2);
-    g.fillCircle(cx + 10, cy + 20, 2);
-    
-    // === DETAILS ===
-    // Body segment lines
+    // === ARMOR/SHELL SEGMENTS ===
     g.lineStyle(1.5, 0x3a4a5a);
-    g.lineBetween(cx - 18, cy, cx - 18, cy + 18);
-    g.lineBetween(cx + 7, cy - 4, cx + 7, cy + 22);
+    g.beginPath();
+    g.arc(cx, cy + 7, 20, Math.PI * 0.2, Math.PI * 0.8);
+    g.strokePath();
+    g.beginPath();
+    g.arc(cx + 2, cy + 7, 26, Math.PI * 0.1, Math.PI * 0.9);
+    g.strokePath();
+    
+    // === INFECTION PUSTULES (varied sizes, glowing) ===
+    // Large central pustule cluster
+    g.fillStyle(0xff5522);
+    g.fillCircle(cx + 4, cy + 4, 10);
+    g.fillStyle(0xff7744);
+    g.fillCircle(cx + 4, cy + 3, 7);
+    g.fillStyle(0xffaa66, 0.9);
+    g.fillCircle(cx + 3, cy + 1, 4);
+    g.fillStyle(0xffdd99, 0.7);
+    g.fillCircle(cx + 2, cy, 2);
+    
+    // Secondary large pustule
+    g.fillStyle(0xff6633);
+    g.fillCircle(cx - 14, cy + 10, 6);
+    g.fillStyle(0xffaa66, 0.8);
+    g.fillCircle(cx - 15, cy + 8, 3);
+    
+    // Back pustules
+    g.fillStyle(0xff7744);
+    g.fillCircle(cx + 18, cy + 12, 6);
+    g.fillStyle(0xffcc88, 0.7);
+    g.fillCircle(cx + 17, cy + 10, 3);
+    
+    // Head infection
+    g.fillStyle(0xff6633);
+    g.fillCircle(cx - 7, cy - 10, 5);
+    g.fillStyle(0xffaa66, 0.8);
+    g.fillCircle(cx - 8, cy - 11, 2.5);
+    
+    // Scattered smaller pustules
+    g.fillStyle(0xff8855);
+    g.fillCircle(cx + 9, cy - 4, 3);
+    g.fillCircle(cx - 20, cy + 4, 3);
+    g.fillCircle(cx + 24, cy + 6, 3);
+    g.fillCircle(cx - 4, cy + 18, 2.5);
+    g.fillCircle(cx + 10, cy + 20, 2.5);
+    g.fillCircle(cx - 18, cy + 16, 2);
+    
+    // Tiny infection spots (spreading)
+    g.fillStyle(0xff9966, 0.6);
+    g.fillCircle(cx + 14, cy - 2, 1.5);
+    g.fillCircle(cx - 2, cy + 12, 1.5);
+    g.fillCircle(cx + 22, cy + 18, 1.5);
+    g.fillCircle(cx - 22, cy + 8, 1.5);
+    g.fillCircle(cx + 6, cy + 8, 1.5);
+    
+    // Infection veins/tendrils
+    g.lineStyle(1, 0xff7744, 0.5);
+    g.lineBetween(cx + 4, cy + 14, cx + 2, cy + 20);
+    g.lineBetween(cx - 14, cy + 16, cx - 10, cy + 22);
+    g.lineBetween(cx + 18, cy + 18, cx + 14, cy + 24);
+    
+    // === BODY DETAILS ===
+    // Shell crack lines
+    g.lineStyle(1, 0x2a3a48, 0.7);
+    g.lineBetween(cx - 18, cy, cx - 22, cy + 12);
+    g.lineBetween(cx + 7, cy - 4, cx + 10, cy + 8);
+    g.lineBetween(cx - 6, cy + 6, cx - 8, cy + 16);
     
     // Outline
     g.lineStyle(2, 0x2a3a4a);
     g.strokeEllipse(cx, cy + 7, 56, 42);
+    g.lineStyle(1.5, 0x2a3a4a);
+    g.strokeEllipse(cx - 12, cy - 6, 28, 24);
     
     g.generateTexture('infectedHusk', 72, 60);
     g.destroy();
@@ -517,11 +589,13 @@ export class BootScene extends Phaser.Scene {
     const hg = this.make.graphics({ x: 0, y: 0 });
     hg.fillStyle(0xffffff);
     hg.fillEllipse(cx, cy + 7, 56, 42);
-    hg.fillEllipse(cx - 10, cy - 7, 28, 24);
+    hg.fillEllipse(cx - 12, cy - 6, 28, 24);
+    hg.fillEllipse(cx + 14, cy, 18, 32);
     hg.fillStyle(0xffddaa);
-    hg.fillCircle(cx + 4, cy + 4, 9);
-    hg.fillCircle(cx - 14, cy + 10, 5);
-    hg.fillCircle(cx + 18, cy + 14, 5);
+    hg.fillCircle(cx + 4, cy + 4, 10);
+    hg.fillCircle(cx - 14, cy + 10, 6);
+    hg.fillCircle(cx + 18, cy + 12, 6);
+    hg.fillCircle(cx - 7, cy - 10, 5);
     hg.generateTexture('infectedHusk_hurt', 72, 60);
     hg.destroy();
   }
