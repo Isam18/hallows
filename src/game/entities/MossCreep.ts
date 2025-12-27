@@ -37,9 +37,10 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
   private isDead = false;
   private lastHitBySwingId = -1;
   
-  // Animation
-  private wobbleOffset = 0;
-  private eyeBlinkTimer = 0;
+  // Animation tweens
+  private rustleTween: Phaser.Tweens.Tween | null = null;
+  private breathTween: Phaser.Tweens.Tween | null = null;
+  private eyeGlowTween: Phaser.Tweens.Tween | null = null;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig, startSurface: CrawlSurface = 'floor') {
     super(scene, x, y, 'mossCreep');
@@ -66,9 +67,64 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
     // Randomize crawl direction
     this.crawlDir = Math.random() > 0.5 ? 1 : -1;
     
-    // Random animation phase
-    this.wobbleOffset = Math.random() * Math.PI * 2;
-    this.eyeBlinkTimer = Math.random() * 3000;
+    // Start camouflaged with subtle rustle
+    this.startCamouflageAnimation();
+  }
+  
+  private startCamouflageAnimation(): void {
+    // Subtle leaf rustle while camouflaged
+    this.rustleTween = this.scene.tweens.add({
+      targets: this,
+      angle: { from: -2, to: 2 },
+      duration: 2000 + Math.random() * 1000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  }
+  
+  private startActiveAnimation(): void {
+    // Stop camouflage animation
+    if (this.rustleTween) {
+      this.rustleTween.stop();
+      this.rustleTween = null;
+    }
+    
+    // Breathing/pulsing when active
+    this.breathTween = this.scene.tweens.add({
+      targets: this,
+      scaleX: { from: 1, to: 1.12 },
+      scaleY: { from: 1, to: 0.9 },
+      duration: 400,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+    
+    // Eye glow pulse effect (using tint)
+    this.eyeGlowTween = this.scene.tweens.add({
+      targets: this,
+      alpha: { from: 1, to: 0.85 },
+      duration: 300,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+  }
+  
+  private stopAnimations(): void {
+    if (this.rustleTween) {
+      this.rustleTween.stop();
+      this.rustleTween = null;
+    }
+    if (this.breathTween) {
+      this.breathTween.stop();
+      this.breathTween = null;
+    }
+    if (this.eyeGlowTween) {
+      this.eyeGlowTween.stop();
+      this.eyeGlowTween = null;
+    }
   }
   
   private updateSurfaceOrientation(): void {
@@ -215,47 +271,39 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
   }
 
   private updateVisuals(): void {
-    // Wobble animation
-    this.wobbleOffset += 0.002 * 16;
-    const wobbleScale = 1 + Math.sin(this.wobbleOffset * 2) * 0.03;
-    
-    // Eye blink timer
-    this.eyeBlinkTimer -= 16;
-    if (this.eyeBlinkTimer <= 0) {
-      this.eyeBlinkTimer = 2000 + Math.random() * 3000;
-    }
-    
-    // Camouflaged - stay still, blend in
+    // Camouflaged - stay still, blend in with subtle rustle
     if (this.aiState === 'camouflaged') {
       this.setTexture('mossCreep');
       this.clearTint();
-      this.setAlpha(0.9);
-      this.setScale(1); // No wobble when hidden
+      this.setAlpha(0.85);
+      // Restart rustle if not active
+      if (!this.rustleTween) {
+        this.startCamouflageAnimation();
+      }
       return;
+    }
+    
+    // Start active animations when crawling begins
+    if (this.aiState === 'crawling' && !this.breathTween) {
+      this.startActiveAnimation();
     }
     
     // Hurt flash
     if (this.hurtFlashTimer > 0) {
       this.setTexture('mossCreep_hurt');
       this.setTint(0xffffff);
-      this.setScale(1);
+      this.stopAnimations();
+      // Squish effect when hurt
+      this.setScale(1.3, 0.7);
     } else if (this.invulnTimer > 0) {
       this.setTexture('mossCreep');
       this.clearTint();
       this.setAlpha(Math.sin(Date.now() * 0.02) > 0 ? 1 : 0.5);
-      this.setScale(wobbleScale);
     } else {
-      // Active - wobbling movement
+      // Active - crawling with animations
       this.setTexture('mossCreep');
       this.clearTint();
       this.setAlpha(1);
-      
-      // Subtle wobble when crawling
-      if (this.aiState === 'crawling') {
-        this.setScale(wobbleScale, 1 / wobbleScale);
-      } else {
-        this.setScale(1);
-      }
     }
   }
 
