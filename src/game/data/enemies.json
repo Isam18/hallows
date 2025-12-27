@@ -1,4 +1,22 @@
 {
+  "basicHusk": {
+    "id": "basicHusk",
+    "displayName": "Husk",
+    "hp": 3,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 30,
+    "moveSpeedAggro": 270,
+    "aggroRangePx": 160,
+    "deaggroRangePx": 250,
+    "knockbackOnHit": { "x": 60, "y": 30 },
+    "hitstunMs": 150,
+    "invulnOnHitMs": 140,
+    "dropShells": { "min": 4, "max": 8 },
+    "hurtFlashMs": 140,
+    "spriteKey": "basicHusk",
+    "width": 32,
+    "height": 36
+  },
   "spikyGrub": {
     "id": "spikyGrub",
     "displayName": "Spiky Grub",
