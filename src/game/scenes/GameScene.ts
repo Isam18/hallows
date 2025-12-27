@@ -71,15 +71,20 @@ export class GameScene extends Phaser.Scene {
   
   // Respawn tracking
   private isRespawning = false;
+  
+  // Debug mode
+  private debugModeEnabled = false;
+  private debugGraphics: Phaser.GameObjects.Graphics | null = null;
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
-  init(data: { levelId: string; spawnId: string; respawning?: boolean }): void {
+  init(data: { levelId: string; spawnId: string; respawning?: boolean; debugMode?: boolean }): void {
     this.levelId = data.levelId || 'fadingTown';
     this.spawnId = data.spawnId || 'default';
     this.isRespawning = data.respawning || false;
+    this.debugModeEnabled = data.debugMode || this.registry.get('debugMode') || false;
     this.inBossArena = false;
     this.bossGateClosed = false;
   }
@@ -150,6 +155,46 @@ export class GameScene extends Phaser.Scene {
       this.applyRespawnInvulnerability();
       this.isRespawning = false;
     }
+    
+    // Setup debug mode visuals if enabled
+    if (this.debugModeEnabled) {
+      this.setupDebugMode();
+    }
+  }
+  
+  private setupDebugMode(): void {
+    // Enable physics debug
+    this.physics.world.createDebugGraphic();
+    
+    // Create debug overlay graphics
+    this.debugGraphics = this.add.graphics();
+    this.debugGraphics.setDepth(1000);
+    
+    // Show debug info text
+    const debugText = this.add.text(10, 10, 'DEBUG MODE', {
+      fontFamily: 'JetBrains Mono, monospace',
+      fontSize: '12px',
+      color: '#ff6644',
+      backgroundColor: '#000000aa',
+      padding: { x: 5, y: 3 }
+    });
+    debugText.setScrollFactor(0);
+    debugText.setDepth(1001);
+    
+    // Add keyboard shortcuts for debug
+    this.input.keyboard?.on('keydown-ONE', () => this.teleportToLevel('fadingTown'));
+    this.input.keyboard?.on('keydown-TWO', () => this.teleportToLevel('forgottenCrossroads'));
+    this.input.keyboard?.on('keydown-THREE', () => this.teleportToLevel('ruinedCrossroads'));
+    this.input.keyboard?.on('keydown-B', () => {
+      if (this.currentLevel.bossArena) this.enterBossArena();
+    });
+    this.input.keyboard?.on('keydown-H', () => {
+      gameState.fullHeal();
+      this.emitUIEvent('hpChange', gameState.getPlayerData());
+    });
+    this.input.keyboard?.on('keydown-G', () => {
+      this.giveShells(100);
+    });
   }
 
   private buildLevel(): void {

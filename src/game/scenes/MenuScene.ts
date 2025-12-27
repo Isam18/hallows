@@ -5,7 +5,9 @@ import gameState from '../core/GameState';
 export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text;
   private startButton!: Phaser.GameObjects.Text;
+  private debugButton!: Phaser.GameObjects.Text;
   private particles!: Phaser.GameObjects.Graphics;
+  private debugMode = false;
 
   constructor() {
     super({ key: 'MenuScene' });
@@ -21,7 +23,7 @@ export class MenuScene extends Phaser.Scene {
     this.createAmbientParticles();
     
     // Title
-    this.titleText = this.add.text(width / 2, height * 0.35, 'HALLOW NEST', {
+    this.titleText = this.add.text(width / 2, height * 0.30, 'HALLOW NEST', {
       fontFamily: 'Cinzel, serif',
       fontSize: '64px',
       color: '#e8e8e8',
@@ -30,14 +32,14 @@ export class MenuScene extends Phaser.Scene {
     }).setOrigin(0.5);
     
     // Subtitle
-    this.add.text(width / 2, height * 0.45, 'A cursed vessel awakens...', {
+    this.add.text(width / 2, height * 0.40, 'A cursed vessel awakens...', {
       fontFamily: 'Outfit, sans-serif',
       fontSize: '18px',
       color: '#888899',
     }).setOrigin(0.5);
     
     // Start button
-    this.startButton = this.add.text(width / 2, height * 0.65, '[ BEGIN JOURNEY ]', {
+    this.startButton = this.add.text(width / 2, height * 0.55, '[ BEGIN JOURNEY ]', {
       fontFamily: 'Cinzel, serif',
       fontSize: '24px',
       color: '#5599dd',
@@ -56,8 +58,35 @@ export class MenuScene extends Phaser.Scene {
       this.startGame();
     });
     
+    // Debug mode toggle button
+    this.debugButton = this.add.text(width / 2, height * 0.65, '[ DEBUG MODE: OFF ]', {
+      fontFamily: 'JetBrains Mono, monospace',
+      fontSize: '16px',
+      color: '#666677',
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerover', () => {
+      this.debugButton.setColor(this.debugMode ? '#ff8866' : '#88aa88');
+      this.debugButton.setScale(1.05);
+    })
+    .on('pointerout', () => {
+      this.debugButton.setColor(this.debugMode ? '#ff6644' : '#666677');
+      this.debugButton.setScale(1);
+    })
+    .on('pointerdown', () => {
+      this.toggleDebugMode();
+    });
+    
+    // Debug mode explanation
+    this.add.text(width / 2, height * 0.72, 'Shows hitboxes, stats, and enables teleport commands', {
+      fontFamily: 'JetBrains Mono, monospace',
+      fontSize: '11px',
+      color: '#444455',
+    }).setOrigin(0.5);
+    
     // Controls hint
-    this.add.text(width / 2, height * 0.85, 'WASD / Arrows: Move  |  Space: Jump  |  Shift: Dash  |  K: Attack  |  E: Interact', {
+    this.add.text(width / 2, height * 0.88, 'WASD / Arrows: Move  |  Space: Jump  |  Shift: Dash  |  K: Attack  |  E: Interact', {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '12px',
       color: '#555566',
@@ -72,8 +101,28 @@ export class MenuScene extends Phaser.Scene {
       this.startGame();
     });
     
+    // D key to toggle debug
+    this.input.keyboard?.on('keydown-D', () => {
+      this.toggleDebugMode();
+    });
+    
     // Fade in
     this.cameras.main.fadeIn(500);
+  }
+
+  private toggleDebugMode(): void {
+    this.debugMode = !this.debugMode;
+    
+    if (this.debugMode) {
+      this.debugButton.setText('[ DEBUG MODE: ON ]');
+      this.debugButton.setColor('#ff6644');
+    } else {
+      this.debugButton.setText('[ DEBUG MODE: OFF ]');
+      this.debugButton.setColor('#666677');
+    }
+    
+    // Store in registry for GameScene to access
+    this.registry.set('debugMode', this.debugMode);
   }
 
   private createAmbientParticles(): void {
@@ -119,7 +168,11 @@ export class MenuScene extends Phaser.Scene {
     
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.cameras.main.once('camerafadeoutcomplete', () => {
-      this.scene.start('GameScene', { levelId: 'fadingTown', spawnId: 'default' });
+      this.scene.start('GameScene', { 
+        levelId: 'fadingTown', 
+        spawnId: 'default',
+        debugMode: this.debugMode
+      });
     });
   }
 }
