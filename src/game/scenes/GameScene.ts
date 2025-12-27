@@ -376,11 +376,18 @@ export class GameScene extends Phaser.Scene {
 
   private setupCamera(): void {
     const cam = this.cameras.main;
+    // Reset camera look-ahead to prevent offset issues on level load
+    this.cameraLookAheadX = 0;
+    cam.setFollowOffset(0, 0);
+    
     // Use improved camera lerp from movement config
     cam.startFollow(this.player, true, 0.12, 0.10);
     cam.setBounds(0, 0, this.currentLevel.width, this.currentLevel.height);
     cam.setZoom(1);
     cam.setDeadzone(20, 30); // Small deadzone for stability
+    
+    // Immediately center camera on player to prevent off-screen start
+    cam.centerOn(this.player.x, this.player.y);
   }
 
   private checkDeathMarker(): void {
@@ -620,6 +627,9 @@ export class GameScene extends Phaser.Scene {
 
   private handlePortalOverlap(portal: Portal): void {
     if (!portal.canUse()) return;
+    
+    // Trigger the portal use to set cooldowns
+    portal.triggerUse();
     
     const data = portal.getData();
     
