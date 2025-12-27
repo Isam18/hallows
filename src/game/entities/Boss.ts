@@ -68,16 +68,16 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     
     this.setSize(CFG.width, CFG.height);
     this.setCollideWorldBounds(true);
-    this.setTint(0x8B4513); // Brown armored beetle
+    this.clearTint(); // Use actual sprite colors
     this.setScale(CFG.scale);
     
-    // Create mace visual
-    this.maceSprite = scene.add.rectangle(x + 60, y, 30, 80, 0x555555);
+    // Hide mace sprite - the image already has the mace
+    this.maceSprite = null;
     
-    // Set up arena bounds (assuming 1000px wide arena)
-    this.arenaLeft = x - 400;
-    this.arenaRight = x + 400;
-    
+    // Set up arena bounds (assuming 1200px wide arena)
+    this.arenaLeft = x - 500;
+    this.arenaRight = x + 500;
+
     this.cooldown = 1500;
   }
 
@@ -126,7 +126,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
         
       case 'staggered':
         body.setVelocityX(0);
-        this.setTint(0xffff00); // Yellow when staggered
+        // Use staggered sprite - fallen over with exposed maggot
         if (this.stateTimer > CFG.staggerDuration) {
           this.recoverFromStagger();
         }
@@ -307,15 +307,6 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  private recoverFromStagger(): void {
-    this.isStaggered = false;
-    this.staggerDamage = 0;
-    this.setTint(0x8B4513);
-    this.hideHeadHitbox();
-    
-    this.bossState = 'recovering';
-    this.stateTimer = 0;
-  }
 
   private updateRageTantrum(body: Phaser.Physics.Arcade.Body, delta: number): void {
     const cfg = CFG.attackPatterns.rageTantrum;
@@ -463,7 +454,7 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     this.setTint(0xffffff);
     this.scene.time.delayedCall(100, () => {
       if (!this.dead) {
-        this.setTint(this.isStaggered ? 0xffff00 : 0x8B4513);
+        this.clearTint(); // Use actual sprite colors
       }
     });
   }
@@ -477,18 +468,41 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityX(0);
     
+    // Switch to staggered sprite (fallen over with maggot exposed)
+    this.setTexture('falseChampion_staggered');
+    this.clearTint();
+    
     // Show head hitbox if conditions met
     if (this.headExposed) {
       this.showHeadHitbox();
     }
     
-    // Falling animation
+    // Slight bounce animation when falling
     this.scene.tweens.add({
       targets: this,
-      angle: this.facing * 20,
-      duration: 300,
+      y: this.y + 10,
+      duration: 200,
+      yoyo: true,
       ease: 'Bounce.easeOut'
     });
+    
+    // Camera shake on fall
+    this.scene.cameras.main.shake(150, 0.02);
+  }
+  
+  private recoverFromStagger(): void {
+    this.isStaggered = false;
+    this.staggerDamage = 0;
+    
+    // Switch back to normal sprite
+    this.setTexture('falseChampion');
+    this.clearTint();
+    this.setAngle(0);
+    
+    this.hideHeadHitbox();
+    
+    this.bossState = 'recovering';
+    this.stateTimer = 0;
   }
 
   private die(): void {
