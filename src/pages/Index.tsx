@@ -20,6 +20,7 @@ const Index = () => {
   const [gameLoaded, setGameLoaded] = useState(false);
   const [uiState, setUiState] = useState<string>('menu');
   const [playerData, setPlayerData] = useState(gameState.getPlayerData());
+  const [soul, setSoul] = useState(gameState.getSoul());
   
   // Additional UI states
   const [showShop, setShowShop] = useState(false);
@@ -101,6 +102,7 @@ const Index = () => {
       });
       const unsubHp = gameState.on('hpChange', () => setPlayerData(gameState.getPlayerData()));
       const unsubShells = gameState.on('shellsChange', () => setPlayerData(gameState.getPlayerData()));
+      const unsubSoul = gameState.on('soulChange', (newSoul: number) => setSoul(newSoul));
 
       // Poll for UI events from game scene
       const pollInterval = setInterval(() => {
@@ -133,6 +135,7 @@ const Index = () => {
         unsubState();
         unsubHp();
         unsubShells();
+        unsubSoul();
         clearInterval(pollInterval);
         gameRef.current?.destroy(true);
         gameRef.current = null;

@@ -655,6 +655,8 @@ export class GameScene extends Phaser.Scene {
     
     if (hitSomething) {
       this.applyHitstop();
+      // Add soul on successful hit
+      gameState.addSoulOnHit();
     }
   }
   

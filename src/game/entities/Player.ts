@@ -60,6 +60,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private slashSprite: Phaser.GameObjects.Sprite | null = null;
   private currentSwingId = 0;
   
+  // Focus healing system
+  private isFocusing = false;
+  private focusTimer = 0;
+  private focusParticles: Phaser.GameObjects.Group | null = null;
+  private readonly FOCUS_TIME = 1500; // 1.5 seconds to heal
+  
   // Invulnerability
   private invulnerable = false;
   private invulnerabilityTime = 0;
@@ -88,6 +94,15 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     
     // Update all timers
     this.updateTimers(delta);
+    
+    // Handle focus healing (highest priority - locks movement)
+    this.handleFocus(delta);
+    
+    // Skip other updates if focusing
+    if (this.isFocusing) {
+      this.updateDebugState();
+      return;
+    }
     
     // Process input buffers
     this.processInputBuffers();
@@ -597,6 +612,159 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   getAttackHitbox(): Phaser.Geom.Rectangle | null {
     return this.isAttacking ? this.attackHitbox : null;
   }
+  
+  // Focus healing system
+  private handleFocus(delta: number): void {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    
+    // Check if player can start or continue focusing
+    const canFocus = gameState.canFocusHeal() && 
+                     this.isGrounded && 
+                     !this.isAttacking &&
+                     this.movementState !== 'dash' &&
+                     this.movementState !== 'hitstun';
+    
+    // Start focusing
+    if (inputManager.isDown('focus') && canFocus && !this.isFocusing) {
+      this.startFocus();
+    }
+    
+    // Continue focusing
+    if (this.isFocusing) {
+      // Check if should cancel
+      if (!inputManager.isDown('focus') || !canFocus) {
+        this.cancelFocus();
+        return;
+      }
+      
+      // Lock movement during focus
+      body.setVelocityX(0);
+      
+      // Update timer
+      this.focusTimer -= delta;
+      
+      // Update particles
+      this.updateFocusParticles();
+      
+      // Check for heal completion
+      if (this.focusTimer <= 0) {
+        this.completeFocus();
+      }
+    }
+  }
+  
+  private startFocus(): void {
+    this.isFocusing = true;
+    this.focusTimer = this.FOCUS_TIME;
+    
+    // Emit event for UI
+    gameState['emit']('focusStart', null);
+    
+    // Visual - curl inward
+    this.setTint(0xaaccff);
+    
+    // Create particle group
+    this.focusParticles = this.scene.add.group();
+  }
+  
+  private updateFocusParticles(): void {
+    if (!this.focusParticles) return;
+    
+    // Create gathering particles
+    if (Math.random() < 0.3) {
+      const angle = Math.random() * Math.PI * 2;
+      const dist = 40 + Math.random() * 30;
+      const startX = this.x + Math.cos(angle) * dist;
+      const startY = this.y + Math.sin(angle) * dist;
+      
+      const particle = this.scene.add.circle(startX, startY, 3, 0xffffff, 0.8);
+      this.focusParticles.add(particle);
+      
+      // Animate toward player center
+      this.scene.tweens.add({
+        targets: particle,
+        x: this.x,
+        y: this.y - 10,
+        scale: 0.5,
+        alpha: 0,
+        duration: 400,
+        ease: 'Power2',
+        onComplete: () => particle.destroy()
+      });
+    }
+    
+    // Pulsing glow
+    const progress = 1 - (this.focusTimer / this.FOCUS_TIME);
+    const tintValue = Math.floor(0xaa + progress * 0x55);
+    this.setTint(Phaser.Display.Color.GetColor(tintValue, 0xcc, 0xff));
+  }
+  
+  private cancelFocus(): void {
+    this.isFocusing = false;
+    this.focusTimer = 0;
+    this.clearTint();
+    
+    // Clear particles
+    if (this.focusParticles) {
+      this.focusParticles.clear(true, true);
+      this.focusParticles = null;
+    }
+    
+    gameState['emit']('focusEnd', null);
+  }
+  
+  private completeFocus(): void {
+    // Perform heal
+    if (gameState.useSoulForHeal()) {
+      // Success - burst effect
+      this.createFocusBurst();
+    }
+    
+    // Clean up focus state
+    this.isFocusing = false;
+    this.focusTimer = 0;
+    this.clearTint();
+    
+    if (this.focusParticles) {
+      this.focusParticles.clear(true, true);
+      this.focusParticles = null;
+    }
+    
+    gameState['emit']('focusEnd', null);
+  }
+  
+  private createFocusBurst(): void {
+    // White burst particles
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const particle = this.scene.add.circle(this.x, this.y - 10, 5, 0xffffff, 1);
+      
+      this.scene.tweens.add({
+        targets: particle,
+        x: particle.x + Math.cos(angle) * 50,
+        y: particle.y + Math.sin(angle) * 50,
+        scale: 0.2,
+        alpha: 0,
+        duration: 300,
+        ease: 'Power2',
+        onComplete: () => particle.destroy()
+      });
+    }
+    
+    // Central flash
+    const flash = this.scene.add.circle(this.x, this.y - 10, 20, 0xffffff, 0.9);
+    this.scene.tweens.add({
+      targets: flash,
+      radius: 50,
+      alpha: 0,
+      duration: 200,
+      ease: 'Power2',
+      onComplete: () => flash.destroy()
+    });
+    
+    // Small screen shake
+    this.scene.cameras.main.shake(100, 0.01);
+  }
 
   private updateVisualState(): void {
     if (this.isAttacking) {
@@ -640,6 +808,11 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   // Damage handling
   takeDamage(amount: number, fromX: number): void {
     if (this.invulnerable) return;
+    
+    // Cancel focus if currently focusing
+    if (this.isFocusing) {
+      this.cancelFocus();
+    }
     
     gameState.damage(amount);
     
