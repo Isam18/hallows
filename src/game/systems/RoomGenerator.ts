@@ -502,6 +502,60 @@ function generateBossRoom(roomIndex: number, xOffset: number): RoomData {
 }
 
 /**
+ * Generate the Starting Room - styled like Fading Town
+ * A calm introductory area with basic platforming and light enemies
+ */
+function generateStartingRoom(xOffset: number): RoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  
+  // Ground - full width
+  platforms.push({
+    x: xOffset, y: ROOM_HEIGHT - 50, width: ROOM_WIDTH, height: 50, type: 'ground'
+  });
+  
+  // Side walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT - 50, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT - 50, type: 'wall' }
+  );
+  
+  // Platforms similar to fadingTown layout
+  platforms.push(
+    { x: xOffset + 150, y: ROOM_HEIGHT - 150, width: 120, height: 20, type: 'platform' },
+    { x: xOffset + 350, y: ROOM_HEIGHT - 220, width: 100, height: 20, type: 'platform' },
+    { x: xOffset + 550, y: ROOM_HEIGHT - 280, width: 100, height: 20, type: 'platform' },
+    { x: xOffset + 300, y: ROOM_HEIGHT - 350, width: 80, height: 20, type: 'platform' }
+  );
+  
+  // Interior wall obstacles
+  platforms.push(
+    { x: xOffset + 280, y: ROOM_HEIGHT - 200, width: 20, height: 150, type: 'wall' }
+  );
+  
+  // Light enemies - just a couple to introduce combat
+  enemies.push(
+    { type: 'spikyGrub', x: xOffset + 200, y: ROOM_HEIGHT - 80 },
+    { type: 'vengefly', x: xOffset + 450, y: ROOM_HEIGHT - 350 }
+  );
+  
+  return {
+    platforms,
+    enemies,
+    pickups: [
+      { type: 'shells', x: xOffset + 400, y: ROOM_HEIGHT - 250, amount: 5 },
+      { type: 'shells', x: xOffset + 600, y: ROOM_HEIGHT - 80, amount: 5 }
+    ],
+    triggers: [],
+    spawns: {
+      default: { x: xOffset + 80, y: ROOM_HEIGHT - 100 },
+      startingRoom_entry: { x: xOffset + 80, y: ROOM_HEIGHT - 100 },
+      startingRoom_exit: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 100 }
+    }
+  };
+}
+
+/**
  * Generate randomized room order with constraints
  */
 function generateRoomOrder(): RoomType[] {
@@ -549,29 +603,34 @@ export function generateForgottenCrossroads(): LevelConfig {
   const rooms: RoomData[] = [];
   let totalWidth = 0;
   
+  // Generate starting room first (styled like Fading Town)
+  const startingRoom = generateStartingRoom(totalWidth);
+  rooms.push(startingRoom);
+  totalWidth += ROOM_WIDTH;
+  
   // Generate randomized room order
   const roomOrder = generateRoomOrder();
   
-  // Generate 10 rooms
+  // Generate 10 rooms after the starting room
   for (let i = 0; i < 10; i++) {
     const roomType = roomOrder[i];
     let roomData: RoomData;
     
     switch (roomType) {
       case 'verticalShaft':
-        roomData = generateVerticalShaft(i, totalWidth);
+        roomData = generateVerticalShaft(i + 1, totalWidth);
         break;
       case 'guardedCorridor':
-        roomData = generateGuardedCorridor(i, totalWidth);
+        roomData = generateGuardedCorridor(i + 1, totalWidth);
         break;
       case 'restingStation':
-        roomData = generateRestingStation(i, totalWidth);
+        roomData = generateRestingStation(i + 1, totalWidth);
         break;
       case 'infectedCuldesac':
-        roomData = generateInfectedCuldesac(i, totalWidth);
+        roomData = generateInfectedCuldesac(i + 1, totalWidth);
         break;
       default:
-        roomData = generateGuardedCorridor(i, totalWidth);
+        roomData = generateGuardedCorridor(i + 1, totalWidth);
     }
     
     rooms.push(roomData);
@@ -579,7 +638,7 @@ export function generateForgottenCrossroads(): LevelConfig {
   }
   
   // Add fixed boss room at the end
-  const bossRoom = generateBossRoom(10, totalWidth);
+  const bossRoom = generateBossRoom(11, totalWidth);
   rooms.push(bossRoom);
   const bossRoomStartX = totalWidth;
   totalWidth += BOSS_ARENA_WIDTH;
@@ -603,22 +662,34 @@ export function generateForgottenCrossroads(): LevelConfig {
     if (room.breakables) allBreakables.push(...room.breakables);
   });
   
-  // Add transitions between rooms
+  // Add transition from starting room to first generated room
+  allTriggers.push({
+    id: 'transition_start_to_room1',
+    type: 'transition',
+    x: ROOM_WIDTH - 30,
+    y: ROOM_HEIGHT - 150,
+    width: 30,
+    height: 100,
+    target: 'forgottenCrossroads',
+    targetSpawn: 'room1_entry'
+  });
+  
+  // Add transitions between the 10 generated rooms
   for (let i = 0; i < 10; i++) {
     const roomType = roomOrder[i];
-    const xPos = (i + 1) * ROOM_WIDTH - 30;
+    const xPos = ((i + 2) * ROOM_WIDTH) - 30; // +2 because starting room is at index 0
     
     // Skip transition for cul-de-sac (dead end)
     if (roomType !== 'infectedCuldesac') {
       allTriggers.push({
-        id: `transition_room${i}_to_room${i + 1}`,
+        id: `transition_room${i + 1}_to_room${i + 2}`,
         type: 'transition',
         x: xPos,
         y: ROOM_HEIGHT - 150,
         width: 30,
         height: 100,
         target: 'forgottenCrossroads',
-        targetSpawn: `room${i + 1}_entry`
+        targetSpawn: i < 9 ? `room${i + 2}_entry` : 'room11_entry'
       });
     }
   }
@@ -629,7 +700,7 @@ export function generateForgottenCrossroads(): LevelConfig {
     width: totalWidth,
     height: BOSS_ARENA_HEIGHT,
     backgroundColor: '#0a0e18',
-    spawnPoint: { x: 100, y: ROOM_HEIGHT - 100 },
+    spawnPoint: { x: 80, y: ROOM_HEIGHT - 100 },
     platforms: allPlatforms,
     enemies: allEnemies,
     pickups: allPickups,
