@@ -172,7 +172,7 @@ export class GameScene extends Phaser.Scene {
     
     // Show debug info text with controls
     const debugText = this.add.text(10, 10, 
-      'DEBUG MODE\n1: Fading Town | 2: Crossroads | 3: Ruins\nB: Boss | H: Heal | G: +100 Shells', {
+      `DEBUG MODE\n1: Fading Town | 2: Crossroads | 3: Ruins\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${gameState.isInstakillMode() ? 'ON' : 'OFF'}]`, {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '11px',
       color: '#ff6644',
@@ -182,6 +182,9 @@ export class GameScene extends Phaser.Scene {
     });
     debugText.setScrollFactor(0);
     debugText.setDepth(1001);
+    
+    // Store reference to update text
+    this.registry.set('debugText', debugText);
     
     // Add keyboard shortcuts for debug using correct Phaser key codes
     if (this.input.keyboard) {
@@ -210,6 +213,15 @@ export class GameScene extends Phaser.Scene {
         } else if (event.key === 'g' || event.key === 'G') {
           console.log('Giving 100 shells');
           this.giveShells(100);
+        } else if (event.key === 'i' || event.key === 'I') {
+          const newState = !gameState.isInstakillMode();
+          gameState.setInstakillMode(newState);
+          console.log(`Instakill mode: ${newState ? 'ON' : 'OFF'}`);
+          // Update debug text
+          const debugTextObj = this.registry.get('debugText') as Phaser.GameObjects.Text;
+          if (debugTextObj) {
+            debugTextObj.setText(`DEBUG MODE\n1: Fading Town | 2: Crossroads | 3: Ruins\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${newState ? 'ON' : 'OFF'}]`);
+          }
         }
       });
     }
@@ -441,7 +453,8 @@ export class GameScene extends Phaser.Scene {
   
   // Player attack hit check - called by Player when attack hitbox is active
   checkAttackHit(hitbox: Phaser.Geom.Rectangle, swingId: number): void {
-    const damage = PLAYER_CONFIG.attackDamage + gameState.getCharmModifier('damageMod');
+    const baseDamage = PLAYER_CONFIG.attackDamage + gameState.getCharmModifier('damageMod');
+    const damage = gameState.isInstakillMode() ? 100000 : baseDamage;
     let hitSomething = false;
     
     this.enemies.getChildren().forEach((enemy) => {
