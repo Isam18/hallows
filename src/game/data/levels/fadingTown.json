@@ -47,8 +47,8 @@
       "y": 450,
       "width": 30,
       "height": 100,
-      "target": "ruinedCrossroads",
-      "targetSpawn": "entrance"
+      "target": "forgottenCrossroads",
+      "targetSpawn": "default"
     }
   ],
   "spawns": {
