@@ -85,6 +85,18 @@ export interface CharmData {
 // Re-export EnemyCombatConfig as EnemyConfig for compatibility
 export type { EnemyCombatConfig as EnemyConfig } from './CombatConfig';
 
+export interface SpikeConfig {
+  x: number;
+  y: number;
+  width: number;
+}
+
+export interface BreakableConfig {
+  type: 'signpost' | 'pole' | 'barrel';
+  x: number;
+  y: number;
+}
+
 export interface LevelConfig {
   id: string;
   name: string;
@@ -97,6 +109,8 @@ export interface LevelConfig {
   pickups: PickupConfig[];
   triggers: TriggerConfig[];
   spawns: Record<string, { x: number; y: number }>;
+  spikes?: SpikeConfig[];
+  breakables?: BreakableConfig[];
   bossArena?: {
     x: number;
     y: number;
