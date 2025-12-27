@@ -1476,6 +1476,152 @@ export class BootScene extends Phaser.Scene {
     
     portalGraphics.generateTexture('portal', 30, 100);
     portalGraphics.destroy();
+    
+    // Breakable - Signpost (old ruined sign)
+    this.createBreakableSignpost();
+    this.createBreakablePole();
+    this.createBreakableBarrel();
+    
+    // Spike hazard
+    this.createSpikeTexture();
+  }
+  
+  private createBreakableSignpost(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    
+    // Wooden post
+    g.fillStyle(0x4a3a2a);
+    g.fillRect(8, 20, 6, 30);
+    
+    // Post detail
+    g.fillStyle(0x5a4a3a);
+    g.fillRect(9, 22, 4, 26);
+    
+    // Sign board (angled/broken)
+    g.fillStyle(0x5a4a3a);
+    g.beginPath();
+    g.moveTo(0, 0);
+    g.lineTo(22, 2);
+    g.lineTo(20, 18);
+    g.lineTo(2, 16);
+    g.closePath();
+    g.fillPath();
+    
+    // Sign highlight
+    g.fillStyle(0x6a5a4a);
+    g.fillRect(3, 4, 15, 8);
+    
+    // Cracks
+    g.lineStyle(1, 0x3a2a1a, 0.7);
+    g.lineBetween(5, 2, 8, 14);
+    g.lineBetween(14, 4, 16, 12);
+    
+    // Nails
+    g.fillStyle(0x3a3a3a);
+    g.fillCircle(4, 6, 1.5);
+    g.fillCircle(18, 8, 1.5);
+    
+    g.generateTexture('breakable_signpost', 24, 50);
+    g.destroy();
+  }
+  
+  private createBreakablePole(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    
+    // Tall wooden pole
+    g.fillStyle(0x4a3a2a);
+    g.fillRect(3, 0, 8, 55);
+    
+    // Wood grain
+    g.fillStyle(0x5a4a3a);
+    g.fillRect(5, 2, 4, 51);
+    
+    // Cracks/weathering
+    g.lineStyle(1, 0x3a2a1a, 0.6);
+    g.lineBetween(4, 5, 6, 20);
+    g.lineBetween(8, 30, 10, 45);
+    
+    // Top (broken/jagged)
+    g.fillStyle(0x4a3a2a);
+    g.beginPath();
+    g.moveTo(3, 0);
+    g.lineTo(5, -4);
+    g.lineTo(7, 2);
+    g.lineTo(9, -2);
+    g.lineTo(11, 0);
+    g.closePath();
+    g.fillPath();
+    
+    g.generateTexture('breakable_pole', 14, 60);
+    g.destroy();
+  }
+  
+  private createBreakableBarrel(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 12;
+    
+    // Barrel body
+    g.fillStyle(0x4a3a2a);
+    g.fillEllipse(cx, 8, 22, 12);
+    g.fillRect(1, 8, 22, 24);
+    g.fillEllipse(cx, 32, 22, 12);
+    
+    // Barrel front
+    g.fillStyle(0x5a4a3a);
+    g.fillEllipse(cx, 32, 20, 10);
+    
+    // Metal bands
+    g.fillStyle(0x3a4a5a);
+    g.fillRect(0, 12, 24, 3);
+    g.fillRect(0, 26, 24, 3);
+    
+    // Band highlights
+    g.fillStyle(0x4a5a6a);
+    g.fillRect(2, 12, 20, 1);
+    g.fillRect(2, 26, 20, 1);
+    
+    // Wood planks vertical lines
+    g.lineStyle(1, 0x3a2a1a, 0.5);
+    g.lineBetween(6, 8, 6, 32);
+    g.lineBetween(12, 8, 12, 32);
+    g.lineBetween(18, 8, 18, 32);
+    
+    g.generateTexture('breakable_barrel', 24, 44);
+    g.destroy();
+  }
+  
+  private createSpikeTexture(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const spikeCount = 8;
+    const spikeWidth = 10;
+    const totalWidth = spikeCount * spikeWidth;
+    
+    // Draw row of spikes
+    for (let i = 0; i < spikeCount; i++) {
+      const x = i * spikeWidth;
+      
+      // Spike body - dark metal
+      g.fillStyle(0x3a4050);
+      g.beginPath();
+      g.moveTo(x, 20);
+      g.lineTo(x + spikeWidth / 2, 0);
+      g.lineTo(x + spikeWidth, 20);
+      g.closePath();
+      g.fillPath();
+      
+      // Spike highlight (left edge)
+      g.fillStyle(0x4a5060, 0.7);
+      g.beginPath();
+      g.moveTo(x + 2, 18);
+      g.lineTo(x + spikeWidth / 2, 3);
+      g.lineTo(x + spikeWidth / 2 + 2, 8);
+      g.lineTo(x + 4, 18);
+      g.closePath();
+      g.fillPath();
+    }
+    
+    g.generateTexture('spike', totalWidth, 20);
+    g.destroy();
   }
 
   create(): void {

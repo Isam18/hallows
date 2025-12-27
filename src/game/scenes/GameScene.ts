@@ -18,7 +18,8 @@ import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
 import { Portal } from '../entities/Portal';
 import { DeathMarker } from '../entities/DeathMarker';
-// Breakable import removed - not currently used
+import { Spike } from '../entities/Spike';
+import { Breakable } from '../entities/Breakable';
 import { ParallaxBackground } from '../systems/ParallaxBackground';
 import { DustParticles } from '../systems/DustParticles';
 import { FlyingEnemySpawner } from '../systems/FlyingEnemySpawner';
@@ -51,9 +52,10 @@ export class GameScene extends Phaser.Scene {
   private pickups!: Phaser.Physics.Arcade.Group;
   private benches!: Phaser.Physics.Arcade.StaticGroup;
   private portals!: Phaser.Physics.Arcade.StaticGroup;
+  private spikes!: Phaser.Physics.Arcade.StaticGroup;
+  private breakables!: Phaser.Physics.Arcade.StaticGroup;
   private deathMarker: DeathMarker | null = null;
   private boss: Boss | null = null;
-  // spikes and breakables reserved for future use
   
   // Visual systems
   private parallaxBg: ParallaxBackground | null = null;
@@ -121,6 +123,8 @@ export class GameScene extends Phaser.Scene {
     this.pickups = this.physics.add.group();
     this.benches = this.physics.add.staticGroup();
     this.portals = this.physics.add.staticGroup();
+    this.spikes = this.physics.add.staticGroup();
+    this.breakables = this.physics.add.staticGroup();
     
     // Create visual effects based on level biome
     const biome = (this.currentLevel as any).biome || 'crossroads';
@@ -367,6 +371,22 @@ export class GameScene extends Phaser.Scene {
         this.pickups.add(pickup);
       }
     });
+    
+    // Spikes (hazards)
+    if (this.currentLevel.spikes) {
+      this.currentLevel.spikes.forEach(s => {
+        const spike = new Spike(this, s.x, s.y, s.width);
+        this.spikes.add(spike);
+      });
+    }
+    
+    // Breakables (environmental objects that drop currency)
+    if (this.currentLevel.breakables) {
+      this.currentLevel.breakables.forEach(b => {
+        const breakable = new Breakable(this, b.x, b.y, b.type);
+        this.breakables.add(breakable);
+      });
+    }
   }
 
   private setupCollisions(): void {
@@ -398,6 +418,14 @@ export class GameScene extends Phaser.Scene {
     // Player vs portals
     this.physics.add.overlap(this.player, this.portals,
       (player, portal) => this.handlePortalOverlap(portal as Portal)
+    );
+    
+    // Player vs spikes (hazard damage)
+    this.physics.add.overlap(this.player, this.spikes,
+      (player, spike) => {
+        const s = spike as Spike;
+        s.onPlayerContact(this.player);
+      }
     );
     
     // Boss collisions (if boss exists)

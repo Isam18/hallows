@@ -7,12 +7,26 @@ export type RoomType =
   | 'infectedCuldesac'
   | 'bossRoom';
 
+export interface SpikeConfig {
+  x: number;
+  y: number;
+  width: number;
+}
+
+export interface BreakableConfig {
+  type: 'signpost' | 'pole' | 'barrel';
+  x: number;
+  y: number;
+}
+
 export interface RoomData {
   platforms: PlatformConfig[];
   enemies: EnemySpawnConfig[];
   pickups: PickupConfig[];
   triggers: TriggerConfig[];
   spawns: Record<string, { x: number; y: number }>;
+  spikes?: SpikeConfig[];
+  breakables?: BreakableConfig[];
 }
 
 // Room dimensions - unified for all rooms
@@ -49,6 +63,7 @@ function shuffleArray<T>(arr: T[]): T[] {
 function generateVerticalShaft(roomIndex: number, xOffset: number): RoomData {
   const platforms: PlatformConfig[] = [];
   const enemies: EnemySpawnConfig[] = [];
+  const spikes: SpikeConfig[] = [];
   
   // Left and right walls
   platforms.push({
@@ -58,17 +73,43 @@ function generateVerticalShaft(roomIndex: number, xOffset: number): RoomData {
     x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall'
   });
   
-  // Ground
+  // Ground (thin ledge at bottom for spikes)
   platforms.push({
-    x: xOffset + 20, y: ROOM_HEIGHT - 30, width: ROOM_WIDTH - 40, height: 30, type: 'ground'
+    x: xOffset + 20, y: ROOM_HEIGHT - 20, width: ROOM_WIDTH - 40, height: 20, type: 'ground'
+  });
+  
+  // SPIKES at the very bottom - covering most of the floor
+  // Leave small safe landing zones on left and right
+  const safeZoneWidth = 80;
+  const spikeWidth = ROOM_WIDTH - 40 - (safeZoneWidth * 2);
+  spikes.push({
+    x: xOffset + 20 + safeZoneWidth,
+    y: ROOM_HEIGHT - 40,
+    width: spikeWidth
+  });
+  
+  // Small safe platforms above spikes for entry/exit
+  platforms.push({
+    x: xOffset + 25,
+    y: ROOM_HEIGHT - 60,
+    width: 70,
+    height: 15,
+    type: 'platform'
+  });
+  platforms.push({
+    x: xOffset + ROOM_WIDTH - 95,
+    y: ROOM_HEIGHT - 60,
+    width: 70,
+    height: 15,
+    type: 'platform'
   });
   
   // Randomized ascending platforms (zigzag pattern with variation)
   const platformCount = randomInt(5, 7);
-  const heightStep = (ROOM_HEIGHT - 150) / platformCount;
+  const heightStep = (ROOM_HEIGHT - 180) / platformCount;
   
   for (let i = 0; i < platformCount; i++) {
-    const baseY = ROOM_HEIGHT - 100 - (i * heightStep);
+    const baseY = ROOM_HEIGHT - 140 - (i * heightStep);
     const xVariation = randomInt(60, ROOM_WIDTH - 180);
     const widthVariation = randomInt(100, 140);
     
@@ -81,17 +122,17 @@ function generateVerticalShaft(roomIndex: number, xOffset: number): RoomData {
     });
   }
   
-  // Randomized Vengefly count and positions
+  // Randomized Vengefly count and positions (patrolling mid-air sections)
   const vengeflyCount = randomInt(2, 4);
   for (let i = 0; i < vengeflyCount; i++) {
     enemies.push({
       type: 'vengefly',
       x: xOffset + randomInt(100, ROOM_WIDTH - 100),
-      y: randomInt(100, ROOM_HEIGHT - 200)
+      y: randomInt(100, ROOM_HEIGHT - 250)
     });
   }
   
-  // Random pickup positions
+  // Random pickup positions on platforms
   const pickups: PickupConfig[] = [];
   const pickupCount = randomInt(1, 3);
   for (let i = 0; i < pickupCount; i++) {
@@ -108,9 +149,10 @@ function generateVerticalShaft(roomIndex: number, xOffset: number): RoomData {
     enemies,
     pickups,
     triggers: [],
+    spikes,
     spawns: {
-      [`room${roomIndex}_entry`]: { x: xOffset + 100, y: ROOM_HEIGHT - 80 },
-      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 80 }
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 100 }
     }
   };
 }
@@ -121,6 +163,7 @@ function generateVerticalShaft(roomIndex: number, xOffset: number): RoomData {
 function generateGuardedCorridor(roomIndex: number, xOffset: number): RoomData {
   const platforms: PlatformConfig[] = [];
   const enemies: EnemySpawnConfig[] = [];
+  const breakables: BreakableConfig[] = [];
   
   // Ground
   platforms.push({
@@ -154,20 +197,32 @@ function generateGuardedCorridor(roomIndex: number, xOffset: number): RoomData {
     });
   }
   
-  // Randomized Husk Guard positions (1-2)
-  const guardCount = randomInt(1, 2);
-  const guardSpacing = (ROOM_WIDTH - 200) / guardCount;
+  // Randomized Husk Guard positions (at least 2 per the requirement)
+  const guardCount = 2;
+  const guardSpacing = (ROOM_WIDTH - 300) / guardCount;
   
   for (let i = 0; i < guardCount; i++) {
     enemies.push({
       type: 'huskGuard',
-      x: xOffset + 150 + (i * guardSpacing) + randomInt(-50, 50),
+      x: xOffset + 150 + (i * guardSpacing) + randomInt(-30, 30),
       y: ROOM_HEIGHT - 120
     });
   }
   
-  // Random ground enemies
-  const grubCount = randomInt(1, 3);
+  // BREAKABLE BACKGROUND OBJECTS (old signposts and poles that drop currency)
+  const breakableCount = randomInt(2, 4);
+  const breakableTypes: Array<'signpost' | 'pole' | 'barrel'> = ['signpost', 'pole', 'barrel'];
+  
+  for (let i = 0; i < breakableCount; i++) {
+    breakables.push({
+      type: randomChoice(breakableTypes),
+      x: xOffset + 80 + (i * ((ROOM_WIDTH - 160) / breakableCount)) + randomInt(-20, 20),
+      y: ROOM_HEIGHT - 70
+    });
+  }
+  
+  // Random ground enemies (fewer since we have guards)
+  const grubCount = randomInt(0, 2);
   for (let i = 0; i < grubCount; i++) {
     enemies.push({
       type: randomChoice(['spikyGrub', 'crawlingHusk']),
@@ -179,6 +234,7 @@ function generateGuardedCorridor(roomIndex: number, xOffset: number): RoomData {
   return {
     platforms,
     enemies,
+    breakables,
     pickups: [
       { 
         type: 'shells', 
@@ -534,6 +590,8 @@ export function generateForgottenCrossroads(): LevelConfig {
   const allPickups: PickupConfig[] = [];
   const allTriggers: TriggerConfig[] = [];
   const allSpawns: Record<string, { x: number; y: number }> = {};
+  const allSpikes: SpikeConfig[] = [];
+  const allBreakables: BreakableConfig[] = [];
   
   rooms.forEach((room) => {
     allPlatforms.push(...room.platforms);
@@ -541,6 +599,8 @@ export function generateForgottenCrossroads(): LevelConfig {
     allPickups.push(...room.pickups);
     allTriggers.push(...room.triggers);
     Object.assign(allSpawns, room.spawns);
+    if (room.spikes) allSpikes.push(...room.spikes);
+    if (room.breakables) allBreakables.push(...room.breakables);
   });
   
   // Add transitions between rooms
@@ -567,7 +627,7 @@ export function generateForgottenCrossroads(): LevelConfig {
     id: 'forgottenCrossroads',
     name: 'Forgotten Crossroads',
     width: totalWidth,
-    height: BOSS_ARENA_HEIGHT, // Use taller boss arena height for whole level
+    height: BOSS_ARENA_HEIGHT,
     backgroundColor: '#0a0e18',
     spawnPoint: { x: 100, y: ROOM_HEIGHT - 100 },
     platforms: allPlatforms,
@@ -578,6 +638,8 @@ export function generateForgottenCrossroads(): LevelConfig {
       default: { x: 100, y: ROOM_HEIGHT - 100 },
       ...allSpawns
     },
+    spikes: allSpikes,
+    breakables: allBreakables,
     bossArena: {
       x: bossRoomStartX,
       y: 0,
