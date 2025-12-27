@@ -1411,6 +1411,6 @@ export class GameScene extends Phaser.Scene {
   
   // Transition to Greenway (called from React UI)
   transitionToGreenway(): void {
-    this.transitionToLevel('greenway', 'entrance');
+    this.transitionToLevel('greenwayGenerated', 'fromChainRoom');
   }
 }
