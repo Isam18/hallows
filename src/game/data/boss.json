@@ -1,28 +1,46 @@
 {
-  "elderGrub": {
-    "id": "elderGrub",
-    "name": "Elder Grub",
-    "maxHp": 40,
-    "phase1": {
-      "patterns": ["charge", "slam"],
-      "chargeSpeed": 200,
-      "slamDelay": 800,
-      "patternCooldown": 2000
+  "falseChampion": {
+    "id": "falseChampion",
+    "name": "False Champion",
+    "maxHp": 60,
+    "staggerThreshold": 12,
+    "staggerDuration": 5000,
+    "staggerRecoveryRageTime": 2000,
+    "headExposureCondition": {
+      "timeThresholdSec": 45,
+      "damageThresholdRatio": 0.2
     },
-    "phase2": {
-      "trigger": 0.5,
-      "patterns": ["charge", "slam", "spikeBurst"],
-      "chargeSpeed": 280,
-      "slamDelay": 600,
-      "patternCooldown": 1500,
-      "spikeCount": 5
+    "attackPatterns": {
+      "leapSmash": {
+        "jumpHeight": 350,
+        "hangTime": 600,
+        "slamSpeed": 800,
+        "shockwaveWidth": 120,
+        "shockwaveDamage": 2,
+        "cooldown": 2000
+      },
+      "maceCombo": {
+        "swings": 3,
+        "swingDelay": 400,
+        "forwardMovePerSwing": 60,
+        "damage": 2,
+        "cooldown": 1800
+      },
+      "rageTantrum": {
+        "duration": 3500,
+        "smashInterval": 300,
+        "rockSpawnInterval": 500,
+        "rockDamage": 1,
+        "cooldown": 0
+      }
     },
     "contactDamage": 2,
-    "width": 80,
-    "height": 60,
+    "width": 100,
+    "height": 90,
+    "scale": 3.5,
     "reward": {
-      "shells": 100,
-      "charm": "toughShell"
+      "shells": 150,
+      "charm": "falseStrength"
     }
   }
 }

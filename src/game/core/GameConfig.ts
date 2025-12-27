@@ -129,7 +129,7 @@ export interface PickupConfig {
 
 export interface TriggerConfig {
   id: string;
-  type: 'bench' | 'transition' | 'bossGate';
+  type: 'bench' | 'transition' | 'bossGate' | 'gate' | 'decoration';
   x: number;
   y: number;
   width: number;
