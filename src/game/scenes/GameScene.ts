@@ -7,6 +7,7 @@ import inputManager from '../core/InputManager';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { Vengefly } from '../entities/Vengefly';
+import { Aspid } from '../entities/Aspid';
 import { HuskGuard } from '../entities/HuskGuard';
 import { InfectedHusk } from '../entities/InfectedHusk';
 import { Boss } from '../entities/Boss';
@@ -17,6 +18,7 @@ import { DeathMarker } from '../entities/DeathMarker';
 // Breakable import removed - not currently used
 import { ParallaxBackground } from '../systems/ParallaxBackground';
 import { DustParticles } from '../systems/DustParticles';
+import { FlyingEnemySpawner } from '../systems/FlyingEnemySpawner';
 import { generateForgottenCrossroads } from '../systems/RoomGenerator';
 
 // Import level data
@@ -49,6 +51,7 @@ export class GameScene extends Phaser.Scene {
   // Visual systems
   private parallaxBg: ParallaxBackground | null = null;
   private dustParticles: DustParticles | null = null;
+  private flyingSpawner: FlyingEnemySpawner | null = null;
   
   // Level data
   private currentLevel!: LevelConfig;
@@ -280,14 +283,20 @@ export class GameScene extends Phaser.Scene {
       }
     });
     
+    // Initialize flying enemy spawner
+    this.flyingSpawner = new FlyingEnemySpawner(this, this.enemies);
+    
     // Enemies
     this.currentLevel.enemies.forEach(e => {
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
       if (config) {
-        // Use appropriate class based on enemy type
+        // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         if (e.type === 'vengefly' || (config as any).isFlying) {
-          const vengefly = new Vengefly(this, e.x, e.y, config);
-          this.enemies.add(vengefly);
+          // Use spawner for random Vengefly/Aspid selection
+          this.flyingSpawner!.spawnAt(e.x, e.y);
+        } else if (e.type === 'aspid') {
+          // Force Aspid if explicitly specified
+          this.flyingSpawner!.spawnAt(e.x, e.y, 'aspid');
         } else if (e.type === 'huskGuard' || (config as any).isElite) {
           const huskGuard = new HuskGuard(this, e.x, e.y, config);
           this.enemies.add(huskGuard);
@@ -643,10 +652,83 @@ export class GameScene extends Phaser.Scene {
     // Close gate
     this.bossGateClosed = true;
     
-    // Emit boss start
-    this.emitUIEvent('bossStart', {
-      name: this.boss.getName(),
-      maxHp: this.boss.getMaxHp(),
+    // Show boss name intro
+    this.showBossIntro(this.boss.getName());
+    
+    // Emit boss start (after intro delay)
+    this.time.delayedCall(2000, () => {
+      this.emitUIEvent('bossStart', {
+        name: this.boss?.getName(),
+        maxHp: this.boss?.getMaxHp(),
+      });
+    });
+  }
+  
+  private showBossIntro(bossName: string): void {
+    // Create dramatic boss name display
+    const centerX = this.cameras.main.width / 2;
+    const bottomY = this.cameras.main.height - 100;
+    
+    // Background bar
+    const bgBar = this.add.rectangle(centerX, bottomY, 0, 60, 0x000000, 0.7);
+    bgBar.setScrollFactor(0);
+    bgBar.setDepth(1000);
+    
+    // Boss name text
+    const nameText = this.add.text(centerX, bottomY, bossName.toUpperCase(), {
+      fontFamily: 'Georgia, serif',
+      fontSize: '48px',
+      color: '#ffffff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 4,
+    });
+    nameText.setOrigin(0.5);
+    nameText.setScrollFactor(0);
+    nameText.setDepth(1001);
+    nameText.setAlpha(0);
+    
+    // Subtitle
+    const subtitle = this.add.text(centerX, bottomY + 35, '~ Champion of the Forgotten ~', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '18px',
+      color: '#ff8844',
+      fontStyle: 'italic',
+    });
+    subtitle.setOrigin(0.5);
+    subtitle.setScrollFactor(0);
+    subtitle.setDepth(1001);
+    subtitle.setAlpha(0);
+    
+    // Animate in
+    this.tweens.add({
+      targets: bgBar,
+      width: 600,
+      duration: 300,
+      ease: 'Power2'
+    });
+    
+    this.tweens.add({
+      targets: [nameText, subtitle],
+      alpha: 1,
+      duration: 500,
+      delay: 200,
+      ease: 'Power2'
+    });
+    
+    // Hold for 2 seconds, then fade out
+    this.time.delayedCall(2000, () => {
+      this.tweens.add({
+        targets: [nameText, subtitle, bgBar],
+        alpha: 0,
+        duration: 500,
+        ease: 'Power2',
+        onComplete: () => {
+          nameText.destroy();
+          subtitle.destroy();
+          bgBar.destroy();
+        }
+      });
     });
   }
   

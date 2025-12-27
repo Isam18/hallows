@@ -244,6 +244,9 @@ export class BootScene extends Phaser.Scene {
     // Vengefly - Hollow Knight inspired flying enemy
     this.createVengeflySprite();
     
+    // Aspid - Ranged flying enemy
+    this.createAspidSprite();
+    
     // Husk Guard - Elite armored enemy
     this.createHuskGuardSprite();
     
@@ -351,6 +354,101 @@ export class BootScene extends Phaser.Scene {
     hg.fillEllipse(cx - 10, cy + 2, 12, 10); // Head
     
     hg.generateTexture('vengefly_hurt', 44, 36);
+    hg.destroy();
+  }
+
+  private createAspidSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 22; // Center X
+    const cy = 20; // Center Y
+    
+    // === WINGS (translucent, larger than vengefly) ===
+    g.fillStyle(0xd8c8c0, 0.5);
+    g.fillEllipse(cx - 10, cy - 10, 22, 12);
+    g.fillEllipse(cx + 10, cy - 10, 22, 12);
+    g.lineStyle(1, 0xa09088, 0.4);
+    g.strokeEllipse(cx - 10, cy - 10, 22, 12);
+    g.strokeEllipse(cx + 10, cy - 10, 22, 12);
+    
+    // Wing veins
+    g.lineStyle(0.5, 0x908880, 0.3);
+    g.lineBetween(cx - 14, cy - 12, cx - 6, cy - 8);
+    g.lineBetween(cx + 14, cy - 12, cx + 6, cy - 8);
+    
+    // === BODY (round, bulbous) ===
+    // Main body - dark with orange infection
+    g.fillStyle(0x4a4a58);
+    g.fillEllipse(cx, cy + 4, 26, 22);
+    
+    // Glowing orange belly (infection)
+    g.fillStyle(0xff6600);
+    g.fillEllipse(cx, cy + 8, 18, 14);
+    g.fillStyle(0xff8844, 0.8);
+    g.fillEllipse(cx, cy + 6, 12, 10);
+    g.fillStyle(0xffaa66, 0.6);
+    g.fillEllipse(cx, cy + 5, 6, 6);
+    
+    // Body highlight
+    g.fillStyle(0x5a5a68, 0.5);
+    g.fillEllipse(cx - 4, cy, 8, 6);
+    
+    // === SMALL LEGS ===
+    g.lineStyle(1.5, 0x3a3a48);
+    g.lineBetween(cx - 6, cy + 12, cx - 10, cy + 20);
+    g.lineBetween(cx + 6, cy + 12, cx + 10, cy + 20);
+    g.lineBetween(cx - 2, cy + 13, cx - 4, cy + 19);
+    g.lineBetween(cx + 2, cy + 13, cx + 4, cy + 19);
+    
+    // === HEAD (skull-like, with mandibles) ===
+    g.fillStyle(0xe0d8d0);
+    g.fillEllipse(cx, cy - 6, 16, 12);
+    
+    // Mandibles/pincers
+    g.fillStyle(0xd0c8c0);
+    g.beginPath();
+    g.moveTo(cx - 6, cy - 4);
+    g.lineTo(cx - 12, cy + 2);
+    g.lineTo(cx - 4, cy);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 6, cy - 4);
+    g.lineTo(cx + 12, cy + 2);
+    g.lineTo(cx + 4, cy);
+    g.closePath();
+    g.fillPath();
+    
+    // Eyes - glowing orange
+    g.fillStyle(0xff4400);
+    g.fillEllipse(cx - 4, cy - 7, 4, 5);
+    g.fillEllipse(cx + 4, cy - 7, 4, 5);
+    g.fillStyle(0xff8844, 0.7);
+    g.fillEllipse(cx - 4, cy - 8, 2, 3);
+    g.fillEllipse(cx + 4, cy - 8, 2, 3);
+    
+    // Mouth/spit opening
+    g.fillStyle(0x1a1a20);
+    g.fillCircle(cx, cy - 2, 3);
+    
+    // === OUTLINES ===
+    g.lineStyle(1.5, 0x3a3a48);
+    g.strokeEllipse(cx, cy + 4, 26, 22);
+    g.lineStyle(1, 0x2a2a30);
+    g.strokeEllipse(cx, cy - 6, 16, 12);
+    
+    g.generateTexture('aspid', 48, 42);
+    g.destroy();
+    
+    // Aspid hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillEllipse(cx - 10, cy - 10, 22, 12);
+    hg.fillEllipse(cx + 10, cy - 10, 22, 12);
+    hg.fillEllipse(cx, cy + 4, 26, 22);
+    hg.fillEllipse(cx, cy - 6, 16, 12);
+    hg.fillStyle(0xffddaa);
+    hg.fillEllipse(cx, cy + 8, 18, 14);
+    hg.generateTexture('aspid_hurt', 48, 42);
     hg.destroy();
   }
 
