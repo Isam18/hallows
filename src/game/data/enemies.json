@@ -167,5 +167,25 @@
     "height": 20,
     "isGreenway": true,
     "isCrawler": true
+  },
+  "mossWarrior": {
+    "id": "mossWarrior",
+    "displayName": "Moss Warrior",
+    "hp": 18,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 45,
+    "aggroRangePx": 80,
+    "deaggroRangePx": 300,
+    "knockbackOnHit": { "x": 30, "y": 15 },
+    "hitstunMs": 80,
+    "invulnOnHitMs": 120,
+    "dropShells": { "min": 25, "max": 40 },
+    "hurtFlashMs": 100,
+    "spriteKey": "mossWarrior",
+    "width": 44,
+    "height": 70,
+    "isGreenway": true,
+    "isElite": true
   }
 }
