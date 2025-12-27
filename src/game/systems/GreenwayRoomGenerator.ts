@@ -5,7 +5,10 @@ export type GreenwayRoomType =
   | 'mosskinGauntlet'
   | 'hiddenGrove'
   | 'verticalThicket'
-  | 'restingGlade';
+  | 'restingGlade'
+  | 'acidWaterfallChamber'
+  | 'thicketGauntlet'
+  | 'infectedOvergrowth';
 
 export interface AcidPoolConfig {
   x: number;
@@ -21,6 +24,16 @@ export interface BreakableVineConfig {
   height: number;
 }
 
+export interface MovingPlatformConfig {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  moveDistance: number;
+  moveSpeed: number;
+  direction: 'horizontal' | 'vertical';
+}
+
 export interface GreenwayRoomData {
   platforms: PlatformConfig[];
   enemies: EnemySpawnConfig[];
@@ -29,6 +42,8 @@ export interface GreenwayRoomData {
   spawns: Record<string, { x: number; y: number }>;
   acidPools?: AcidPoolConfig[];
   breakableVines?: BreakableVineConfig[];
+  movingPlatforms?: MovingPlatformConfig[];
+  hasInfection?: boolean;
 }
 
 // Room dimensions
@@ -416,18 +431,267 @@ function generateRestingGlade(roomIndex: number, xOffset: number): GreenwayRoomD
 }
 
 /**
- * Generate room order with variety
+ * NEW: Acid Waterfall Chamber - Vertical room with acid waterfalls and moving platforms
+ */
+function generateAcidWaterfallChamber(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  const acidPools: AcidPoolConfig[] = [];
+  const movingPlatforms: MovingPlatformConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  
+  // Large acid pool at bottom
+  acidPools.push({
+    x: xOffset + 20,
+    y: ROOM_HEIGHT - 60,
+    width: ROOM_WIDTH - 40,
+    height: 60
+  });
+  
+  // Acid waterfalls on sides (visual + hazard strips)
+  acidPools.push(
+    { x: xOffset + 20, y: 50, width: 40, height: ROOM_HEIGHT - 110 },
+    { x: xOffset + ROOM_WIDTH - 60, y: 80, width: 40, height: ROOM_HEIGHT - 140 }
+  );
+  
+  // Entry/exit safe platforms
+  platforms.push(
+    { x: xOffset + 70, y: ROOM_HEIGHT - 90, width: 80, height: 20, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 150, y: ROOM_HEIGHT - 90, width: 80, height: 20, type: 'platform' }
+  );
+  
+  // Moving platforms that slide through acid streams
+  const movingCount = randomInt(3, 5);
+  for (let i = 0; i < movingCount; i++) {
+    const py = ROOM_HEIGHT - 150 - (i * 80);
+    movingPlatforms.push({
+      x: xOffset + 150 + randomInt(0, 100),
+      y: py,
+      width: 80,
+      height: 18,
+      moveDistance: 200 + randomInt(0, 100),
+      moveSpeed: 40 + randomInt(0, 30),
+      direction: 'horizontal'
+    });
+    
+    // Moss creep on underside of some platforms
+    if (i % 2 === 0) {
+      enemies.push({
+        type: 'mossCreep',
+        x: xOffset + 180 + randomInt(0, 100),
+        y: py + 25
+      });
+    }
+  }
+  
+  // Static stepping stones
+  platforms.push(
+    { x: xOffset + 200, y: ROOM_HEIGHT - 200, width: 60, height: 18, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 260, y: ROOM_HEIGHT - 280, width: 60, height: 18, type: 'platform' }
+  );
+  
+  return {
+    platforms,
+    enemies,
+    acidPools,
+    movingPlatforms,
+    pickups: [
+      { type: 'shells', x: xOffset + ROOM_WIDTH / 2, y: 120, amount: randomInt(15, 25) }
+    ],
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 110, y: ROOM_HEIGHT - 130 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 110, y: ROOM_HEIGHT - 130 }
+    }
+  };
+}
+
+/**
+ * NEW: Thicket Gauntlet - Tight corridor with thorny vines and chasing Mosskins
+ */
+function generateThicketGauntlet(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  const acidPools: AcidPoolConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  
+  // Ground with gaps (acid pits)
+  platforms.push(
+    { x: xOffset + 20, y: ROOM_HEIGHT - 50, width: 150, height: 50, type: 'ground' },
+    { x: xOffset + 250, y: ROOM_HEIGHT - 50, width: 100, height: 50, type: 'ground' },
+    { x: xOffset + 430, y: ROOM_HEIGHT - 50, width: 100, height: 50, type: 'ground' },
+    { x: xOffset + 610, y: ROOM_HEIGHT - 50, width: 170, height: 50, type: 'ground' }
+  );
+  
+  // Acid in gaps
+  acidPools.push(
+    { x: xOffset + 170, y: ROOM_HEIGHT - 40, width: 80, height: 40 },
+    { x: xOffset + 350, y: ROOM_HEIGHT - 40, width: 80, height: 40 },
+    { x: xOffset + 530, y: ROOM_HEIGHT - 40, width: 80, height: 40 }
+  );
+  
+  // Thorny obstacles (using narrow wall segments)
+  platforms.push(
+    { x: xOffset + 180, y: ROOM_HEIGHT - 180, width: 20, height: 100, type: 'wall' },
+    { x: xOffset + 340, y: ROOM_HEIGHT - 200, width: 20, height: 120, type: 'wall' },
+    { x: xOffset + 500, y: ROOM_HEIGHT - 160, width: 20, height: 80, type: 'wall' }
+  );
+  
+  // Platforms to navigate around thorns
+  platforms.push(
+    { x: xOffset + 120, y: ROOM_HEIGHT - 130, width: 50, height: 18, type: 'platform' },
+    { x: xOffset + 210, y: ROOM_HEIGHT - 180, width: 60, height: 18, type: 'platform' },
+    { x: xOffset + 370, y: ROOM_HEIGHT - 150, width: 60, height: 18, type: 'platform' },
+    { x: xOffset + 530, y: ROOM_HEIGHT - 120, width: 70, height: 18, type: 'platform' }
+  );
+  
+  // Hidden alcove in ceiling with big geo cache
+  platforms.push(
+    { x: xOffset + 350, y: 80, width: 100, height: 18, type: 'platform' }
+  );
+  
+  // Chasing Mosskins
+  enemies.push(
+    { type: 'mosskin', x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 90 },
+    { type: 'mosskin', x: xOffset + ROOM_WIDTH - 180, y: ROOM_HEIGHT - 90 }
+  );
+  
+  // Moss Warrior guarding the hidden geo (rare spawn)
+  if (random() > 0.6) {
+    enemies.push({
+      type: 'mossWarrior',
+      x: xOffset + 400,
+      y: 50
+    });
+  }
+  
+  return {
+    platforms,
+    enemies,
+    acidPools,
+    pickups: [
+      // Hidden ceiling cache - 100 geo!
+      { type: 'shells', x: xOffset + 380, y: 50, amount: 100 },
+      // Smaller pickup on path
+      { type: 'shells', x: xOffset + 300, y: ROOM_HEIGHT - 180, amount: 10 }
+    ],
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 60, y: ROOM_HEIGHT - 100 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 60, y: ROOM_HEIGHT - 100 }
+    }
+  };
+}
+
+/**
+ * NEW: Infected Overgrowth - Bridge room with collapsed center, orange infection theme
+ */
+function generateInfectedOvergrowth(roomIndex: number, xOffset: number): GreenwayRoomData {
+  const platforms: PlatformConfig[] = [];
+  const enemies: EnemySpawnConfig[] = [];
+  const acidPools: AcidPoolConfig[] = [];
+  
+  // Walls
+  platforms.push(
+    { x: xOffset, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' },
+    { x: xOffset + ROOM_WIDTH - 20, y: 0, width: 20, height: ROOM_HEIGHT, type: 'wall' }
+  );
+  
+  // Ceiling
+  platforms.push({ x: xOffset, y: 0, width: ROOM_WIDTH, height: 25, type: 'wall' });
+  
+  // Bridge platforms on sides (center collapsed)
+  platforms.push(
+    { x: xOffset + 20, y: ROOM_HEIGHT - 100, width: 200, height: 30, type: 'ground' },
+    { x: xOffset + ROOM_WIDTH - 220, y: ROOM_HEIGHT - 100, width: 200, height: 30, type: 'ground' }
+  );
+  
+  // Massive acid pit in center (collapsed floor)
+  acidPools.push({
+    x: xOffset + 220,
+    y: ROOM_HEIGHT - 80,
+    width: ROOM_WIDTH - 440,
+    height: 80
+  });
+  
+  // Stepping stone platforms across the pit
+  const stoneCount = randomInt(3, 5);
+  const pitWidth = ROOM_WIDTH - 440;
+  const stoneSpacing = pitWidth / (stoneCount + 1);
+  
+  for (let i = 0; i < stoneCount; i++) {
+    platforms.push({
+      x: xOffset + 220 + (i + 1) * stoneSpacing - 30,
+      y: ROOM_HEIGHT - randomInt(130, 180),
+      width: randomInt(50, 70),
+      height: 18,
+      type: 'platform'
+    } as any);
+  }
+  
+  // Higher platforms for safety
+  platforms.push(
+    { x: xOffset + 150, y: ROOM_HEIGHT - 220, width: 80, height: 18, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 230, y: ROOM_HEIGHT - 240, width: 80, height: 18, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH / 2 - 40, y: ROOM_HEIGHT - 300, width: 80, height: 18, type: 'platform' }
+  );
+  
+  // Flying enemies - 75% Vengefly, 25% Aspid
+  const flyerCount = randomInt(3, 5);
+  for (let i = 0; i < flyerCount; i++) {
+    const isAspid = random() < 0.25;
+    enemies.push({
+      type: isAspid ? 'aspid' : 'vengefly',
+      x: xOffset + 100 + randomInt(0, ROOM_WIDTH - 200),
+      y: randomInt(100, ROOM_HEIGHT - 250)
+    });
+  }
+  
+  return {
+    platforms,
+    enemies,
+    acidPools,
+    hasInfection: true, // Flag for visual effects
+    pickups: [
+      { type: 'shells', x: xOffset + ROOM_WIDTH / 2, y: ROOM_HEIGHT - 330, amount: randomInt(20, 30) }
+    ],
+    triggers: [],
+    spawns: {
+      [`room${roomIndex}_entry`]: { x: xOffset + 100, y: ROOM_HEIGHT - 150 },
+      [`room${roomIndex}_exit`]: { x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 150 }
+    }
+  };
+}
+
+/**
+ * Generate room order with variety including new room types
  */
 function generateGreenwayRoomOrder(): GreenwayRoomType[] {
   const roomPool: GreenwayRoomType[] = [
-    'overgrownParkour',
+    'overgrownParkour',      // Tutorial room first
     'mosskinGauntlet',
+    'acidWaterfallChamber',  // NEW
+    'verticalThicket',
+    'restingGlade',          // Midpoint rest
+    'thicketGauntlet',       // NEW
     'hiddenGrove',
-    'verticalThicket',
-    'restingGlade',
-    'overgrownParkour',
-    'mosskinGauntlet',
-    'verticalThicket',
+    'infectedOvergrowth',    // NEW
     'overgrownParkour',
     'mosskinGauntlet'
   ];
@@ -447,13 +711,20 @@ function generateGreenwayRoomOrder(): GreenwayRoomType[] {
     [shuffled[targetIdx], shuffled[gladeIdx]] = [shuffled[gladeIdx], shuffled[targetIdx]];
   }
   
+  // Place hidden grove before the bench
+  const groveIdx = shuffled.findIndex(r => r === 'hiddenGrove');
+  const benchIdx = shuffled.findIndex(r => r === 'restingGlade');
+  if (groveIdx > benchIdx) {
+    [shuffled[benchIdx - 1], shuffled[groveIdx]] = [shuffled[groveIdx], shuffled[benchIdx - 1]];
+  }
+  
   return shuffled;
 }
 
 /**
  * Generate the complete Greenway level with 10 rooms
  */
-export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[], breakableVines?: BreakableVineConfig[] } {
+export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[], breakableVines?: BreakableVineConfig[], movingPlatforms?: MovingPlatformConfig[] } {
   seed = Date.now();
   
   const rooms: GreenwayRoomData[] = [];
@@ -482,6 +753,15 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
       case 'restingGlade':
         roomData = generateRestingGlade(i, totalWidth);
         break;
+      case 'acidWaterfallChamber':
+        roomData = generateAcidWaterfallChamber(i, totalWidth);
+        break;
+      case 'thicketGauntlet':
+        roomData = generateThicketGauntlet(i, totalWidth);
+        break;
+      case 'infectedOvergrowth':
+        roomData = generateInfectedOvergrowth(i, totalWidth);
+        break;
       default:
         roomData = generateOvergrownParkour(i, totalWidth);
     }
@@ -498,6 +778,7 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
   const allSpawns: Record<string, { x: number; y: number }> = {};
   const allAcidPools: AcidPoolConfig[] = [];
   const allBreakableVines: BreakableVineConfig[] = [];
+  const allMovingPlatforms: MovingPlatformConfig[] = [];
   
   rooms.forEach((room) => {
     allPlatforms.push(...room.platforms);
@@ -507,6 +788,7 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     Object.assign(allSpawns, room.spawns);
     if (room.acidPools) allAcidPools.push(...room.acidPools);
     if (room.breakableVines) allBreakableVines.push(...room.breakableVines);
+    if (room.movingPlatforms) allMovingPlatforms.push(...room.movingPlatforms);
   });
   
   // Add transitions between rooms
@@ -556,6 +838,7 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     },
     acidPools: allAcidPools,
     breakableVines: allBreakableVines,
+    movingPlatforms: allMovingPlatforms,
     biome: 'greenway'
   } as any;
 }
