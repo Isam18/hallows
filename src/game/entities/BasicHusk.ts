@@ -33,8 +33,11 @@ export class BasicHusk extends Phaser.Physics.Arcade.Sprite {
   
   // Charge settings (1.8x player speed = ~270)
   private readonly CHARGE_SPEED = 270;
-  private readonly WINDUP_DURATION = 3000; // 3 seconds windup
+  private readonly WINDUP_DURATION = 1600; // 1.6 seconds windup
   private readonly PAUSE_DURATION = 400; // Brief pause after miss
+  
+  // Track if we hit the player during charge
+  private hitPlayerDuringCharge = false;
   
   // Visual variant (skin A or B)
   private skinVariant: 'A' | 'B';
@@ -113,18 +116,21 @@ export class BasicHusk extends Phaser.Physics.Arcade.Sprite {
         // Start charging in the direction of the player
         this.chargeDir = player.x > this.x ? 1 : -1;
         this.aiState = 'charge';
+        this.hitPlayerDuringCharge = false;
         this.setFlipX(this.chargeDir < 0);
       }
       return;
     }
     
-    // Handle charge state - stop on wall collision
+    // Handle charge state - stop on wall collision OR hitting player
     if (this.aiState === 'charge') {
       if ((this.chargeDir === -1 && body.blocked.left) || 
-          (this.chargeDir === 1 && body.blocked.right)) {
-        // Hit a wall - enter pause state
+          (this.chargeDir === 1 && body.blocked.right) ||
+          this.hitPlayerDuringCharge) {
+        // Hit a wall or player - enter pause state
         this.aiState = 'pause';
         this.pauseTimer = this.PAUSE_DURATION;
+        this.hitPlayerDuringCharge = false;
       }
       return;
     }
@@ -370,5 +376,12 @@ export class BasicHusk extends Phaser.Physics.Arcade.Sprite {
   
   getDisplayName(): string {
     return this.cfg.displayName;
+  }
+  
+  // Called when this husk deals contact damage to player
+  onHitPlayer(): void {
+    if (this.aiState === 'charge') {
+      this.hitPlayerDuringCharge = true;
+    }
   }
 }

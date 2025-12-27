@@ -548,6 +548,11 @@ export class GameScene extends Phaser.Scene {
     
     const damage = enemy.getContactDamage();
     this.player.takeDamage(damage, enemy.x);
+    
+    // Notify BasicHusk that it hit the player (to stop charging)
+    if ((enemy as any).onHitPlayer) {
+      (enemy as any).onHitPlayer();
+    }
   }
 
   private handlePlayerBossContact(): void {
