@@ -47,13 +47,14 @@
       "y": 450,
       "width": 30,
       "height": 100,
-      "target": "forgottenCrossroads",
-      "targetSpawn": "default"
+      "target": "ruinedCrossroads",
+      "targetSpawn": "entrance"
     }
   ],
   "spawns": {
     "default": { "x": 100, "y": 400 },
     "fromRuins": { "x": 1450, "y": 500 },
-    "benchFadingTown": { "x": 830, "y": 500 }
+    "benchFadingTown": { "x": 830, "y": 500 },
+    "entrance": { "x": 100, "y": 500 }
   }
 }

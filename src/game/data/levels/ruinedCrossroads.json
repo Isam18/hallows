@@ -64,7 +64,8 @@
   "spawns": {
     "default": { "x": 100, "y": 700 },
     "entrance": { "x": 100, "y": 700 },
-    "fromBoss": { "x": 1400, "y": 700 }
+    "fromBoss": { "x": 1400, "y": 700 },
+    "fromChainRoom": { "x": 1500, "y": 700 }
   },
   "bossArena": {
     "x": 1470,
