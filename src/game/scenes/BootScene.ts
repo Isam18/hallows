@@ -359,121 +359,85 @@ export class BootScene extends Phaser.Scene {
     const cx = 32;
     const cy = 40;
     
-    // === WING SHELLS (on top/sides) ===
-    // Left wing shell - dark blue pointed
+    // === ARMORED SHELL (hunched back) ===
+    // Main shell plates - dark blue-grey armor
     g.fillStyle(0x3a4858);
-    g.beginPath();
-    g.moveTo(cx - 8, cy - 8);
-    g.lineTo(cx - 30, cy - 20);
-    g.lineTo(cx - 26, cy - 5);
-    g.lineTo(cx - 10, cy + 5);
-    g.closePath();
-    g.fillPath();
+    g.fillEllipse(cx, cy - 5, 44, 32);
     
-    // Right wing shell
-    g.fillStyle(0x3a4858);
-    g.beginPath();
-    g.moveTo(cx + 8, cy - 8);
-    g.lineTo(cx + 30, cy - 20);
-    g.lineTo(cx + 26, cy - 5);
-    g.lineTo(cx + 10, cy + 5);
-    g.closePath();
-    g.fillPath();
-    
-    // Wing shell highlights
-    g.fillStyle(0x4a5868, 0.7);
-    g.beginPath();
-    g.moveTo(cx - 10, cy - 6);
-    g.lineTo(cx - 24, cy - 16);
-    g.lineTo(cx - 22, cy - 8);
-    g.closePath();
-    g.fillPath();
-    
-    g.beginPath();
-    g.moveTo(cx + 10, cy - 6);
-    g.lineTo(cx + 24, cy - 16);
-    g.lineTo(cx + 22, cy - 8);
-    g.closePath();
-    g.fillPath();
-    
-    // === MAIN BODY (round bulbous) ===
-    // Main round body - dark blue-grey
-    g.fillStyle(0x4a5565);
-    g.fillEllipse(cx, cy + 8, 50, 44);
-    
-    // Body shading - lighter center
-    g.fillStyle(0x5a6575, 0.8);
-    g.fillEllipse(cx, cy + 4, 40, 32);
-    
-    // Body highlight
-    g.fillStyle(0x6a7585, 0.5);
-    g.fillEllipse(cx - 6, cy - 2, 20, 16);
-    
-    // === BODY SEGMENTS (curved lines) ===
+    // Shell segment lines
     g.lineStyle(2, 0x2a3545);
-    // Horizontal curved segments
     g.beginPath();
-    g.arc(cx, cy + 40, 36, Phaser.Math.DegToRad(-150), Phaser.Math.DegToRad(-30), false);
+    g.arc(cx, cy + 20, 30, Phaser.Math.DegToRad(-160), Phaser.Math.DegToRad(-20), false);
+    g.strokePath();
+    g.beginPath();
+    g.arc(cx, cy + 30, 38, Phaser.Math.DegToRad(-160), Phaser.Math.DegToRad(-20), false);
     g.strokePath();
     
-    g.beginPath();
-    g.arc(cx, cy + 50, 46, Phaser.Math.DegToRad(-150), Phaser.Math.DegToRad(-30), false);
-    g.strokePath();
+    // Shell highlight
+    g.fillStyle(0x4a5868, 0.6);
+    g.fillEllipse(cx - 8, cy - 10, 20, 14);
     
-    g.beginPath();
-    g.arc(cx, cy + 60, 54, Phaser.Math.DegToRad(-150), Phaser.Math.DegToRad(-30), false);
-    g.strokePath();
+    // === BODY (hunched beetle shape) ===
+    g.fillStyle(0x4a5565);
+    g.fillEllipse(cx, cy + 10, 40, 36);
     
-    // Vertical center line
-    g.lineStyle(1.5, 0x2a3545);
-    g.lineBetween(cx, cy - 8, cx, cy + 28);
+    // Body shading
+    g.fillStyle(0x3a4555, 0.7);
+    g.fillEllipse(cx, cy + 18, 36, 24);
     
-    // === HEAD/FACE (small, grumpy) ===
-    // Face area - slightly lighter
-    g.fillStyle(0x5a6575);
-    g.fillEllipse(cx, cy - 8, 24, 16);
+    // === HEAD (pale skull mask) ===
+    // Skull base - pale cream/white like player
+    g.fillStyle(0xe8e0d8);
+    g.fillEllipse(cx, cy - 20, 20, 16);
     
-    // Angry eyes - slanted dark
-    g.fillStyle(0x1a1a20);
-    // Left eye (slanted down-inward)
-    g.beginPath();
-    g.moveTo(cx - 10, cy - 12);
-    g.lineTo(cx - 4, cy - 8);
-    g.lineTo(cx - 6, cy - 6);
-    g.lineTo(cx - 12, cy - 8);
-    g.closePath();
-    g.fillPath();
+    // Skull detail - darker bottom
+    g.fillStyle(0xd8d0c8);
+    g.fillEllipse(cx, cy - 16, 16, 10);
     
-    // Right eye (slanted down-inward)
-    g.beginPath();
-    g.moveTo(cx + 10, cy - 12);
-    g.lineTo(cx + 4, cy - 8);
-    g.lineTo(cx + 6, cy - 6);
-    g.lineTo(cx + 12, cy - 8);
-    g.closePath();
-    g.fillPath();
+    // Hollow eye sockets - deep black
+    g.fillStyle(0x0a0a10);
+    g.fillEllipse(cx - 5, cy - 22, 5, 6);
+    g.fillEllipse(cx + 5, cy - 22, 5, 6);
     
-    // === LEGS (thin, pointed, dangling) ===
-    g.lineStyle(3, 0x2a3545);
-    // Front left leg
-    g.lineBetween(cx - 14, cy + 26, cx - 20, cy + 42);
-    // Front right leg
-    g.lineBetween(cx + 14, cy + 26, cx + 20, cy + 42);
-    // Back left leg
-    g.lineBetween(cx - 8, cy + 28, cx - 10, cy + 40);
-    // Back right leg
-    g.lineBetween(cx + 8, cy + 28, cx + 10, cy + 40);
+    // Skull outline
+    g.lineStyle(2, 0x2a2a30);
+    g.strokeEllipse(cx, cy - 20, 20, 16);
     
-    // Leg tips (pointed)
-    g.fillStyle(0x1a2535);
-    g.fillTriangle(cx - 20, cy + 40, cx - 23, cy + 48, cx - 17, cy + 48);
-    g.fillTriangle(cx + 20, cy + 40, cx + 17, cy + 48, cx + 23, cy + 48);
-    g.fillTriangle(cx - 10, cy + 38, cx - 12, cy + 46, cx - 8, cy + 46);
-    g.fillTriangle(cx + 10, cy + 38, cx + 8, cy + 46, cx + 12, cy + 46);
+    // === THICK LEGS ===
+    g.fillStyle(0x3a4555);
+    // Left leg
+    g.fillRect(cx - 18, cy + 20, 8, 28);
+    g.fillRect(cx - 20, cy + 44, 12, 6);
+    // Right leg
+    g.fillRect(cx + 10, cy + 20, 8, 28);
+    g.fillRect(cx + 8, cy + 44, 12, 6);
+    
+    // Leg outlines
+    g.lineStyle(2, 0x2a3545);
+    g.strokeRect(cx - 18, cy + 20, 8, 28);
+    g.strokeRect(cx + 10, cy + 20, 8, 28);
+    
+    // === HEAVY CLUB (right side) ===
+    // Club handle
+    g.fillStyle(0x5a4a3a);
+    g.fillRect(cx + 20, cy - 10, 6, 40);
+    
+    // Club head - heavy stone/metal
+    g.fillStyle(0x4a5060);
+    g.fillEllipse(cx + 23, cy - 18, 16, 20);
+    
+    // Club detail
+    g.fillStyle(0x5a6070, 0.7);
+    g.fillEllipse(cx + 21, cy - 20, 8, 10);
+    
+    // Club outline
+    g.lineStyle(2, 0x2a3040);
+    g.strokeEllipse(cx + 23, cy - 18, 16, 20);
     
     // === BODY OUTLINE ===
     g.lineStyle(2.5, 0x1a2535);
-    g.strokeEllipse(cx, cy + 8, 50, 44);
+    g.strokeEllipse(cx, cy - 5, 44, 32);
+    g.strokeEllipse(cx, cy + 10, 40, 36);
     
     g.generateTexture('huskGuard', 64, 80);
     g.destroy();
@@ -481,23 +445,14 @@ export class BootScene extends Phaser.Scene {
     // Husk Guard hurt frame (white flash)
     const hg = this.make.graphics({ x: 0, y: 0 });
     hg.fillStyle(0xffffff);
-    // Wings
-    hg.beginPath();
-    hg.moveTo(cx - 8, cy - 8);
-    hg.lineTo(cx - 30, cy - 20);
-    hg.lineTo(cx - 26, cy - 5);
-    hg.lineTo(cx - 10, cy + 5);
-    hg.closePath();
-    hg.fillPath();
-    hg.beginPath();
-    hg.moveTo(cx + 8, cy - 8);
-    hg.lineTo(cx + 30, cy - 20);
-    hg.lineTo(cx + 26, cy - 5);
-    hg.lineTo(cx + 10, cy + 5);
-    hg.closePath();
-    hg.fillPath();
+    // Shell
+    hg.fillEllipse(cx, cy - 5, 44, 32);
     // Body
-    hg.fillEllipse(cx, cy + 8, 50, 44);
+    hg.fillEllipse(cx, cy + 10, 40, 36);
+    // Head
+    hg.fillEllipse(cx, cy - 20, 20, 16);
+    // Club
+    hg.fillEllipse(cx + 23, cy - 18, 16, 20);
     hg.generateTexture('huskGuard_hurt', 64, 80);
     hg.destroy();
   }
