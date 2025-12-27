@@ -38,6 +38,14 @@ export function DeathScreen({ gameRef }: Props) {
     scene?.respawnPlayer();
   };
 
+  const giveUp = () => {
+    // Reset all progress
+    gameState.resetRun();
+    // Stop the game scene and go to menu
+    gameRef.current?.scene.stop('GameScene');
+    gameRef.current?.scene.start('MenuScene');
+  };
+
   const lastBench = gameState.getLastBench();
   const hasDroppedShells = droppedAmount > 0;
 
@@ -73,16 +81,26 @@ export function DeathScreen({ gameRef }: Props) {
         
         {/* Respawn Button */}
         {showRespawnHint && (
-          <div className="animate-fade-in">
-            <button 
-              onClick={respawn} 
-              className="game-button-primary text-lg px-8 py-3 mb-4"
-            >
-              Rise Again
-            </button>
-            <p className="text-muted-foreground text-xs">
-              Press SPACE or ENTER to continue
-            </p>
+          <div className="animate-fade-in space-y-4">
+            <div>
+              <button 
+                onClick={respawn} 
+                className="game-button-primary text-lg px-8 py-3 mb-2"
+              >
+                Rise Again
+              </button>
+              <p className="text-muted-foreground text-xs">
+                Press SPACE or ENTER to continue
+              </p>
+            </div>
+            <div>
+              <button 
+                onClick={giveUp} 
+                className="text-muted-foreground hover:text-destructive text-sm underline transition-colors"
+              >
+                Give Up (Lose All Progress)
+              </button>
+            </div>
           </div>
         )}
       </div>
