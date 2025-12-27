@@ -45,6 +45,10 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
   
   // Original position for shake effect
   private originalX = 0;
+  
+  // Animation
+  private bobOffset = 0;
+  private bobSpeed = 0.003;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig) {
     super(scene, x, y, 'mosskin');
@@ -56,24 +60,21 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
-    this.setSize(this.cfg.width, this.cfg.height);
+    // Set size based on sprite - fluffy mosskin is roughly 48x56
+    this.setSize(36, 40);
+    this.setDisplaySize(48, 56);
     this.setCollideWorldBounds(true);
     
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setMass(2.0);
+    body.setOffset(6, 8);
     
     // Randomize patrol direction
     this.patrolDir = Math.random() > 0.5 ? 1 : -1;
     this.setFlipX(this.patrolDir < 0);
     
-    // Create visual representation (mossy humanoid beetle)
-    this.createVisual();
-  }
-  
-  private createVisual(): void {
-    // Mosskin is a fluffy white mossy humanoid with dark face and big eyes
-    // Using a simple rectangle with green/white coloring
-    this.setTint(0xe8f5e0); // Pale mossy white
+    // Random bob phase
+    this.bobOffset = Math.random() * Math.PI * 2;
   }
 
   update(time: number, delta: number, player: Player): void {
@@ -223,23 +224,40 @@ export class Mosskin extends Phaser.Physics.Arcade.Sprite {
   }
 
   private updateVisuals(): void {
+    // Idle bobbing animation
+    this.bobOffset += this.bobSpeed * 16;
+    const bobY = Math.sin(this.bobOffset) * 2;
+    
     // Hurt flash
     if (this.hurtFlashTimer > 0) {
+      this.setTexture('mosskin_hurt');
       this.setTint(0xffffff);
     } else if (this.invulnTimer > 0) {
-      this.setTint(0xe8f5e0);
+      this.setTexture('mosskin');
+      this.clearTint();
       this.setAlpha(Math.sin(Date.now() * 0.02) > 0 ? 1 : 0.5);
     } else {
-      this.setTint(0xe8f5e0);
+      this.setTexture('mosskin');
+      this.clearTint();
       this.setAlpha(1);
     }
     
-    // Shake during windup
+    // Shake during windup - more intense
     if (this.aiState === 'windup') {
-      const shake = Math.sin(Date.now() * 0.08) * 3;
+      const shake = Math.sin(Date.now() * 0.1) * 4;
       this.setX(this.originalX + shake);
-      this.setTint(0xffcccc); // Reddish tint during windup
+      // Slight red tint during windup to show anger
+      this.setTint(0xffcccc);
+      // Scale up slightly during windup
+      this.setScale(1.05 + Math.sin(Date.now() * 0.02) * 0.05);
+    } else if (this.aiState === 'charge') {
+      // Squash effect during charge
+      this.setScale(1.1, 0.9);
+      this.originalX = this.x;
     } else {
+      // Normal bob + scale
+      this.setScale(1);
+      this.y += bobY * 0.1;
       this.originalX = this.x;
     }
   }

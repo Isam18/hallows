@@ -36,6 +36,10 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
   // Track death
   private isDead = false;
   private lastHitBySwingId = -1;
+  
+  // Animation
+  private wobbleOffset = 0;
+  private eyeBlinkTimer = 0;
 
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig, startSurface: CrawlSurface = 'floor') {
     super(scene, x, y, 'mossCreep');
@@ -47,11 +51,14 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
-    this.setSize(this.cfg.width, this.cfg.height);
+    // Size based on the bushy sprite
+    this.setSize(24, 20);
+    this.setDisplaySize(64, 56);
     
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setMass(0.5);
     body.setAllowGravity(false); // Can crawl on walls/ceilings
+    body.setOffset(20, 18);
     
     // Set initial rotation based on surface
     this.updateSurfaceOrientation();
@@ -59,13 +66,9 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
     // Randomize crawl direction
     this.crawlDir = Math.random() > 0.5 ? 1 : -1;
     
-    // Create visual representation
-    this.createVisual();
-  }
-  
-  private createVisual(): void {
-    // Moss Creep is a round bushy mound of green leaves with orange eyes
-    this.setTint(0x4a8f3c); // Vibrant green
+    // Random animation phase
+    this.wobbleOffset = Math.random() * Math.PI * 2;
+    this.eyeBlinkTimer = Math.random() * 3000;
   }
   
   private updateSurfaceOrientation(): void {
@@ -212,23 +215,47 @@ export class MossCreep extends Phaser.Physics.Arcade.Sprite {
   }
 
   private updateVisuals(): void {
-    // Camouflaged - darker, blends in
+    // Wobble animation
+    this.wobbleOffset += 0.002 * 16;
+    const wobbleScale = 1 + Math.sin(this.wobbleOffset * 2) * 0.03;
+    
+    // Eye blink timer
+    this.eyeBlinkTimer -= 16;
+    if (this.eyeBlinkTimer <= 0) {
+      this.eyeBlinkTimer = 2000 + Math.random() * 3000;
+    }
+    
+    // Camouflaged - stay still, blend in
     if (this.aiState === 'camouflaged') {
-      this.setTint(0x2a5f2c); // Darker green
-      this.setAlpha(0.85);
+      this.setTexture('mossCreep');
+      this.clearTint();
+      this.setAlpha(0.9);
+      this.setScale(1); // No wobble when hidden
       return;
     }
     
     // Hurt flash
     if (this.hurtFlashTimer > 0) {
+      this.setTexture('mossCreep_hurt');
       this.setTint(0xffffff);
+      this.setScale(1);
     } else if (this.invulnTimer > 0) {
-      this.setTint(0x4a8f3c);
+      this.setTexture('mossCreep');
+      this.clearTint();
       this.setAlpha(Math.sin(Date.now() * 0.02) > 0 ? 1 : 0.5);
+      this.setScale(wobbleScale);
     } else {
-      // Active - brighter with visible orange eyes effect
-      this.setTint(0x5aaf4c);
+      // Active - wobbling movement
+      this.setTexture('mossCreep');
+      this.clearTint();
       this.setAlpha(1);
+      
+      // Subtle wobble when crawling
+      if (this.aiState === 'crawling') {
+        this.setScale(wobbleScale, 1 / wobbleScale);
+      } else {
+        this.setScale(1);
+      }
     }
   }
 
