@@ -14,6 +14,8 @@ import { InfectedHusk } from '../entities/InfectedHusk';
 import { Mosskin } from '../entities/Mosskin';
 import { MossCreep } from '../entities/MossCreep';
 import { MossWarrior } from '../entities/MossWarrior';
+import { Squit } from '../entities/Squit';
+import { MossTitan } from '../entities/MossTitan';
 import { Boss } from '../entities/Boss';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
@@ -353,9 +355,17 @@ export class GameScene extends Phaser.Scene {
           // Elite Moss Warrior - dual-state enemy
           const mossWarrior = new MossWarrior(this, e.x, e.y, config);
           this.enemies.add(mossWarrior);
+        } else if (e.type === 'squit') {
+          // Squit - Greenway flying enemy with lunge attack
+          const squit = new Squit(this, e.x, e.y, config);
+          this.enemies.add(squit);
+        } else if (e.type === 'mossTitan') {
+          // Moss Titan - Greenway mini-boss
+          const mossTitan = new MossTitan(this, e.x, e.y, config);
+          this.enemies.add(mossTitan);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
-        else if (e.type === 'vengefly' || (config as any).isFlying) {
+        else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
           // Use spawner for random Vengefly/Aspid selection
           this.flyingSpawner!.spawnAt(e.x, e.y);
         } else if (e.type === 'aspid') {
