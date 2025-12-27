@@ -52,88 +52,92 @@ export class BootScene extends Phaser.Scene {
   private createMosskinSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
     const cx = 24;
-    const cy = 28;
+    const cy = 30;
     
-    // Clean silhouette style matching the game's aesthetic
-    // Main body - dark mossy green cloak-like shape
-    g.fillStyle(0x1a2a1c);
-    g.fillRoundedRect(6, 14, 36, 32, 4);
+    // Fluffy mossy body like reference - pale green-gray organic shape
+    // Outer fluffy layer
+    g.fillStyle(0x8a9a88);
+    g.fillEllipse(cx, cy + 2, 38, 42);
     
-    // Body bottom flutter (like player's cloak)
-    g.fillTriangle(6, 42, 2, 50, 16, 44);
-    g.fillTriangle(42, 42, 46, 50, 32, 44);
+    // Fluffy texture bumps around body
+    g.fillStyle(0x9aaa98);
+    g.fillEllipse(cx - 14, cy - 4, 12, 14);
+    g.fillEllipse(cx + 14, cy - 2, 11, 13);
+    g.fillEllipse(cx - 12, cy + 12, 10, 12);
+    g.fillEllipse(cx + 12, cy + 10, 11, 13);
+    g.fillEllipse(cx, cy + 16, 14, 10);
     
-    // Mossy texture bumps on body (subtle)
-    g.fillStyle(0x2a3a2c);
-    g.fillEllipse(cx - 8, cy + 8, 8, 6);
-    g.fillEllipse(cx + 8, cy + 6, 10, 7);
-    g.fillEllipse(cx, cy + 12, 12, 6);
+    // Inner lighter fluff
+    g.fillStyle(0xa8b8a6);
+    g.fillEllipse(cx, cy, 28, 32);
+    g.fillEllipse(cx - 8, cy - 6, 10, 12);
+    g.fillEllipse(cx + 8, cy - 4, 9, 11);
     
-    // Head - pale green-gray mask like player's white mask
-    g.fillStyle(0x6a7a68);
-    g.fillRoundedRect(10, 4, 28, 16, 5);
-    
-    // Face shadow/depth
-    g.fillStyle(0x4a5a48);
-    g.fillRoundedRect(14, 8, 20, 10, 3);
-    
-    // Eye sockets - deep black voids (like player)
-    g.fillStyle(0x000000);
-    g.fillEllipse(cx - 5, cy - 16, 5, 6);
-    g.fillEllipse(cx + 5, cy - 16, 5, 6);
-    
-    // Tiny eye shine
-    g.fillStyle(0xffffff, 0.4);
-    g.fillCircle(cx - 6, cy - 18, 1.5);
-    g.fillCircle(cx + 4, cy - 18, 1.5);
-    
-    // Top leaf antenna
-    g.fillStyle(0x3a4a3c);
+    // Top tuft/antenna
+    g.fillStyle(0x7a8a78);
     g.beginPath();
-    g.moveTo(cx - 3, 6);
-    g.lineTo(cx, -4);
-    g.lineTo(cx + 3, 6);
+    g.moveTo(cx - 5, cy - 18);
+    g.lineTo(cx, cy - 30);
+    g.lineTo(cx + 5, cy - 18);
     g.closePath();
     g.fillPath();
     
-    // Leaf tip
-    g.fillStyle(0x4a5a4c);
-    g.fillEllipse(cx, -2, 6, 4);
+    // Tuft fluff ball
+    g.fillStyle(0x8a9a88);
+    g.fillEllipse(cx, cy - 28, 10, 8);
+    g.fillStyle(0x9aaa98);
+    g.fillEllipse(cx, cy - 30, 7, 5);
     
-    // Bold outline for definition
-    g.lineStyle(2, 0x0a0c10);
-    g.strokeRoundedRect(6, 14, 36, 32, 4);
-    g.strokeRoundedRect(10, 4, 28, 16, 5);
+    // Dark face area - recessed
+    g.fillStyle(0x2a3028);
+    g.fillEllipse(cx, cy - 6, 18, 16);
     
-    g.generateTexture('mosskin', 48, 52);
+    // Deeper face shadow
+    g.fillStyle(0x1a201a);
+    g.fillEllipse(cx, cy - 4, 14, 12);
+    
+    // Large round eyes - black voids
+    g.fillStyle(0x000000);
+    g.fillCircle(cx - 5, cy - 6, 5);
+    g.fillCircle(cx + 5, cy - 6, 5);
+    
+    // Eye shine
+    g.fillStyle(0xffffff, 0.5);
+    g.fillCircle(cx - 6, cy - 8, 2);
+    g.fillCircle(cx + 4, cy - 8, 2);
+    
+    // Small feet
+    g.fillStyle(0x6a7a68);
+    g.fillEllipse(cx - 10, cy + 22, 8, 5);
+    g.fillEllipse(cx + 10, cy + 22, 8, 5);
+    
+    // Subtle outline
+    g.lineStyle(1.5, 0x5a6a58);
+    g.strokeEllipse(cx, cy + 2, 38, 42);
+    
+    g.generateTexture('mosskin', 48, 56);
     g.destroy();
   }
   
   private createMosskinHurtSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
     const cx = 24;
-    const cy = 28;
+    const cy = 30;
     
-    // White flash version - same silhouette
+    // White flash version
     g.fillStyle(0xffffff);
-    g.fillRoundedRect(6, 14, 36, 32, 4);
-    g.fillTriangle(6, 42, 2, 50, 16, 44);
-    g.fillTriangle(42, 42, 46, 50, 32, 44);
+    g.fillEllipse(cx, cy + 2, 38, 42);
     
-    // Head
+    // Fluffy texture
     g.fillStyle(0xeeffee);
-    g.fillRoundedRect(10, 4, 28, 16, 5);
+    g.fillEllipse(cx - 14, cy - 4, 12, 14);
+    g.fillEllipse(cx + 14, cy - 2, 11, 13);
+    g.fillEllipse(cx, cy + 16, 14, 10);
     
-    // Antenna
-    g.beginPath();
-    g.moveTo(cx - 3, 6);
-    g.lineTo(cx, -4);
-    g.lineTo(cx + 3, 6);
-    g.closePath();
-    g.fillPath();
-    g.fillEllipse(cx, -2, 6, 4);
+    // Tuft
+    g.fillEllipse(cx, cy - 28, 10, 8);
     
-    g.generateTexture('mosskin_hurt', 48, 52);
+    g.generateTexture('mosskin_hurt', 48, 56);
     g.destroy();
   }
   
@@ -142,64 +146,67 @@ export class BootScene extends Phaser.Scene {
     const cx = 32;
     const cy = 24;
     
-    // MossCreep as a low-profile ground creature that blends with environment
-    // Like a mossy rock or clump of leaves
+    // MossCreep - bushy foliage mound with glowing yellow eyes
     
-    // Base shadow for grounding
+    // Base shadow
     g.fillStyle(0x0a0c0a, 0.3);
-    g.fillEllipse(cx, cy + 14, 48, 8);
+    g.fillEllipse(cx, cy + 14, 50, 8);
     
-    // Main body - dark low mound shape (like a rock covered in moss)
-    g.fillStyle(0x1a2a1c);
-    g.fillEllipse(cx, cy + 4, 52, 28);
+    // Main body - dark green mound
+    g.fillStyle(0x1a3a1c);
+    g.fillEllipse(cx, cy + 4, 54, 30);
     
-    // Rocky/mossy texture - darker patches
+    // Leafy texture layers
+    g.fillStyle(0x2a4a2c);
+    g.fillEllipse(cx - 16, cy, 14, 12);
+    g.fillEllipse(cx + 16, cy + 2, 13, 11);
+    g.fillEllipse(cx, cy - 4, 18, 14);
+    
+    g.fillStyle(0x3a5a3c);
+    g.fillEllipse(cx - 10, cy - 6, 12, 10);
+    g.fillEllipse(cx + 8, cy - 8, 14, 11);
+    g.fillEllipse(cx - 20, cy + 4, 10, 8);
+    g.fillEllipse(cx + 20, cy + 2, 11, 9);
+    
+    // Top foliage bumps
+    g.fillStyle(0x4a6a4c);
+    g.fillEllipse(cx - 6, cy - 10, 10, 8);
+    g.fillEllipse(cx + 4, cy - 12, 12, 9);
+    g.fillEllipse(cx - 14, cy - 4, 8, 7);
+    g.fillEllipse(cx + 14, cy - 6, 9, 7);
+    
+    // Dark eye cavity
     g.fillStyle(0x0a1a0c);
-    g.fillEllipse(cx - 12, cy + 6, 14, 10);
-    g.fillEllipse(cx + 14, cy + 8, 12, 8);
-    g.fillEllipse(cx, cy + 10, 16, 8);
+    g.fillEllipse(cx, cy + 8, 26, 14);
     
-    // Moss/leaf bumps on top
-    g.fillStyle(0x2a3a2c);
-    g.fillEllipse(cx - 16, cy - 2, 12, 10);
-    g.fillEllipse(cx, cy - 6, 14, 12);
-    g.fillEllipse(cx + 14, cy - 4, 10, 10);
+    // Yellow glowing eyes - outer glow
+    g.fillStyle(0xffcc00, 0.4);
+    g.fillEllipse(cx - 7, cy + 8, 12, 10);
+    g.fillEllipse(cx + 7, cy + 8, 12, 10);
     
-    // Lighter moss highlights
-    g.fillStyle(0x3a4a3c);
-    g.fillEllipse(cx - 8, cy - 8, 8, 6);
-    g.fillEllipse(cx + 6, cy - 6, 10, 7);
-    g.fillEllipse(cx - 18, cy + 2, 6, 5);
-    g.fillEllipse(cx + 20, cy, 5, 4);
+    // Yellow eyes main
+    g.fillStyle(0xffdd22);
+    g.fillEllipse(cx - 7, cy + 8, 8, 6);
+    g.fillEllipse(cx + 7, cy + 8, 8, 6);
     
-    // Hidden eye area - very dark, blends in when camouflaged
-    g.fillStyle(0x000000, 0.6);
-    g.fillEllipse(cx, cy + 6, 20, 10);
+    // Bright center
+    g.fillStyle(0xffee66);
+    g.fillEllipse(cx - 7, cy + 7, 5, 4);
+    g.fillEllipse(cx + 7, cy + 7, 5, 4);
     
-    // Eyes - small, subtle, only visible when active
-    // Pale ghostly eyes (not bright orange - more subtle)
-    g.fillStyle(0x4a5a4c);
-    g.fillEllipse(cx - 6, cy + 6, 5, 4);
-    g.fillEllipse(cx + 6, cy + 6, 5, 4);
-    
-    // Eye pupils
-    g.fillStyle(0x000000);
-    g.fillCircle(cx - 6, cy + 6, 2);
+    // Eye shine
+    g.fillStyle(0xffffcc, 0.9);
+    g.fillCircle(cx - 8, cy + 6, 2);
     g.fillCircle(cx + 6, cy + 6, 2);
     
-    // Tiny eye shine (very subtle)
-    g.fillStyle(0xffffff, 0.3);
-    g.fillCircle(cx - 7, cy + 5, 1);
-    g.fillCircle(cx + 5, cy + 5, 1);
+    // Hidden feet
+    g.fillStyle(0x2a3a2c);
+    g.fillEllipse(cx - 16, cy + 16, 8, 5);
+    g.fillEllipse(cx + 16, cy + 16, 8, 5);
     
-    // Small hidden legs (barely visible)
-    g.fillStyle(0x1a2a1c);
-    g.fillEllipse(cx - 18, cy + 14, 8, 5);
-    g.fillEllipse(cx + 18, cy + 14, 8, 5);
-    
-    // Outline for definition
-    g.lineStyle(1.5, 0x0a0c10);
-    g.strokeEllipse(cx, cy + 4, 52, 28);
+    // Outline
+    g.lineStyle(1.5, 0x0a1a0c);
+    g.strokeEllipse(cx, cy + 4, 54, 30);
     
     g.generateTexture('mossCreep', 64, 40);
     g.destroy();
