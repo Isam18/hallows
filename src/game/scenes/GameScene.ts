@@ -185,7 +185,7 @@ export class GameScene extends Phaser.Scene {
     
     // Show debug info text with controls
     const debugText = this.add.text(10, 10, 
-      `DEBUG MODE\n1: Fading Town | 2: Crossroads | 3: Ruins\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${gameState.isInstakillMode() ? 'ON' : 'OFF'}]`, {
+      `DEBUG MODE\n1: Fading Town | 2: Forgotten Crossroads | 3: Ruins\n4: Chain Room | 5: Greenway\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${gameState.isInstakillMode() ? 'ON' : 'OFF'}]`, {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '11px',
       color: '#ff6644',
@@ -212,6 +212,12 @@ export class GameScene extends Phaser.Scene {
         } else if (event.key === '3') {
           console.log('Teleporting to ruinedCrossroads');
           this.teleportToLevel('ruinedCrossroads');
+        } else if (event.key === '4') {
+          console.log('Teleporting to chainRoom');
+          this.teleportToLevel('chainRoom');
+        } else if (event.key === '5') {
+          console.log('Teleporting to greenway');
+          this.teleportToLevel('greenway');
         } else if (event.key === 'b' || event.key === 'B') {
           if (this.currentLevel.bossArena) {
             console.log('Entering boss arena');
@@ -233,7 +239,7 @@ export class GameScene extends Phaser.Scene {
           // Update debug text
           const debugTextObj = this.registry.get('debugText') as Phaser.GameObjects.Text;
           if (debugTextObj) {
-            debugTextObj.setText(`DEBUG MODE\n1: Fading Town | 2: Crossroads | 3: Ruins\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${newState ? 'ON' : 'OFF'}]`);
+            debugTextObj.setText(`DEBUG MODE\n1: Fading Town | 2: Forgotten Crossroads | 3: Ruins\n4: Chain Room | 5: Greenway\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${newState ? 'ON' : 'OFF'}]`);
           }
         }
       });
