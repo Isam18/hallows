@@ -35,9 +35,9 @@
       }
     },
     "contactDamage": 1,
-    "width": 100,
-    "height": 90,
-    "scale": 2.5,
+    "width": 80,
+    "height": 70,
+    "scale": 1.5,
     "reward": {
       "shells": 150,
       "charm": "falseStrength"
