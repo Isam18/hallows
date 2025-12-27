@@ -52,224 +52,180 @@ export class BootScene extends Phaser.Scene {
   private createMosskinSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
     const cx = 24;
-    const cy = 32;
+    const cy = 28;
     
-    // === FLUFFY BODY (pale green-gray moss) ===
-    // Base fluffy shape - multiple overlapping circles for texture
-    const fluffColors = [0x8a9a88, 0x9aaa98, 0x7a8a78, 0xa8b8a6];
+    // Clean silhouette style matching the game's aesthetic
+    // Main body - dark mossy green cloak-like shape
+    g.fillStyle(0x1a2a1c);
+    g.fillRoundedRect(6, 14, 36, 32, 4);
     
-    // Main body fluff
-    g.fillStyle(0x9aaa98);
-    g.fillEllipse(cx, cy + 4, 36, 40);
+    // Body bottom flutter (like player's cloak)
+    g.fillTriangle(6, 42, 2, 50, 16, 44);
+    g.fillTriangle(42, 42, 46, 50, 32, 44);
     
-    // Add fluffy texture with overlapping circles
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * Math.PI * 2;
-      const dist = 12 + Math.random() * 4;
-      const px = cx + Math.cos(angle) * dist;
-      const py = cy + 4 + Math.sin(angle) * dist * 1.1;
-      const size = 8 + Math.random() * 6;
-      g.fillStyle(fluffColors[i % fluffColors.length]);
-      g.fillEllipse(px, py, size, size);
-    }
+    // Mossy texture bumps on body (subtle)
+    g.fillStyle(0x2a3a2c);
+    g.fillEllipse(cx - 8, cy + 8, 8, 6);
+    g.fillEllipse(cx + 8, cy + 6, 10, 7);
+    g.fillEllipse(cx, cy + 12, 12, 6);
     
-    // Inner fluff layer
-    g.fillStyle(0xb8c8b6);
-    g.fillEllipse(cx, cy + 2, 24, 28);
-    
-    // More fluffy bumps
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const dist = 8;
-      const px = cx + Math.cos(angle) * dist;
-      const py = cy + 2 + Math.sin(angle) * dist * 1.2;
-      g.fillStyle(0xc8d8c6);
-      g.fillEllipse(px, py, 6, 7);
-    }
-    
-    // === TUFT/ANTENNA on top ===
+    // Head - pale green-gray mask like player's white mask
     g.fillStyle(0x6a7a68);
+    g.fillRoundedRect(10, 4, 28, 16, 5);
+    
+    // Face shadow/depth
+    g.fillStyle(0x4a5a48);
+    g.fillRoundedRect(14, 8, 20, 10, 3);
+    
+    // Eye sockets - deep black voids (like player)
+    g.fillStyle(0x000000);
+    g.fillEllipse(cx - 5, cy - 16, 5, 6);
+    g.fillEllipse(cx + 5, cy - 16, 5, 6);
+    
+    // Tiny eye shine
+    g.fillStyle(0xffffff, 0.4);
+    g.fillCircle(cx - 6, cy - 18, 1.5);
+    g.fillCircle(cx + 4, cy - 18, 1.5);
+    
+    // Top leaf antenna
+    g.fillStyle(0x3a4a3c);
     g.beginPath();
-    g.moveTo(cx - 4, cy - 18);
-    g.lineTo(cx, cy - 28);
-    g.lineTo(cx + 4, cy - 18);
+    g.moveTo(cx - 3, 6);
+    g.lineTo(cx, -4);
+    g.lineTo(cx + 3, 6);
     g.closePath();
     g.fillPath();
     
-    // Tuft fluff
-    g.fillStyle(0x8a9a88);
-    g.fillEllipse(cx, cy - 26, 10, 8);
-    g.fillStyle(0x9aaa98);
-    g.fillEllipse(cx, cy - 28, 6, 5);
+    // Leaf tip
+    g.fillStyle(0x4a5a4c);
+    g.fillEllipse(cx, -2, 6, 4);
     
-    // === DARK FACE AREA ===
-    g.fillStyle(0x2a3028);
-    g.fillEllipse(cx, cy - 4, 18, 16);
+    // Bold outline for definition
+    g.lineStyle(2, 0x0a0c10);
+    g.strokeRoundedRect(6, 14, 36, 32, 4);
+    g.strokeRoundedRect(10, 4, 28, 16, 5);
     
-    // Face shadow depth
-    g.fillStyle(0x1a201a);
-    g.fillEllipse(cx, cy - 2, 14, 12);
-    
-    // === LARGE ROUND EYES ===
-    // Eye sockets (dark)
-    g.fillStyle(0x0a100a);
-    g.fillCircle(cx - 5, cy - 5, 6);
-    g.fillCircle(cx + 5, cy - 5, 6);
-    
-    // Eye shine (small white dots)
-    g.fillStyle(0xffffff, 0.6);
-    g.fillCircle(cx - 6, cy - 7, 2);
-    g.fillCircle(cx + 4, cy - 7, 2);
-    
-    // === SMALL FEET ===
-    g.fillStyle(0x5a6a58);
-    g.fillEllipse(cx - 10, cy + 22, 8, 5);
-    g.fillEllipse(cx + 10, cy + 22, 8, 5);
-    
-    // === OUTLINE ===
-    g.lineStyle(1.5, 0x4a5a48);
-    g.strokeEllipse(cx, cy + 4, 36, 40);
-    
-    g.generateTexture('mosskin', 48, 56);
+    g.generateTexture('mosskin', 48, 52);
     g.destroy();
   }
   
   private createMosskinHurtSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
     const cx = 24;
-    const cy = 32;
+    const cy = 28;
     
-    // White flash version
+    // White flash version - same silhouette
     g.fillStyle(0xffffff);
-    g.fillEllipse(cx, cy + 4, 36, 40);
-    g.fillEllipse(cx, cy - 26, 10, 8);
+    g.fillRoundedRect(6, 14, 36, 32, 4);
+    g.fillTriangle(6, 42, 2, 50, 16, 44);
+    g.fillTriangle(42, 42, 46, 50, 32, 44);
     
-    // Slight texture
-    g.fillStyle(0xeeeeff);
-    for (let i = 0; i < 8; i++) {
-      const angle = (i / 8) * Math.PI * 2;
-      const px = cx + Math.cos(angle) * 12;
-      const py = cy + 4 + Math.sin(angle) * 14;
-      g.fillEllipse(px, py, 6, 6);
-    }
+    // Head
+    g.fillStyle(0xeeffee);
+    g.fillRoundedRect(10, 4, 28, 16, 5);
     
-    g.generateTexture('mosskin_hurt', 48, 56);
+    // Antenna
+    g.beginPath();
+    g.moveTo(cx - 3, 6);
+    g.lineTo(cx, -4);
+    g.lineTo(cx + 3, 6);
+    g.closePath();
+    g.fillPath();
+    g.fillEllipse(cx, -2, 6, 4);
+    
+    g.generateTexture('mosskin_hurt', 48, 52);
     g.destroy();
   }
   
   private createMossCreepSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    const cx = 40;
-    const cy = 44;
+    const cx = 32;
+    const cy = 24;
     
-    // === BUSHY FOLIAGE BODY ===
-    // Multiple layers of leafy bumps for texture
-    const leafColors = [0x2a5a2c, 0x3a6a3c, 0x4a7a4c, 0x2a4a2a, 0x3a5a3a];
+    // MossCreep as a low-profile ground creature that blends with environment
+    // Like a mossy rock or clump of leaves
     
-    // Back layer - darker
-    g.fillStyle(0x1a3a1c);
-    g.fillEllipse(cx, cy + 6, 68, 52);
+    // Base shadow for grounding
+    g.fillStyle(0x0a0c0a, 0.3);
+    g.fillEllipse(cx, cy + 14, 48, 8);
     
-    // Main body - bushy mound shape
-    g.fillStyle(0x2a5a2c);
-    g.fillEllipse(cx, cy, 64, 48);
+    // Main body - dark low mound shape (like a rock covered in moss)
+    g.fillStyle(0x1a2a1c);
+    g.fillEllipse(cx, cy + 4, 52, 28);
     
-    // Add leafy texture with many overlapping circles
-    for (let layer = 0; layer < 3; layer++) {
-      const count = 16 - layer * 4;
-      const dist = 24 - layer * 6;
-      for (let i = 0; i < count; i++) {
-        const angle = (i / count) * Math.PI * 2 + layer * 0.3;
-        const px = cx + Math.cos(angle) * dist;
-        const py = cy + Math.sin(angle) * (dist * 0.7);
-        const size = 10 + Math.random() * 8 - layer * 2;
-        g.fillStyle(leafColors[(i + layer) % leafColors.length]);
-        g.fillEllipse(px, py, size, size * 0.8);
-      }
-    }
+    // Rocky/mossy texture - darker patches
+    g.fillStyle(0x0a1a0c);
+    g.fillEllipse(cx - 12, cy + 6, 14, 10);
+    g.fillEllipse(cx + 14, cy + 8, 12, 8);
+    g.fillEllipse(cx, cy + 10, 16, 8);
     
-    // Top foliage bumps
-    g.fillStyle(0x4a7a4c);
-    g.fillEllipse(cx - 12, cy - 14, 14, 10);
-    g.fillEllipse(cx + 8, cy - 16, 16, 12);
-    g.fillEllipse(cx - 4, cy - 20, 12, 10);
+    // Moss/leaf bumps on top
+    g.fillStyle(0x2a3a2c);
+    g.fillEllipse(cx - 16, cy - 2, 12, 10);
+    g.fillEllipse(cx, cy - 6, 14, 12);
+    g.fillEllipse(cx + 14, cy - 4, 10, 10);
     
-    g.fillStyle(0x5a8a5c);
-    g.fillEllipse(cx, cy - 18, 10, 8);
-    g.fillEllipse(cx + 14, cy - 12, 8, 6);
-    g.fillEllipse(cx - 16, cy - 10, 10, 8);
+    // Lighter moss highlights
+    g.fillStyle(0x3a4a3c);
+    g.fillEllipse(cx - 8, cy - 8, 8, 6);
+    g.fillEllipse(cx + 6, cy - 6, 10, 7);
+    g.fillEllipse(cx - 18, cy + 2, 6, 5);
+    g.fillEllipse(cx + 20, cy, 5, 4);
     
-    // Side leaf protrusions
-    g.fillStyle(0x3a6a3c);
-    g.fillEllipse(cx - 28, cy + 4, 12, 10);
-    g.fillEllipse(cx + 28, cy + 2, 14, 12);
-    g.fillEllipse(cx - 24, cy - 6, 10, 8);
-    g.fillEllipse(cx + 22, cy - 8, 12, 10);
+    // Hidden eye area - very dark, blends in when camouflaged
+    g.fillStyle(0x000000, 0.6);
+    g.fillEllipse(cx, cy + 6, 20, 10);
     
-    // === DARK AREA FOR EYES ===
-    g.fillStyle(0x1a2a1a, 0.8);
-    g.fillEllipse(cx, cy + 12, 30, 18);
+    // Eyes - small, subtle, only visible when active
+    // Pale ghostly eyes (not bright orange - more subtle)
+    g.fillStyle(0x4a5a4c);
+    g.fillEllipse(cx - 6, cy + 6, 5, 4);
+    g.fillEllipse(cx + 6, cy + 6, 5, 4);
     
-    // === GLOWING ORANGE EYES ===
-    // Eye glow (outer)
-    g.fillStyle(0xff6600, 0.4);
-    g.fillEllipse(cx - 8, cy + 12, 12, 10);
-    g.fillEllipse(cx + 8, cy + 12, 12, 10);
+    // Eye pupils
+    g.fillStyle(0x000000);
+    g.fillCircle(cx - 6, cy + 6, 2);
+    g.fillCircle(cx + 6, cy + 6, 2);
     
-    // Eye main
-    g.fillStyle(0xff8800);
-    g.fillEllipse(cx - 8, cy + 12, 8, 7);
-    g.fillEllipse(cx + 8, cy + 12, 8, 7);
+    // Tiny eye shine (very subtle)
+    g.fillStyle(0xffffff, 0.3);
+    g.fillCircle(cx - 7, cy + 5, 1);
+    g.fillCircle(cx + 5, cy + 5, 1);
     
-    // Eye bright center
-    g.fillStyle(0xffaa44);
-    g.fillEllipse(cx - 8, cy + 11, 5, 4);
-    g.fillEllipse(cx + 8, cy + 11, 5, 4);
+    // Small hidden legs (barely visible)
+    g.fillStyle(0x1a2a1c);
+    g.fillEllipse(cx - 18, cy + 14, 8, 5);
+    g.fillEllipse(cx + 18, cy + 14, 8, 5);
     
-    // Eye shine
-    g.fillStyle(0xffddaa, 0.8);
-    g.fillCircle(cx - 9, cy + 10, 2);
-    g.fillCircle(cx + 7, cy + 10, 2);
+    // Outline for definition
+    g.lineStyle(1.5, 0x0a0c10);
+    g.strokeEllipse(cx, cy + 4, 52, 28);
     
-    // === SMALL HIDDEN FEET (barely visible) ===
-    g.fillStyle(0x3a4a3a);
-    g.fillEllipse(cx - 14, cy + 26, 10, 6);
-    g.fillEllipse(cx + 14, cy + 26, 10, 6);
-    g.fillEllipse(cx, cy + 28, 8, 5);
-    
-    g.generateTexture('mossCreep', 80, 64);
+    g.generateTexture('mossCreep', 64, 40);
     g.destroy();
   }
   
   private createMossCreepHurtSprite(): void {
     const g = this.make.graphics({ x: 0, y: 0 });
-    const cx = 40;
-    const cy = 44;
+    const cx = 32;
+    const cy = 24;
     
-    // White flash version with some texture
+    // White flash version
     g.fillStyle(0xffffff);
-    g.fillEllipse(cx, cy, 64, 48);
+    g.fillEllipse(cx, cy + 4, 52, 28);
     
-    // Leafy texture in white
+    // Texture bumps
     g.fillStyle(0xeeffee);
-    for (let i = 0; i < 12; i++) {
-      const angle = (i / 12) * Math.PI * 2;
-      const px = cx + Math.cos(angle) * 22;
-      const py = cy + Math.sin(angle) * 16;
-      g.fillEllipse(px, py, 10, 8);
-    }
+    g.fillEllipse(cx - 16, cy - 2, 12, 10);
+    g.fillEllipse(cx, cy - 6, 14, 12);
+    g.fillEllipse(cx + 14, cy - 4, 10, 10);
     
-    // Top bumps
-    g.fillStyle(0xeeffee);
-    g.fillEllipse(cx - 12, cy - 14, 14, 10);
-    g.fillEllipse(cx + 8, cy - 16, 16, 12);
+    // Eyes visible
+    g.fillStyle(0xccddcc);
+    g.fillEllipse(cx - 6, cy + 6, 5, 4);
+    g.fillEllipse(cx + 6, cy + 6, 5, 4);
     
-    // Eyes still visible but lighter
-    g.fillStyle(0xffcc88);
-    g.fillEllipse(cx - 8, cy + 12, 8, 7);
-    g.fillEllipse(cx + 8, cy + 12, 8, 7);
-    
-    g.generateTexture('mossCreep_hurt', 80, 64);
+    g.generateTexture('mossCreep_hurt', 64, 40);
     g.destroy();
   }
 
