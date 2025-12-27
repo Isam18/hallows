@@ -14,15 +14,24 @@ import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
 import { Portal } from '../entities/Portal';
 import { DeathMarker } from '../entities/DeathMarker';
+import { Spike, createSpikeTexture } from '../entities/Spike';
+import { Breakable } from '../entities/Breakable';
+import { ParallaxBackground } from '../systems/ParallaxBackground';
+import { DustParticles } from '../systems/DustParticles';
+import { generateForgottenCrossroads } from '../systems/RoomGenerator';
 
 // Import level data
 import fadingTownData from '../data/levels/fadingTown.json';
 import ruinedCrossroadsData from '../data/levels/ruinedCrossroads.json';
 import enemiesData from '../data/enemies.json';
 
+// Generate the Forgotten Crossroads level
+const forgottenCrossroadsData = generateForgottenCrossroads();
+
 const LEVELS: Record<string, LevelConfig> = {
   fadingTown: fadingTownData as LevelConfig,
   ruinedCrossroads: ruinedCrossroadsData as LevelConfig,
+  forgottenCrossroads: forgottenCrossroadsData,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -36,6 +45,12 @@ export class GameScene extends Phaser.Scene {
   private portals!: Phaser.Physics.Arcade.StaticGroup;
   private deathMarker: DeathMarker | null = null;
   private boss: Boss | null = null;
+  private spikes!: Phaser.Physics.Arcade.StaticGroup;
+  private breakables!: Phaser.Physics.Arcade.StaticGroup;
+  
+  // Visual systems
+  private parallaxBg: ParallaxBackground | null = null;
+  private dustParticles: DustParticles | null = null;
   
   // Level data
   private currentLevel!: LevelConfig;
@@ -93,6 +108,17 @@ export class GameScene extends Phaser.Scene {
     this.pickups = this.physics.add.group();
     this.benches = this.physics.add.staticGroup();
     this.portals = this.physics.add.staticGroup();
+    this.spikes = this.physics.add.staticGroup();
+    this.breakables = this.physics.add.staticGroup();
+    
+    // Create visual effects for Forgotten Crossroads style levels
+    if (this.levelId === 'forgottenCrossroads' || this.levelId === 'ruinedCrossroads') {
+      this.parallaxBg = new ParallaxBackground(this);
+      this.dustParticles = new DustParticles(this);
+    }
+    
+    // Create spike texture
+    createSpikeTexture(this);
     
     // Build level
     this.buildLevel();
@@ -314,6 +340,11 @@ export class GameScene extends Phaser.Scene {
       
       // Update bench proximity and prompts
       this.updateBenchProximity(delta);
+      
+      // Update parallax background
+      if (this.parallaxBg) {
+        this.parallaxBg.update();
+      }
     }
     
     // Clear just-pressed/released states at END of frame so all systems can read them
