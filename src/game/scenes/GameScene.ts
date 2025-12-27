@@ -6,6 +6,7 @@ import gameState from '../core/GameState';
 import inputManager from '../core/InputManager';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
+import { BasicHusk } from '../entities/BasicHusk';
 import { Vengefly } from '../entities/Vengefly';
 import { Aspid } from '../entities/Aspid';
 import { HuskGuard } from '../entities/HuskGuard';
@@ -303,9 +304,22 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'infectedHusk' || (config as any).isPassive) {
           const infectedHusk = new InfectedHusk(this, e.x, e.y, config);
           this.enemies.add(infectedHusk);
+        } else if (e.type === 'basicHusk') {
+          // Explicit BasicHusk spawn
+          const huskConfig = (enemiesData as Record<string, EnemyCombatConfig>)['basicHusk'];
+          const husk = new BasicHusk(this, e.x, e.y, huskConfig);
+          this.enemies.add(husk);
         } else {
-          const enemy = new Enemy(this, e.x, e.y, config);
-          this.enemies.add(enemy);
+          // Basic crawler enemies - 40% chance to replace with BasicHusk
+          const replaceWithHusk = Math.random() < 0.4;
+          if (replaceWithHusk) {
+            const huskConfig = (enemiesData as Record<string, EnemyCombatConfig>)['basicHusk'];
+            const husk = new BasicHusk(this, e.x, e.y, huskConfig);
+            this.enemies.add(husk);
+          } else {
+            const enemy = new Enemy(this, e.x, e.y, config);
+            this.enemies.add(enemy);
+          }
         }
       }
     });
@@ -467,9 +481,11 @@ export class GameScene extends Phaser.Scene {
     let hitSomething = false;
     
     this.enemies.getChildren().forEach((enemy) => {
-      const e = enemy as Enemy;
+      const e = enemy as any; // Could be Enemy, BasicHusk, Vengefly, etc.
       if (!e.isDying() && !e.isInvulnerable()) {
-        if (Phaser.Geom.Rectangle.Overlaps(hitbox, e.getBounds())) {
+        // Use getHitRect if available, otherwise getBounds
+        const enemyBounds = e.getHitRect ? e.getHitRect() : e.getBounds();
+        if (Phaser.Geom.Rectangle.Overlaps(hitbox, enemyBounds)) {
           if (e.takeDamage(damage, this.player.x, swingId)) {
             hitSomething = true;
           }

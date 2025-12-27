@@ -252,6 +252,9 @@ export class BootScene extends Phaser.Scene {
     
     // Infected Husk - Passive environmental enemy
     this.createInfectedHuskSprite();
+    
+    // Basic Husk - Charging ground enemy with visual variants
+    this.createBasicHuskSprites();
   }
 
   private createVengeflySprite(): void {
@@ -695,6 +698,100 @@ export class BootScene extends Phaser.Scene {
     hg.fillCircle(cx + 18, cy + 12, 6);
     hg.fillCircle(cx - 7, cy - 10, 5);
     hg.generateTexture('infectedHusk_hurt', 72, 60);
+    hg.destroy();
+  }
+
+  private createBasicHuskSprites(): void {
+    // Create two visual variants (Skin A and Skin B) for variety
+    this.createBasicHuskVariant('A', 0x5a6a78, 0x4a5a68); // Blue-gray
+    this.createBasicHuskVariant('B', 0x6a5a58, 0x5a4a48); // Brown-gray
+  }
+
+  private createBasicHuskVariant(variant: string, primaryColor: number, secondaryColor: number): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 20; // Center X
+    const cy = 24; // Center Y
+    
+    // === BODY (humanoid husk shape) ===
+    // Main torso - hunched posture
+    g.fillStyle(primaryColor);
+    g.fillEllipse(cx, cy + 4, 28, 32);
+    
+    // Chest/shoulder area
+    g.fillStyle(secondaryColor);
+    g.fillEllipse(cx, cy - 4, 32, 20);
+    
+    // === HEAD (skull-like) ===
+    g.fillStyle(0xd8d0c8);
+    g.fillEllipse(cx, cy - 14, 18, 16);
+    
+    // Face details - hollow eyes
+    g.fillStyle(0x1a1a20);
+    g.fillEllipse(cx - 4, cy - 15, 4, 5);
+    g.fillEllipse(cx + 4, cy - 15, 4, 5);
+    
+    // Mouth/jaw
+    g.fillStyle(0x0a0a10);
+    g.fillEllipse(cx, cy - 10, 8, 4);
+    
+    // === ARMS (dangling, claw-like) ===
+    g.fillStyle(primaryColor);
+    // Left arm
+    g.beginPath();
+    g.moveTo(cx - 14, cy);
+    g.lineTo(cx - 20, cy + 16);
+    g.lineTo(cx - 16, cy + 18);
+    g.lineTo(cx - 12, cy + 4);
+    g.closePath();
+    g.fillPath();
+    // Right arm
+    g.beginPath();
+    g.moveTo(cx + 14, cy);
+    g.lineTo(cx + 20, cy + 16);
+    g.lineTo(cx + 16, cy + 18);
+    g.lineTo(cx + 12, cy + 4);
+    g.closePath();
+    g.fillPath();
+    
+    // Claws
+    g.fillStyle(0xc0b8b0);
+    g.fillTriangle(cx - 20, cy + 16, cx - 24, cy + 22, cx - 18, cy + 20);
+    g.fillTriangle(cx + 20, cy + 16, cx + 24, cy + 22, cx + 18, cy + 20);
+    
+    // === LEGS (stubby) ===
+    g.fillStyle(secondaryColor);
+    g.fillEllipse(cx - 6, cy + 18, 10, 12);
+    g.fillEllipse(cx + 6, cy + 18, 10, 12);
+    
+    // Feet
+    g.fillStyle(0x3a3a40);
+    g.fillEllipse(cx - 8, cy + 24, 12, 6);
+    g.fillEllipse(cx + 8, cy + 24, 12, 6);
+    
+    // === DETAILS ===
+    // Body segments/cracks
+    g.lineStyle(1, 0x3a4a58);
+    g.lineBetween(cx - 8, cy - 2, cx - 10, cy + 10);
+    g.lineBetween(cx + 8, cy - 2, cx + 10, cy + 10);
+    g.lineBetween(cx, cy + 2, cx, cy + 14);
+    
+    // Outline
+    g.lineStyle(1.5, 0x2a3a48);
+    g.strokeEllipse(cx, cy + 4, 28, 32);
+    g.strokeEllipse(cx, cy - 14, 18, 16);
+    
+    g.generateTexture(`basicHusk${variant}`, 48, 52);
+    g.destroy();
+    
+    // Hurt frame (white flash)
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillEllipse(cx, cy + 4, 28, 32);
+    hg.fillEllipse(cx, cy - 4, 32, 20);
+    hg.fillEllipse(cx, cy - 14, 18, 16);
+    hg.fillEllipse(cx - 6, cy + 18, 10, 12);
+    hg.fillEllipse(cx + 6, cy + 18, 10, 12);
+    hg.generateTexture(`basicHusk${variant}_hurt`, 48, 52);
     hg.destroy();
   }
 
