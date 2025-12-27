@@ -11,6 +11,8 @@ import { Vengefly } from '../entities/Vengefly';
 import { Aspid } from '../entities/Aspid';
 import { HuskGuard } from '../entities/HuskGuard';
 import { InfectedHusk } from '../entities/InfectedHusk';
+import { Mosskin } from '../entities/Mosskin';
+import { MossCreep } from '../entities/MossCreep';
 import { Boss } from '../entities/Boss';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
@@ -310,8 +312,17 @@ export class GameScene extends Phaser.Scene {
     this.currentLevel.enemies.forEach(e => {
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
       if (config) {
+        // Greenway-specific enemies
+        if (e.type === 'mosskin') {
+          const mosskin = new Mosskin(this, e.x, e.y, config);
+          this.enemies.add(mosskin);
+        } else if (e.type === 'mossCreep') {
+          const surface = (e as any).surface || 'floor';
+          const mossCreep = new MossCreep(this, e.x, e.y, config, surface);
+          this.enemies.add(mossCreep);
+        }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
-        if (e.type === 'vengefly' || (config as any).isFlying) {
+        else if (e.type === 'vengefly' || (config as any).isFlying) {
           // Use spawner for random Vengefly/Aspid selection
           this.flyingSpawner!.spawnAt(e.x, e.y);
         } else if (e.type === 'aspid') {
