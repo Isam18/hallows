@@ -34,5 +34,24 @@
     "spriteKey": "crawlingHusk",
     "width": 28,
     "height": 20
+  },
+  "vengefly": {
+    "id": "vengefly",
+    "displayName": "Vengefly",
+    "hp": 2,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 40,
+    "moveSpeedAggro": 110,
+    "aggroRangePx": 120,
+    "deaggroRangePx": 220,
+    "knockbackOnHit": { "x": 80, "y": 40 },
+    "hitstunMs": 200,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 2, "max": 5 },
+    "hurtFlashMs": 150,
+    "spriteKey": "vengefly",
+    "width": 26,
+    "height": 22,
+    "isFlying": true
   }
 }

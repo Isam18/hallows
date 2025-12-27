@@ -6,6 +6,7 @@ import gameState from '../core/GameState';
 import inputManager from '../core/InputManager';
 import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
+import { Vengefly } from '../entities/Vengefly';
 import { Boss } from '../entities/Boss';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
@@ -187,8 +188,14 @@ export class GameScene extends Phaser.Scene {
     this.currentLevel.enemies.forEach(e => {
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
       if (config) {
-        const enemy = new Enemy(this, e.x, e.y, config);
-        this.enemies.add(enemy);
+        // Use Vengefly class for flying enemies
+        if (e.type === 'vengefly' || (config as any).isFlying) {
+          const vengefly = new Vengefly(this, e.x, e.y, config);
+          this.enemies.add(vengefly);
+        } else {
+          const enemy = new Enemy(this, e.x, e.y, config);
+          this.enemies.add(enemy);
+        }
       }
     });
     
@@ -281,9 +288,10 @@ export class GameScene extends Phaser.Scene {
       // Update camera look-ahead based on player facing
       this.updateCameraLookAhead();
       
-      // Update enemies
+      // Update enemies (both ground and flying types)
       this.enemies.getChildren().forEach((enemy) => {
-        (enemy as Enemy).update(time, delta, this.player);
+        const e = enemy as Enemy | Vengefly;
+        e.update(time, delta, this.player);
       });
       
       // Update boss
