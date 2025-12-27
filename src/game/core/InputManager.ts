@@ -7,7 +7,8 @@ export type InputAction =
   | 'attack'
   | 'interact'
   | 'pause'
-  | 'down'; // For future drop-through platforms
+  | 'down'
+  | 'focus'; // For focus healing (hold J)
 
 interface KeyBinding {
   action: InputAction;
@@ -18,11 +19,12 @@ const DEFAULT_BINDINGS: KeyBinding[] = [
   { action: 'left', keys: ['KeyA', 'ArrowLeft'] },
   { action: 'right', keys: ['KeyD', 'ArrowRight'] },
   { action: 'jump', keys: ['Space', 'KeyW', 'ArrowUp'] },
-  { action: 'dash', keys: ['ShiftLeft', 'ShiftRight', 'KeyJ'] },
+  { action: 'dash', keys: ['ShiftLeft', 'ShiftRight'] },
   { action: 'attack', keys: ['KeyK', 'KeyX'] },
   { action: 'interact', keys: ['KeyE', 'KeyF'] },
   { action: 'pause', keys: ['Escape'] },
   { action: 'down', keys: ['KeyS', 'ArrowDown'] },
+  { action: 'focus', keys: ['KeyJ'] },
 ];
 
 class InputManager {

@@ -81,26 +81,6 @@ export class Squit extends Phaser.Physics.Arcade.Sprite {
     // Random hover phase offset
     this.hoverTime = Math.random() * Math.PI * 2;
     this.flapTime = Math.random() * Math.PI * 2;
-    
-    // Create placeholder visual (slender insect)
-    this.createSquitVisual();
-  }
-  
-  private createSquitVisual(): void {
-    // Main body - slender oval
-    const graphics = this.scene.add.graphics();
-    graphics.fillStyle(0x44aa88, 1); // Greenish-blue
-    graphics.fillEllipse(0, 0, 20, 12);
-    
-    // Head
-    graphics.fillStyle(0x338866, 1);
-    graphics.fillCircle(10, 0, 6);
-    
-    // Generate texture
-    graphics.generateTexture('squit_body', 32, 24);
-    graphics.destroy();
-    
-    this.setTexture('squit_body');
   }
 
   update(time: number, delta: number, player: Player): void {

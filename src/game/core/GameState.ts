@@ -3,6 +3,11 @@ import { PlayerData, GameState, CharmData } from './GameConfig';
 import { DEATH_CONFIG, DeathDropRecord, generateDropId, calculateDropAmount } from './DeathConfig';
 import charmsData from '../data/charms.json';
 
+// Soul system constants
+const MAX_SOUL = 100;
+const SOUL_PER_HIT = 15;
+const SOUL_COST_HEAL = 33;
+
 class GameStateManager {
   private state: GameState = 'menu';
   private playerData: PlayerData = {
@@ -13,6 +18,9 @@ class GameStateManager {
     lastBench: null,
     droppedShells: null,
   };
+  
+  // Soul resource
+  private soul = 0;
   
   // Owned charms (purchased from shop)
   private ownedCharms: Set<string> = new Set();
@@ -96,10 +104,53 @@ class GameStateManager {
     this.emit('shellsChange', this.playerData.shells);
   }
   
+  // Soul system
+  getSoul(): number {
+    return this.soul;
+  }
+  
+  getMaxSoul(): number {
+    return MAX_SOUL;
+  }
+  
+  getSoulCostHeal(): number {
+    return SOUL_COST_HEAL;
+  }
+  
+  addSoul(amount: number): void {
+    this.soul = Math.min(MAX_SOUL, this.soul + amount);
+    this.emit('soulChange', this.soul);
+  }
+  
+  addSoulOnHit(): void {
+    this.addSoul(SOUL_PER_HIT);
+  }
+  
+  useSoulForHeal(): boolean {
+    if (this.soul >= SOUL_COST_HEAL && this.playerData.hp < this.playerData.maxHp) {
+      this.soul -= SOUL_COST_HEAL;
+      this.heal(1);
+      this.emit('soulChange', this.soul);
+      this.emit('focusHealComplete', null);
+      return true;
+    }
+    return false;
+  }
+  
+  canFocusHeal(): boolean {
+    return this.soul >= SOUL_COST_HEAL && this.playerData.hp < this.playerData.maxHp;
+  }
+  
+  refillSoul(): void {
+    this.soul = MAX_SOUL;
+    this.emit('soulChange', this.soul);
+  }
+  
   // Bench/checkpoint
   setLastBench(levelId: string, spawnId: string): void {
     this.playerData.lastBench = { levelId, spawnId };
     this.fullHeal();
+    this.refillSoul();
     this.emit('benchActivated', this.playerData.lastBench);
   }
   
@@ -372,6 +423,7 @@ class GameStateManager {
     this.deathDropRecord = null;
     this.ownedCharms.clear();
     this.bossDefeated = false;
+    this.soul = 0;
     this.emit('runReset', null);
   }
   

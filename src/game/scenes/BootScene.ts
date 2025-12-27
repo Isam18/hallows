@@ -50,6 +50,15 @@ export class BootScene extends Phaser.Scene {
     
     // Create MossWarrior - elite enemy with bush and warrior forms
     this.createMossWarriorSprites();
+    
+    // Create Squit - mosquito-like flying enemy
+    this.createSquitSprite();
+  }
+  
+  private createSquitSprite(): void {
+    // Load the squit image as a texture
+    this.load.image('squit', '/src/assets/squit.png');
+    this.load.start();
   }
   
   private createMosskinSprite(): void {
