@@ -601,7 +601,11 @@ export class BootScene extends Phaser.Scene {
   }
 
   private createBossSprites(): void {
-    // Elder Grub - larger, more imposing
+    // Load False Champion sprites from images
+    this.load.image('falseChampion', '/src/assets/boss-normal.png');
+    this.load.image('falseChampion_staggered', '/src/assets/boss-staggered.png');
+    
+    // Fallback procedural sprite for elderGrub (legacy)
     const bossGraphics = this.make.graphics({ x: 0, y: 0 });
     
     // Main body
@@ -616,7 +620,7 @@ export class BootScene extends Phaser.Scene {
     bossGraphics.fillStyle(0x2a5577);
     for (let i = 0; i < 7; i++) {
       const x = 10 + i * 11;
-      const h = i === 3 ? 22 : 16; // Center spine taller
+      const h = i === 3 ? 22 : 16;
       bossGraphics.fillTriangle(x, 8, x - 5, 8 + h, x + 5, 8 + h);
     }
     
@@ -628,7 +632,7 @@ export class BootScene extends Phaser.Scene {
       bossGraphics.fillTriangle(x, 10, x - 2, 10 + h, x + 2, 10 + h);
     }
     
-    // Eyes - menacing red glow
+    // Eyes
     bossGraphics.fillStyle(0x220000);
     bossGraphics.fillCircle(28, 35, 10);
     bossGraphics.fillCircle(62, 35, 10);
@@ -641,7 +645,6 @@ export class BootScene extends Phaser.Scene {
     bossGraphics.fillCircle(30, 33, 3);
     bossGraphics.fillCircle(64, 33, 3);
     
-    // Thick outline
     bossGraphics.lineStyle(3, 0x1a1e2a);
     bossGraphics.strokeEllipse(45, 40, 85, 65);
     

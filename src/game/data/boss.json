@@ -4,7 +4,7 @@
     "name": "False Champion",
     "maxHp": 60,
     "staggerThreshold": 12,
-    "staggerDuration": 5000,
+    "staggerDuration": 3500,
     "staggerRecoveryRageTime": 2000,
     "headExposureCondition": {
       "timeThresholdSec": 45,
@@ -16,14 +16,14 @@
         "hangTime": 600,
         "slamSpeed": 800,
         "shockwaveWidth": 120,
-        "shockwaveDamage": 2,
+        "shockwaveDamage": 1,
         "cooldown": 2000
       },
       "maceCombo": {
         "swings": 3,
         "swingDelay": 400,
         "forwardMovePerSwing": 60,
-        "damage": 2,
+        "damage": 1,
         "cooldown": 1800
       },
       "rageTantrum": {
@@ -34,10 +34,10 @@
         "cooldown": 0
       }
     },
-    "contactDamage": 2,
+    "contactDamage": 1,
     "width": 100,
     "height": 90,
-    "scale": 3.5,
+    "scale": 2.5,
     "reward": {
       "shells": 150,
       "charm": "falseStrength"
