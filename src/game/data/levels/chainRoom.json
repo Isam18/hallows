@@ -40,6 +40,16 @@
       "y": 750,
       "width": 50,
       "height": 100
+    },
+    {
+      "id": "exitToRuins",
+      "type": "transition",
+      "x": 30,
+      "y": 750,
+      "width": 30,
+      "height": 100,
+      "target": "ruinedCrossroads",
+      "targetSpawn": "fromBoss"
     }
   ],
   "spawns": {
