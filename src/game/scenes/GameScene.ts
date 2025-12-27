@@ -20,10 +20,14 @@ import { Portal } from '../entities/Portal';
 import { DeathMarker } from '../entities/DeathMarker';
 import { Spike } from '../entities/Spike';
 import { Breakable } from '../entities/Breakable';
+import { AcidPool } from '../entities/AcidPool';
 import { ParallaxBackground } from '../systems/ParallaxBackground';
 import { DustParticles } from '../systems/DustParticles';
 import { FlyingEnemySpawner } from '../systems/FlyingEnemySpawner';
 import { generateForgottenCrossroads } from '../systems/RoomGenerator';
+import { generateGreenway } from '../systems/GreenwayRoomGenerator';
+import { GreenwayParallax } from '../systems/GreenwayParallax';
+import { LeafParticles } from '../systems/LeafParticles';
 
 // Import level data
 import fadingTownData from '../data/levels/fadingTown.json';
@@ -32,8 +36,9 @@ import chainRoomData from '../data/levels/chainRoom.json';
 import greenwayData from '../data/levels/greenway.json';
 import enemiesData from '../data/enemies.json';
 
-// Generate the Forgotten Crossroads level
+// Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
+const greenwayGeneratedData = generateGreenway();
 
 const LEVELS: Record<string, LevelConfig> = {
   fadingTown: fadingTownData as LevelConfig,
@@ -41,6 +46,7 @@ const LEVELS: Record<string, LevelConfig> = {
   forgottenCrossroads: forgottenCrossroadsData,
   chainRoom: chainRoomData as LevelConfig,
   greenway: greenwayData as LevelConfig,
+  greenwayGenerated: greenwayGeneratedData as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -54,12 +60,19 @@ export class GameScene extends Phaser.Scene {
   private portals!: Phaser.Physics.Arcade.StaticGroup;
   private spikes!: Phaser.Physics.Arcade.StaticGroup;
   private breakables!: Phaser.Physics.Arcade.StaticGroup;
+  private acidPools!: Phaser.Physics.Arcade.StaticGroup;
   private deathMarker: DeathMarker | null = null;
   private boss: Boss | null = null;
   
+  // Safe position tracking for acid respawn
+  private lastSafeX = 0;
+  private lastSafeY = 0;
+  
   // Visual systems
   private parallaxBg: ParallaxBackground | null = null;
+  private greenwayParallax: GreenwayParallax | null = null;
   private dustParticles: DustParticles | null = null;
+  private leafParticles: LeafParticles | null = null;
   private flyingSpawner: FlyingEnemySpawner | null = null;
   
   // Level data
@@ -125,13 +138,16 @@ export class GameScene extends Phaser.Scene {
     this.portals = this.physics.add.staticGroup();
     this.spikes = this.physics.add.staticGroup();
     this.breakables = this.physics.add.staticGroup();
+    this.acidPools = this.physics.add.staticGroup();
     
     // Create visual effects based on level biome
     const biome = (this.currentLevel as any).biome || 'crossroads';
     if (this.levelId === 'forgottenCrossroads' || this.levelId === 'ruinedCrossroads') {
       this.parallaxBg = new ParallaxBackground(this);
       this.dustParticles = new DustParticles(this);
-    } else if (biome === 'greenway' || this.levelId === 'greenway') {
+    } else if (biome === 'greenway' || this.levelId === 'greenway' || this.levelId === 'greenwayGenerated') {
+      this.greenwayParallax = new GreenwayParallax(this);
+      this.leafParticles = new LeafParticles(this, this.currentLevel.height);
       this.createGreenwayEnvironment();
     }
     
@@ -141,6 +157,8 @@ export class GameScene extends Phaser.Scene {
     // Create player at spawn
     const spawn = this.currentLevel.spawns[this.spawnId] || this.currentLevel.spawnPoint;
     this.player = new Player(this, spawn.x, spawn.y);
+    this.lastSafeX = spawn.x;
+    this.lastSafeY = spawn.y;
     
     // Set up collisions
     this.setupCollisions();
@@ -387,6 +405,14 @@ export class GameScene extends Phaser.Scene {
         this.breakables.add(breakable);
       });
     }
+    
+    // Acid pools (Greenway hazard)
+    if ((this.currentLevel as any).acidPools) {
+      (this.currentLevel as any).acidPools.forEach((a: any) => {
+        const acid = new AcidPool(this, a.x, a.y, a.width, a.height || 30);
+        this.acidPools.add(acid);
+      });
+    }
   }
 
   private setupCollisions(): void {
@@ -425,6 +451,14 @@ export class GameScene extends Phaser.Scene {
       (player, spike) => {
         const s = spike as Spike;
         s.onPlayerContact(this.player);
+      }
+    );
+    
+    // Player vs acid pools (Greenway hazard)
+    this.physics.add.overlap(this.player, this.acidPools,
+      (player, acid) => {
+        const a = acid as AcidPool;
+        a.onPlayerContact(this.player, this.lastSafeX, this.lastSafeY);
       }
     );
     
