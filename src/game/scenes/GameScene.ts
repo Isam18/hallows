@@ -170,31 +170,49 @@ export class GameScene extends Phaser.Scene {
     this.debugGraphics = this.add.graphics();
     this.debugGraphics.setDepth(1000);
     
-    // Show debug info text
-    const debugText = this.add.text(10, 10, 'DEBUG MODE', {
+    // Show debug info text with controls
+    const debugText = this.add.text(10, 10, 
+      'DEBUG MODE\n1: Fading Town | 2: Crossroads | 3: Ruins\nB: Boss | H: Heal | G: +100 Shells', {
       fontFamily: 'JetBrains Mono, monospace',
-      fontSize: '12px',
+      fontSize: '11px',
       color: '#ff6644',
-      backgroundColor: '#000000aa',
-      padding: { x: 5, y: 3 }
+      backgroundColor: '#000000cc',
+      padding: { x: 8, y: 6 },
+      lineSpacing: 4
     });
     debugText.setScrollFactor(0);
     debugText.setDepth(1001);
     
-    // Add keyboard shortcuts for debug
-    this.input.keyboard?.on('keydown-ONE', () => this.teleportToLevel('fadingTown'));
-    this.input.keyboard?.on('keydown-TWO', () => this.teleportToLevel('forgottenCrossroads'));
-    this.input.keyboard?.on('keydown-THREE', () => this.teleportToLevel('ruinedCrossroads'));
-    this.input.keyboard?.on('keydown-B', () => {
-      if (this.currentLevel.bossArena) this.enterBossArena();
-    });
-    this.input.keyboard?.on('keydown-H', () => {
-      gameState.fullHeal();
-      this.emitUIEvent('hpChange', gameState.getPlayerData());
-    });
-    this.input.keyboard?.on('keydown-G', () => {
-      this.giveShells(100);
-    });
+    // Add keyboard shortcuts for debug using correct Phaser key codes
+    if (this.input.keyboard) {
+      // Number keys for level teleport
+      this.input.keyboard.on('keydown', (event: KeyboardEvent) => {
+        if (event.key === '1') {
+          console.log('Teleporting to fadingTown');
+          this.teleportToLevel('fadingTown');
+        } else if (event.key === '2') {
+          console.log('Teleporting to forgottenCrossroads');
+          this.teleportToLevel('forgottenCrossroads');
+        } else if (event.key === '3') {
+          console.log('Teleporting to ruinedCrossroads');
+          this.teleportToLevel('ruinedCrossroads');
+        } else if (event.key === 'b' || event.key === 'B') {
+          if (this.currentLevel.bossArena) {
+            console.log('Entering boss arena');
+            this.enterBossArena();
+          } else {
+            console.log('No boss arena in this level');
+          }
+        } else if (event.key === 'h' || event.key === 'H') {
+          console.log('Full heal');
+          gameState.fullHeal();
+          this.emitUIEvent('hpChange', gameState.getPlayerData());
+        } else if (event.key === 'g' || event.key === 'G') {
+          console.log('Giving 100 shells');
+          this.giveShells(100);
+        }
+      });
+    }
   }
 
   private buildLevel(): void {
