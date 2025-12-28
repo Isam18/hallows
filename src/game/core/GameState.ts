@@ -31,6 +31,9 @@ class GameStateManager {
   // Death drop record (more detailed than droppedShells)
   private deathDropRecord: DeathDropRecord | null = null;
   
+  // Opened doors (persisted)
+  private openedDoors: Set<string> = new Set();
+  
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
   private debugMode = false;
   private instakillMode = false;
@@ -409,6 +412,16 @@ class GameStateManager {
     return this.bossDefeated;
   }
   
+  // Door state
+  isDoorOpened(doorId: string): boolean {
+    return this.openedDoors.has(doorId);
+  }
+  
+  setDoorOpened(doorId: string): void {
+    this.openedDoors.add(doorId);
+    this.emit('doorOpened', doorId);
+  }
+  
   // Reset for new run
   resetRun(): void {
     this.playerData = {
@@ -422,6 +435,7 @@ class GameStateManager {
     // Clear death drop record and owned charms
     this.deathDropRecord = null;
     this.ownedCharms.clear();
+    this.openedDoors.clear();
     this.bossDefeated = false;
     this.soul = 0;
     this.emit('runReset', null);

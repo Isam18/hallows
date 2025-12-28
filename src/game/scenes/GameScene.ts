@@ -24,6 +24,8 @@ import { DeathMarker } from '../entities/DeathMarker';
 import { Spike } from '../entities/Spike';
 import { Breakable } from '../entities/Breakable';
 import { AcidPool } from '../entities/AcidPool';
+import { MeleeDoor } from '../entities/MeleeDoor';
+import { InfectionGlobule, InfectionParticles } from '../entities/InfectionGlobule';
 import { ParallaxBackground } from '../systems/ParallaxBackground';
 import { DustParticles } from '../systems/DustParticles';
 import { FlyingEnemySpawner } from '../systems/FlyingEnemySpawner';
@@ -64,6 +66,7 @@ export class GameScene extends Phaser.Scene {
   private spikes!: Phaser.Physics.Arcade.StaticGroup;
   private breakables!: Phaser.Physics.Arcade.StaticGroup;
   private acidPools!: Phaser.Physics.Arcade.StaticGroup;
+  private meleeDoors!: Phaser.Physics.Arcade.StaticGroup;
   private deathMarker: DeathMarker | null = null;
   private boss: Boss | null = null;
   
@@ -142,6 +145,7 @@ export class GameScene extends Phaser.Scene {
     this.spikes = this.physics.add.staticGroup();
     this.breakables = this.physics.add.staticGroup();
     this.acidPools = this.physics.add.staticGroup();
+    this.meleeDoors = this.physics.add.staticGroup();
     
     // Create visual effects based on level biome
     const biome = (this.currentLevel as any).biome || 'crossroads';
@@ -430,6 +434,21 @@ export class GameScene extends Phaser.Scene {
       (this.currentLevel as any).acidPools.forEach((a: any) => {
         const acid = new AcidPool(this, a.x, a.y, a.width, a.height || 30);
         this.acidPools.add(acid);
+      });
+    }
+    
+    // Melee doors
+    if ((this.currentLevel as any).meleeDoors) {
+      (this.currentLevel as any).meleeDoors.forEach((d: any) => {
+        const door = new MeleeDoor(this, d.x, d.y, d.width, d.height, d.doorId);
+        this.meleeDoors.add(door);
+      });
+    }
+    
+    // Infection globules (decorative)
+    if ((this.currentLevel as any).infectionGlobules) {
+      (this.currentLevel as any).infectionGlobules.forEach((g: any) => {
+        new InfectionGlobule(this, g.x, g.y, g.size);
       });
     }
   }
