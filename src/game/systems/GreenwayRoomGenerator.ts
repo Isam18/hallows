@@ -10,6 +10,20 @@ export type GreenwayRoomType =
   | 'thicketGauntlet'
   | 'infectedOvergrowth';
 
+export interface InfectionGlobuleConfig {
+  x: number;
+  y: number;
+  size: 'small' | 'medium' | 'large';
+}
+
+export interface MeleeDoorConfig {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+  doorId: string;
+}
+
 export interface AcidPoolConfig {
   x: number;
   y: number;
@@ -44,6 +58,8 @@ export interface GreenwayRoomData {
   breakableVines?: BreakableVineConfig[];
   movingPlatforms?: MovingPlatformConfig[];
   hasInfection?: boolean;
+  infectionGlobules?: InfectionGlobuleConfig[];
+  meleeDoors?: MeleeDoorConfig[];
 }
 
 // Room dimensions
@@ -76,11 +92,14 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 /**
  * Overgrown Parkour - Medium room with small mossy platforms over acid lake
+ * Platform spacing reduced by 25% for manageable jumps
  */
 function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayRoomData {
   const platforms: PlatformConfig[] = [];
   const enemies: EnemySpawnConfig[] = [];
   const acidPools: AcidPoolConfig[] = [];
+  const infectionGlobules: InfectionGlobuleConfig[] = [];
+  const meleeDoors: MeleeDoorConfig[] = [];
   
   // Walls
   platforms.push(
@@ -99,40 +118,40 @@ function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayR
     height: 50
   });
   
-  // Entry/exit safe platforms
+  // Entry/exit safe platforms (wider for safety)
   platforms.push(
-    { x: xOffset + 20, y: ROOM_HEIGHT - 80, width: 80, height: 20, type: 'platform' },
-    { x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 80, width: 80, height: 20, type: 'platform' }
+    { x: xOffset + 20, y: ROOM_HEIGHT - 80, width: 100, height: 20, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 120, y: ROOM_HEIGHT - 80, width: 100, height: 20, type: 'platform' }
   );
   
-  // Scattered platforms for jumping - tighter spacing for manageable parkour
-  const platformCount = randomInt(8, 11);
-  const usedPositions: Array<{ x: number; y: number }> = [];
+  // Main jumping platforms - REDUCED SPACING (75% of original)
+  // Create a path of platforms with max 90px horizontal gaps (down from 120px)
+  const platformPath = [
+    { x: xOffset + 130, y: ROOM_HEIGHT - 120, width: 80 },
+    { x: xOffset + 230, y: ROOM_HEIGHT - 160, width: 70 },
+    { x: xOffset + 320, y: ROOM_HEIGHT - 200, width: 75 },
+    { x: xOffset + 420, y: ROOM_HEIGHT - 180, width: 80 },
+    { x: xOffset + 520, y: ROOM_HEIGHT - 220, width: 70 },
+    { x: xOffset + 610, y: ROOM_HEIGHT - 260, width: 75 },
+    { x: xOffset + ROOM_WIDTH - 220, y: ROOM_HEIGHT - 180, width: 80 }
+  ];
   
-  for (let i = 0; i < platformCount; i++) {
-    let px: number, py: number;
-    let attempts = 0;
-    
-    do {
-      px = xOffset + 100 + randomInt(0, ROOM_WIDTH - 240);
-      py = ROOM_HEIGHT - 100 - randomInt(0, 300);
-      attempts++;
-    } while (
-      usedPositions.some(p => Math.abs(p.x - px) < 70 && Math.abs(p.y - py) < 50) &&
-      attempts < 20
-    );
-    
-    usedPositions.push({ x: px, y: py });
-    
-    const width = randomInt(60, 100);
+  platformPath.forEach(p => {
     platforms.push({
-      x: px,
-      y: py,
-      width,
+      x: p.x,
+      y: p.y,
+      width: p.width,
       height: 18,
       type: 'platform'
     } as any);
-  }
+  });
+  
+  // Add stepping stones in longer acid sections for safety
+  platforms.push(
+    { x: xOffset + 180, y: ROOM_HEIGHT - 60, width: 40, height: 15, type: 'platform' },
+    { x: xOffset + 370, y: ROOM_HEIGHT - 60, width: 40, height: 15, type: 'platform' },
+    { x: xOffset + 560, y: ROOM_HEIGHT - 60, width: 40, height: 15, type: 'platform' }
+  );
   
   // Moss creeps on walls
   enemies.push(
@@ -140,22 +159,36 @@ function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayR
     { type: 'mossCreep', x: xOffset + ROOM_WIDTH - 20, y: randomInt(250, 450) }
   );
   
-  // Add some Mosskins on platforms
-  const mosskinCount = randomInt(1, 2);
-  for (let i = 0; i < mosskinCount; i++) {
-    if (usedPositions[i + 2]) {
-      enemies.push({
-        type: 'mosskin',
-        x: usedPositions[i + 2].x + 30,
-        y: usedPositions[i + 2].y - 30
-      });
-    }
+  // Add Mosskins on some platforms
+  enemies.push({
+    type: 'mosskin',
+    x: platformPath[2].x + 30,
+    y: platformPath[2].y - 30
+  });
+  
+  // Add infection globules on walls
+  infectionGlobules.push(
+    { x: xOffset + 25, y: randomInt(100, 200), size: 'medium' },
+    { x: xOffset + ROOM_WIDTH - 35, y: randomInt(150, 300), size: 'small' }
+  );
+  
+  // Add melee door at exit (first room only)
+  if (roomIndex === 0) {
+    meleeDoors.push({
+      x: xOffset + ROOM_WIDTH - 60,
+      y: ROOM_HEIGHT - 180,
+      width: 40,
+      height: 100,
+      doorId: `greenway_door_${roomIndex}`
+    });
   }
   
   return {
     platforms,
     enemies,
     acidPools,
+    infectionGlobules,
+    meleeDoors,
     pickups: [
       { type: 'shells', x: xOffset + ROOM_WIDTH / 2, y: randomInt(150, 250), amount: randomInt(8, 15) }
     ],
@@ -168,12 +201,15 @@ function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayR
 }
 
 /**
- * Mosskin Gauntlet - Long horizontal room, mostly acid floor, platforms with charging Mosskins
+ * Mosskin Gauntlet - Long horizontal room, acid floor, platforms with Mosskins
+ * Platform spacing reduced for manageable jumps
  */
 function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRoomData {
   const platforms: PlatformConfig[] = [];
   const enemies: EnemySpawnConfig[] = [];
   const acidPools: AcidPoolConfig[] = [];
+  const infectionGlobules: InfectionGlobuleConfig[] = [];
+  const meleeDoors: MeleeDoorConfig[] = [];
   
   // Walls
   platforms.push(
@@ -192,20 +228,20 @@ function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRo
     height: 40
   });
   
-  // Safe ground at entry/exit
+  // Safe ground at entry/exit (wider)
   platforms.push(
-    { x: xOffset + 20, y: ROOM_HEIGHT - 50, width: 80, height: 50, type: 'ground' },
-    { x: xOffset + ROOM_WIDTH - 100, y: ROOM_HEIGHT - 50, width: 80, height: 50, type: 'ground' }
+    { x: xOffset + 20, y: ROOM_HEIGHT - 50, width: 100, height: 50, type: 'ground' },
+    { x: xOffset + ROOM_WIDTH - 120, y: ROOM_HEIGHT - 50, width: 100, height: 50, type: 'ground' }
   );
   
-  // Platform bridges over acid
-  const bridgeCount = randomInt(4, 6);
-  const spacing = (ROOM_WIDTH - 200) / bridgeCount;
+  // Platform bridges over acid - REDUCED SPACING (75% of original)
+  const bridgeCount = 6;
+  const spacing = (ROOM_WIDTH - 240) / bridgeCount; // ~93px apart instead of 125px
   
   for (let i = 0; i < bridgeCount; i++) {
-    const px = xOffset + 100 + i * spacing + randomInt(-20, 20);
-    const py = ROOM_HEIGHT - randomInt(100, 180);
-    const width = randomInt(70, 100);
+    const px = xOffset + 120 + i * spacing;
+    const py = ROOM_HEIGHT - randomInt(100, 160);
+    const width = randomInt(75, 95); // Slightly wider platforms
     
     platforms.push({
       x: px,
@@ -225,16 +261,40 @@ function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRo
     }
   }
   
+  // Add stepping stones in acid for emergency recovery
+  platforms.push(
+    { x: xOffset + 200, y: ROOM_HEIGHT - 50, width: 35, height: 12, type: 'platform' },
+    { x: xOffset + 400, y: ROOM_HEIGHT - 50, width: 35, height: 12, type: 'platform' },
+    { x: xOffset + 600, y: ROOM_HEIGHT - 50, width: 35, height: 12, type: 'platform' }
+  );
+  
   // Upper escape route platforms
   platforms.push(
-    { x: xOffset + 150, y: ROOM_HEIGHT - 280, width: 100, height: 18, type: 'platform' },
-    { x: xOffset + ROOM_WIDTH - 250, y: ROOM_HEIGHT - 300, width: 100, height: 18, type: 'platform' }
+    { x: xOffset + 150, y: ROOM_HEIGHT - 260, width: 100, height: 18, type: 'platform' },
+    { x: xOffset + ROOM_WIDTH - 250, y: ROOM_HEIGHT - 280, width: 100, height: 18, type: 'platform' }
   );
+  
+  // Infection globules on ceiling
+  infectionGlobules.push(
+    { x: xOffset + 300, y: 40, size: 'large' },
+    { x: xOffset + 550, y: 50, size: 'medium' }
+  );
+  
+  // Melee door at room entry
+  meleeDoors.push({
+    x: xOffset + ROOM_WIDTH - 60,
+    y: ROOM_HEIGHT - 150,
+    width: 40,
+    height: 100,
+    doorId: `greenway_gauntlet_door_${roomIndex}`
+  });
   
   return {
     platforms,
     enemies,
     acidPools,
+    infectionGlobules,
+    meleeDoors,
     pickups: [
       { type: 'shells', x: xOffset + ROOM_WIDTH / 2 + randomInt(-50, 50), y: randomInt(200, 300), amount: randomInt(10, 18) }
     ],
@@ -807,6 +867,8 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
   const allAcidPools: AcidPoolConfig[] = [];
   const allBreakableVines: BreakableVineConfig[] = [];
   const allMovingPlatforms: MovingPlatformConfig[] = [];
+  const allInfectionGlobules: InfectionGlobuleConfig[] = [];
+  const allMeleeDoors: MeleeDoorConfig[] = [];
   
   rooms.forEach((room) => {
     allPlatforms.push(...room.platforms);
@@ -817,6 +879,8 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     if (room.acidPools) allAcidPools.push(...room.acidPools);
     if (room.breakableVines) allBreakableVines.push(...room.breakableVines);
     if (room.movingPlatforms) allMovingPlatforms.push(...room.movingPlatforms);
+    if (room.infectionGlobules) allInfectionGlobules.push(...room.infectionGlobules);
+    if (room.meleeDoors) allMeleeDoors.push(...room.meleeDoors);
   });
   
   // Add Moss Titan boss in room 20 (last room)
@@ -875,6 +939,8 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     acidPools: allAcidPools,
     breakableVines: allBreakableVines,
     movingPlatforms: allMovingPlatforms,
+    infectionGlobules: allInfectionGlobules,
+    meleeDoors: allMeleeDoors,
     biome: 'greenway'
   } as any;
 }
