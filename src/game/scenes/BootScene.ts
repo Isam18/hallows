@@ -56,9 +56,171 @@ export class BootScene extends Phaser.Scene {
   }
   
   private createSquitSprite(): void {
-    // Load the squit image as a texture
-    this.load.image('squit', '/src/assets/squit.png');
-    this.load.start();
+    // Squit - mosquito-like flying enemy inspired by Hollow Knight reference
+    // Features: teal/blue elongated body, translucent wings, dangling legs, long stinger
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 28;
+    const cy = 20;
+    
+    // Wings (behind body) - translucent pale blue
+    g.fillStyle(0xc8d8e8, 0.5);
+    // Left wing
+    g.beginPath();
+    g.moveTo(cx - 4, cy - 6);
+    g.lineTo(cx - 20, cy - 18);
+    g.lineTo(cx - 22, cy - 10);
+    g.lineTo(cx - 8, cy - 2);
+    g.closePath();
+    g.fillPath();
+    
+    // Right wing
+    g.beginPath();
+    g.moveTo(cx + 2, cy - 6);
+    g.lineTo(cx + 16, cy - 20);
+    g.lineTo(cx + 20, cy - 12);
+    g.lineTo(cx + 6, cy - 2);
+    g.closePath();
+    g.fillPath();
+    
+    // Wing outlines
+    g.lineStyle(1, 0x8898a8, 0.6);
+    g.strokePath();
+    
+    // Wing veins
+    g.lineStyle(0.5, 0x98a8b8, 0.4);
+    g.lineBetween(cx - 12, cy - 12, cx - 18, cy - 14);
+    g.lineBetween(cx + 10, cy - 14, cx + 16, cy - 16);
+    
+    // Dangling legs (thin, spindly)
+    g.lineStyle(1.5, 0x283848);
+    // Front legs
+    g.lineBetween(cx - 2, cy + 6, cx - 8, cy + 18);
+    g.lineBetween(cx + 2, cy + 6, cx + 8, cy + 18);
+    // Middle legs  
+    g.lineBetween(cx - 4, cy + 4, cx - 12, cy + 22);
+    g.lineBetween(cx + 4, cy + 4, cx + 12, cy + 22);
+    // Back legs
+    g.lineBetween(cx - 2, cy + 2, cx - 10, cy + 26);
+    g.lineBetween(cx + 2, cy + 2, cx + 10, cy + 26);
+    
+    // Leg joints/feet
+    g.fillStyle(0x1a2838);
+    g.fillCircle(cx - 8, cy + 18, 1.5);
+    g.fillCircle(cx + 8, cy + 18, 1.5);
+    g.fillCircle(cx - 12, cy + 22, 1.5);
+    g.fillCircle(cx + 12, cy + 22, 1.5);
+    g.fillCircle(cx - 10, cy + 26, 1.5);
+    g.fillCircle(cx + 10, cy + 26, 1.5);
+    
+    // Main body - elongated teal/dark blue
+    // Abdomen (back section - dark blue-green)
+    g.fillStyle(0x2a4858);
+    g.beginPath();
+    g.moveTo(cx - 6, cy);
+    g.lineTo(cx - 4, cy + 8);
+    g.lineTo(cx, cy + 12);
+    g.lineTo(cx + 4, cy + 8);
+    g.lineTo(cx + 6, cy);
+    g.closePath();
+    g.fillPath();
+    
+    // Thorax (middle - lighter teal)
+    g.fillStyle(0x4a7888);
+    g.fillEllipse(cx, cy, 14, 10);
+    
+    // Thorax highlight
+    g.fillStyle(0x5a98a8, 0.6);
+    g.fillEllipse(cx, cy - 2, 8, 5);
+    
+    // Head - round with big eye
+    g.fillStyle(0x4a7888);
+    g.fillCircle(cx, cy - 8, 7);
+    
+    // Eye - large, dark with highlight
+    g.fillStyle(0x1a2838);
+    g.fillCircle(cx + 1, cy - 8, 5);
+    
+    // Eye shine
+    g.fillStyle(0x88aabb, 0.7);
+    g.fillCircle(cx - 1, cy - 10, 2);
+    
+    // Proboscis/stinger - long needle pointing forward-down
+    g.lineStyle(2, 0x1a2838);
+    g.lineBetween(cx, cy - 6, cx - 12, cy + 2);
+    
+    // Stinger tip
+    g.fillStyle(0x0a1828);
+    g.fillCircle(cx - 12, cy + 2, 1.5);
+    
+    // Body outline for definition
+    g.lineStyle(1.5, 0x1a2838);
+    g.strokeEllipse(cx, cy, 14, 10);
+    g.strokeCircle(cx, cy - 8, 7);
+    
+    // Abdomen stripes
+    g.lineStyle(1, 0x3a5868, 0.8);
+    g.lineBetween(cx - 4, cy + 4, cx + 4, cy + 4);
+    g.lineBetween(cx - 3, cy + 7, cx + 3, cy + 7);
+    
+    g.generateTexture('squit', 56, 40);
+    g.destroy();
+    
+    // Create hurt version
+    this.createSquitHurtSprite();
+  }
+  
+  private createSquitHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 28;
+    const cy = 20;
+    
+    // White flash version
+    // Wings
+    g.fillStyle(0xffffff, 0.7);
+    g.beginPath();
+    g.moveTo(cx - 4, cy - 6);
+    g.lineTo(cx - 20, cy - 18);
+    g.lineTo(cx - 22, cy - 10);
+    g.lineTo(cx - 8, cy - 2);
+    g.closePath();
+    g.fillPath();
+    
+    g.beginPath();
+    g.moveTo(cx + 2, cy - 6);
+    g.lineTo(cx + 16, cy - 20);
+    g.lineTo(cx + 20, cy - 12);
+    g.lineTo(cx + 6, cy - 2);
+    g.closePath();
+    g.fillPath();
+    
+    // Legs
+    g.lineStyle(1.5, 0xdddddd);
+    g.lineBetween(cx - 2, cy + 6, cx - 8, cy + 18);
+    g.lineBetween(cx + 2, cy + 6, cx + 8, cy + 18);
+    g.lineBetween(cx - 4, cy + 4, cx - 12, cy + 22);
+    g.lineBetween(cx + 4, cy + 4, cx + 12, cy + 22);
+    
+    // Body
+    g.fillStyle(0xffffff);
+    g.fillEllipse(cx, cy, 14, 10);
+    g.fillCircle(cx, cy - 8, 7);
+    
+    // Abdomen
+    g.beginPath();
+    g.moveTo(cx - 6, cy);
+    g.lineTo(cx - 4, cy + 8);
+    g.lineTo(cx, cy + 12);
+    g.lineTo(cx + 4, cy + 8);
+    g.lineTo(cx + 6, cy);
+    g.closePath();
+    g.fillPath();
+    
+    // Stinger
+    g.lineStyle(2, 0xeeeeee);
+    g.lineBetween(cx, cy - 6, cx - 12, cy + 2);
+    
+    g.generateTexture('squit_hurt', 56, 40);
+    g.destroy();
   }
   
   private createMosskinSprite(): void {
