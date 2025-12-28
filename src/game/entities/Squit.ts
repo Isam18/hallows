@@ -75,7 +75,9 @@ export class Squit extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
     
-    this.setSize(this.cfg.width, this.cfg.height);
+    // Set size to match new sprite (56x40)
+    this.setSize(32, 28);
+    this.setOffset(12, 6);
     this.setCollideWorldBounds(true);
     
     // Random hover phase offset
@@ -119,16 +121,15 @@ export class Squit extends Phaser.Physics.Arcade.Sprite {
     this.hoverTime += delta * 0.004;
     this.hoverOffset = Math.sin(this.hoverTime) * 6;
     
-    // Fast wing flap animation
+    // Fast wing flap animation - subtle scale pulse
     this.flapTime += delta * 0.025;
-    const flapScale = 0.85 + Math.sin(this.flapTime) * 0.15;
-    this.setScale(1, flapScale);
+    const flapScale = 0.95 + Math.sin(this.flapTime) * 0.05;
+    this.setScale(this.flipX ? -1 : 1, flapScale);
   }
   
   private updateStingerRotation(player: Player): void {
-    // Rotate to face player (stinger points toward player)
-    const angle = Phaser.Math.Angle.Between(this.x, this.y, player.x, player.y);
-    this.setRotation(angle);
+    // Flip sprite to face player (stinger points toward player)
+    this.setFlipX(player.x < this.x);
   }
 
   private updateAIState(player: Player): void {
