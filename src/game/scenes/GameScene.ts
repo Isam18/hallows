@@ -84,7 +84,7 @@ export class GameScene extends Phaser.Scene {
   private flyingSpawner: FlyingEnemySpawner | null = null;
   
   // Level data
-  private currentLevel!: LevelConfig;
+  currentLevel!: LevelConfig;
   private levelId!: string;
   private spawnId!: string;
   
@@ -157,7 +157,7 @@ export class GameScene extends Phaser.Scene {
     if (this.levelId === 'forgottenCrossroads' || this.levelId === 'ruinedCrossroads') {
       this.parallaxBg = new ParallaxBackground(this);
       this.dustParticles = new DustParticles(this);
-    } else if (biome === 'greenway' || this.levelId === 'greenway' || this.levelId === 'greenwayGenerated') {
+    } else if (biome === 'greenway' || this.levelId === 'greenway' || this.levelId === 'greenwayGenerated' || this.levelId === 'mossTitanArena') {
       this.greenwayParallax = new GreenwayParallax(this);
       this.leafParticles = new LeafParticles(this, this.currentLevel.height);
       this.createGreenwayEnvironment();
@@ -206,6 +206,13 @@ export class GameScene extends Phaser.Scene {
     // Setup debug mode visuals if enabled
     if (this.debugModeEnabled) {
       this.setupDebugMode();
+    }
+    
+    // Auto-enter boss arena if loading a dedicated boss arena level
+    if (this.levelId === 'mossTitanArena' && this.currentLevel.bossArena) {
+      this.time.delayedCall(500, () => {
+        this.enterBossArena();
+      });
     }
   }
   
