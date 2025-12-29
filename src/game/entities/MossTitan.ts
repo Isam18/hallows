@@ -518,6 +518,9 @@ export class MossTitan extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityX(0);
     
+    // Switch to staggered sprite
+    this.setTexture('mossTitan_staggered');
+    
     // Show head hitbox if conditions met
     if (this.headExposed) {
       this.showHeadHitbox();
@@ -539,6 +542,9 @@ export class MossTitan extends Phaser.Physics.Arcade.Sprite {
   private recoverFromStagger(): void {
     this.isStaggered = false;
     this.staggerDamage = 0;
+    
+    // Switch back to normal sprite
+    this.setTexture('mossTitan');
     
     this.clearTint();
     this.setAngle(0);

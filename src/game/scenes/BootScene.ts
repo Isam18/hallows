@@ -1442,6 +1442,10 @@ export class BootScene extends Phaser.Scene {
     // Staggered frame (fallen over with maggot exposed)
     this.createFalseChampionStaggeredFrame('falseChampion_staggered');
     
+    // Moss Titan - giant mossy creature
+    this.createMossTitanSprite('mossTitan');
+    this.createMossTitanStaggeredSprite('mossTitan_staggered');
+    
     // Boss projectile spike / falling rock
     const spikeGraphics = this.make.graphics({ x: 0, y: 0 });
     spikeGraphics.fillStyle(0x555566);
@@ -1452,6 +1456,170 @@ export class BootScene extends Phaser.Scene {
     spikeGraphics.strokeTriangle(15, 0, 0, 30, 30, 30);
     spikeGraphics.generateTexture('fallingRock', 30, 30);
     spikeGraphics.destroy();
+  }
+  
+  private createMossTitanSprite(key: string): void {
+    // Moss Titan - inspired by reference: bushy dark green/teal mossy creature 
+    // with layered foliage texture, small red eyes peeking through
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 90;
+    const cy = 60;
+    
+    // Base body - large mounded shape like reference
+    // Dark teal/green base
+    g.fillStyle(0x1a3830);
+    g.fillEllipse(cx, cy + 20, 150, 80);
+    
+    // Layered mossy texture - multiple overlapping bush shapes
+    // Back layer (darkest)
+    g.fillStyle(0x1a4038);
+    for (let i = 0; i < 8; i++) {
+      const bx = cx - 60 + i * 18 + Math.sin(i * 1.3) * 8;
+      const by = cy - 5 + Math.cos(i * 1.7) * 10;
+      g.fillEllipse(bx, by, 28, 22);
+    }
+    
+    // Middle layer - main mossy clumps
+    g.fillStyle(0x2a5048);
+    for (let i = 0; i < 10; i++) {
+      const bx = cx - 65 + i * 15 + Math.sin(i * 2.1) * 6;
+      const by = cy + 5 + Math.cos(i * 1.4) * 12;
+      g.fillEllipse(bx, by, 25, 20);
+    }
+    
+    // Top layer - lighter mossy tufts
+    g.fillStyle(0x3a6058);
+    for (let i = 0; i < 12; i++) {
+      const bx = cx - 55 + i * 12 + Math.sin(i * 1.8) * 5;
+      const by = cy - 15 + Math.cos(i * 2.2) * 8;
+      g.fillEllipse(bx, by, 18, 14);
+    }
+    
+    // Spiky/leafy protrusions on top
+    g.fillStyle(0x2a4840);
+    for (let i = 0; i < 15; i++) {
+      const angle = (i / 15) * Math.PI - Math.PI * 0.1;
+      const dist = 55 + Math.sin(i * 3) * 10;
+      const px = cx + Math.cos(angle) * dist;
+      const py = cy - 20 + Math.sin(angle) * 25;
+      
+      // Leaf/spike shape
+      g.beginPath();
+      g.moveTo(px, py - 15 - Math.random() * 8);
+      g.lineTo(px - 6, py + 5);
+      g.lineTo(px + 6, py + 5);
+      g.closePath();
+      g.fillPath();
+    }
+    
+    // Additional leafy tufts on edges
+    g.fillStyle(0x3a5850);
+    for (let i = 0; i < 8; i++) {
+      const angle = (i / 8) * Math.PI * 2;
+      const px = cx + Math.cos(angle) * 65;
+      const py = cy + 15 + Math.sin(angle) * 30;
+      g.fillEllipse(px, py, 12, 10);
+    }
+    
+    // Horizontal stripe patterns like reference
+    g.lineStyle(3, 0x1a3028, 0.6);
+    for (let i = 0; i < 5; i++) {
+      const y = cy + i * 12 - 10;
+      g.lineBetween(cx - 60 + i * 5, y, cx + 60 - i * 5, y);
+    }
+    
+    // Face area - slightly darker recessed area
+    g.fillStyle(0x152820);
+    g.fillEllipse(cx - 30, cy + 15, 35, 28);
+    
+    // Eyes - small, red, glowing - peeking through moss
+    g.fillStyle(0x1a1a15);
+    g.fillEllipse(cx - 38, cy + 12, 12, 10);
+    g.fillEllipse(cx - 22, cy + 12, 12, 10);
+    
+    // Eye glow (red like reference)
+    g.fillStyle(0xcc2222);
+    g.fillCircle(cx - 38, cy + 12, 4);
+    g.fillCircle(cx - 22, cy + 12, 4);
+    
+    // Eye highlights
+    g.fillStyle(0xff4444);
+    g.fillCircle(cx - 39, cy + 11, 2);
+    g.fillCircle(cx - 23, cy + 11, 2);
+    
+    // Dark outline around the whole creature
+    g.lineStyle(3, 0x0a1810);
+    g.strokeEllipse(cx, cy + 20, 152, 82);
+    
+    // Additional texture lines for leafy look
+    g.lineStyle(1.5, 0x1a3028, 0.4);
+    for (let i = 0; i < 6; i++) {
+      const startX = cx - 50 + i * 20;
+      g.lineBetween(startX, cy - 10, startX + 5, cy + 30);
+    }
+    
+    g.generateTexture(key, 180, 120);
+    g.destroy();
+  }
+  
+  private createMossTitanStaggeredSprite(key: string): void {
+    // Staggered Moss Titan - collapsed, more spread out, exposed weak point
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 90;
+    const cy = 70;
+    
+    // Flattened/collapsed body
+    g.fillStyle(0x1a3830);
+    g.fillEllipse(cx, cy + 15, 160, 60);
+    
+    // Scattered moss clumps (disheveled)
+    g.fillStyle(0x2a4840);
+    for (let i = 0; i < 12; i++) {
+      const bx = cx - 70 + i * 14 + Math.sin(i * 2) * 8;
+      const by = cy + 10 + Math.cos(i * 1.5) * 15;
+      g.fillEllipse(bx, by, 20, 16);
+    }
+    
+    // Top tufts fallen over
+    g.fillStyle(0x3a5850);
+    for (let i = 0; i < 10; i++) {
+      const bx = cx - 60 + i * 15;
+      const by = cy - 5 + Math.sin(i) * 10;
+      g.fillEllipse(bx, by, 15, 12);
+    }
+    
+    // Exposed weak point - glowing core/head area
+    g.fillStyle(0x4a8060);
+    g.fillEllipse(cx + 40, cy - 10, 35, 28);
+    
+    // Inner glow
+    g.fillStyle(0x66aa88);
+    g.fillEllipse(cx + 40, cy - 10, 25, 20);
+    
+    // Vulnerable core
+    g.fillStyle(0x88ddaa);
+    g.fillCircle(cx + 40, cy - 10, 12);
+    
+    // Eyes dazed/spiraling
+    g.fillStyle(0x1a1a15);
+    g.fillEllipse(cx - 35, cy + 12, 14, 12);
+    g.fillEllipse(cx - 15, cy + 12, 14, 12);
+    
+    // Dazed eye spirals
+    g.lineStyle(2, 0x882222);
+    g.strokeCircle(cx - 35, cy + 12, 5);
+    g.strokeCircle(cx - 15, cy + 12, 5);
+    g.lineStyle(1.5, 0xaa4444);
+    g.strokeCircle(cx - 35, cy + 12, 3);
+    g.strokeCircle(cx - 15, cy + 12, 3);
+    
+    // Dark outline
+    g.lineStyle(3, 0x0a1810);
+    g.strokeEllipse(cx, cy + 15, 162, 62);
+    g.strokeEllipse(cx + 40, cy - 10, 36, 29);
+    
+    g.generateTexture(key, 180, 120);
+    g.destroy();
   }
   
   private createFalseChampionFrame(key: string, xOffset: number, yOffset: number): void {
