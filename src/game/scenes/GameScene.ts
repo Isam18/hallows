@@ -15,8 +15,8 @@ import { Mosskin } from '../entities/Mosskin';
 import { MossCreep } from '../entities/MossCreep';
 import { MossWarrior } from '../entities/MossWarrior';
 import { Squit } from '../entities/Squit';
-import { MossTitan } from '../entities/MossTitan';
 import { Boss } from '../entities/Boss';
+import { MossTitan } from '../entities/MossTitan';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
 import { Portal } from '../entities/Portal';
@@ -39,6 +39,7 @@ import fadingTownData from '../data/levels/fadingTown.json';
 import ruinedCrossroadsData from '../data/levels/ruinedCrossroads.json';
 import chainRoomData from '../data/levels/chainRoom.json';
 import greenwayData from '../data/levels/greenway.json';
+import mossTitanArenaData from '../data/levels/mossTitanArena.json';
 import enemiesData from '../data/enemies.json';
 
 // Generate procedural levels
@@ -52,6 +53,7 @@ const LEVELS: Record<string, LevelConfig> = {
   chainRoom: chainRoomData as LevelConfig,
   greenway: greenwayData as LevelConfig,
   greenwayGenerated: greenwayGeneratedData as LevelConfig,
+  mossTitanArena: mossTitanArenaData as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -106,6 +108,9 @@ export class GameScene extends Phaser.Scene {
   // Debug mode
   private debugModeEnabled = false;
   private debugGraphics: Phaser.GameObjects.Graphics | null = null;
+  
+  // Boss summon tracking
+  private bossSummoned = false;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -214,7 +219,7 @@ export class GameScene extends Phaser.Scene {
     
     // Show debug info text with controls
     const debugText = this.add.text(10, 10, 
-      `DEBUG MODE\n1: Fading Town | 2: Forgotten Crossroads | 3: Ruins\n4: Chain Room | 5: Greenway\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${gameState.isInstakillMode() ? 'ON' : 'OFF'}]`, {
+      `DEBUG MODE\n1: Fading Town | 2: Forgotten Crossroads | 3: Ruins\n4: Chain Room | 5: Greenway | 6: Boss Arena\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${gameState.isInstakillMode() ? 'ON' : 'OFF'}]`, {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '11px',
       color: '#ff6644',
@@ -247,6 +252,9 @@ export class GameScene extends Phaser.Scene {
         } else if (event.key === '5') {
           console.log('Teleporting to greenway');
           this.teleportToLevel('greenway');
+        } else if (event.key === '6') {
+          console.log('Teleporting to Moss Titan Arena');
+          this.teleportToLevel('mossTitanArena');
         } else if (event.key === 'b' || event.key === 'B') {
           if (this.currentLevel.bossArena) {
             console.log('Entering boss arena');
@@ -268,7 +276,7 @@ export class GameScene extends Phaser.Scene {
           // Update debug text
           const debugTextObj = this.registry.get('debugText') as Phaser.GameObjects.Text;
           if (debugTextObj) {
-            debugTextObj.setText(`DEBUG MODE\n1: Fading Town | 2: Forgotten Crossroads | 3: Ruins\n4: Chain Room | 5: Greenway\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${newState ? 'ON' : 'OFF'}]`);
+            debugTextObj.setText(`DEBUG MODE\n1: Fading Town | 2: Forgotten Crossroads | 3: Ruins\n4: Chain Room | 5: Greenway | 6: Boss Arena\nB: Boss | H: Heal | G: +100 Shells\nI: Instakill [${newState ? 'ON' : 'OFF'}]`);
           }
         }
       });
@@ -363,10 +371,6 @@ export class GameScene extends Phaser.Scene {
           // Squit - Greenway flying enemy with lunge attack
           const squit = new Squit(this, e.x, e.y, config);
           this.enemies.add(squit);
-        } else if (e.type === 'mossTitan') {
-          // Moss Titan - Greenway mini-boss
-          const mossTitan = new MossTitan(this, e.x, e.y, config);
-          this.enemies.add(mossTitan);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
@@ -594,6 +598,9 @@ export class GameScene extends Phaser.Scene {
       if (this.parallaxBg) {
         this.parallaxBg.update();
       }
+      
+      // Check if all enemies are dead in boss arena and summon boss
+      this.checkBossSummon();
     }
     
     // Clear just-pressed/released states at END of frame so all systems can read them
@@ -822,8 +829,16 @@ export class GameScene extends Phaser.Scene {
     const arena = this.currentLevel.bossArena;
     this.player.setPosition(arena.x + 50, arena.bossSpawn.y);
     
-    // Spawn boss
-    this.boss = new Boss(this, arena.bossSpawn.x, arena.bossSpawn.y);
+    // Spawn appropriate boss based on level
+    if (this.levelId === 'mossTitanArena') {
+      // Spawn Moss Titan
+      const mossTitan = new MossTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
+      this.boss = mossTitan as any;
+    } else {
+      // Spawn default boss
+      this.boss = new Boss(this, arena.bossSpawn.x, arena.bossSpawn.y);
+    }
+    
     this.physics.add.collider(this.boss, this.platforms);
     this.physics.add.collider(this.boss, this.walls);
     this.physics.add.overlap(this.player, this.boss,
@@ -853,19 +868,28 @@ export class GameScene extends Phaser.Scene {
     const centerX = this.cameras.main.width / 2;
     const bottomY = this.cameras.main.height - 100;
     
+    // Get boss config for color and subtitle
+    let nameColor = '#ffffff';
+    let subtitleText = '~ Champion of the Forgotten ~';
+    
+    if (this.boss && (this.boss as any).getNameColor) {
+      nameColor = (this.boss as any).getNameColor();
+      subtitleText = (this.boss as any).getSubtitle();
+    }
+    
     // Background bar
-    const bgBar = this.add.rectangle(centerX, bottomY, 0, 60, 0x000000, 0.7);
+    const bgBar = this.add.rectangle(centerX, bottomY, 0, 70, 0x000000, 0.8);
     bgBar.setScrollFactor(0);
     bgBar.setDepth(1000);
     
     // Boss name text
-    const nameText = this.add.text(centerX, bottomY, bossName.toUpperCase(), {
+    const nameText = this.add.text(centerX, bottomY - 10, bossName.toUpperCase(), {
       fontFamily: 'Georgia, serif',
       fontSize: '48px',
-      color: '#ffffff',
+      color: nameColor,
       fontStyle: 'bold',
       stroke: '#000000',
-      strokeThickness: 4,
+      strokeThickness: 6,
     });
     nameText.setOrigin(0.5);
     nameText.setScrollFactor(0);
@@ -873,10 +897,10 @@ export class GameScene extends Phaser.Scene {
     nameText.setAlpha(0);
     
     // Subtitle
-    const subtitle = this.add.text(centerX, bottomY + 35, '~ Champion of the Forgotten ~', {
+    const subtitle = this.add.text(centerX, bottomY + 35, subtitleText, {
       fontFamily: 'Georgia, serif',
       fontSize: '18px',
-      color: '#ff8844',
+      color: nameColor,
       fontStyle: 'italic',
     });
     subtitle.setOrigin(0.5);
@@ -1443,5 +1467,32 @@ export class GameScene extends Phaser.Scene {
   // Transition to Greenway (called from React UI)
   transitionToGreenway(): void {
     this.transitionToLevel('greenwayGenerated', 'fromChainRoom');
+  }
+  
+  /**
+   * Check if all enemies are dead and summon boss for Moss Titan Arena
+   */
+  private checkBossSummon(): void {
+    // Only for Moss Titan Arena level
+    if (this.levelId !== 'mossTitanArena') return;
+    
+    // If boss already summoned or player is already in boss fight, don't check
+    if (this.bossSummoned || this.inBossArena) return;
+    
+    // Check if all enemies are dead
+    const activeEnemies = this.enemies.getChildren().filter((enemy) => {
+      const e = enemy as any;
+      return !e.isDying();
+    });
+    
+    if (activeEnemies.length === 0 && !this.bossSummoned) {
+      // All enemies dead, spawn boss
+      this.bossSummoned = true;
+      
+      // Delay slightly before spawning
+      this.time.delayedCall(1000, () => {
+        this.enterBossArena();
+      });
+    }
   }
 }
