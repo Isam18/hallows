@@ -1,886 +1,775 @@
 import Phaser from 'phaser';
-import { EnemyCombatConfig, DEFAULT_ENEMY_CONFIG } from '../core/CombatConfig';
+import bossData from '../data/boss.json';
 import type { Player } from './Player';
-import { Pickup } from './Pickup';
+import type { GameScene } from '../scenes/GameScene';
 
-/**
- * Moss Titan AI States - Massive Moss Charger-style mini-boss
- * - hidden: Buried as a mossy mound, waiting for player
- * - emerging: Screaming and rising from ground
- * - idle: Watching player, deciding next action
- * - charging: High-speed rush across arena
- * - jumpWindup: Preparing to jump
- * - jumping: Arc through air toward player
- * - landing: Impact and recovery after jump
- * - burrowing: Digging underground to relocate
- * - burrowed: Underground and invulnerable, moving
- * - surfacing: Coming back up
- * - hurt: Stunned from taking damage
- * - dead: Death animation with bug escape
- */
-type MossTitanAIState = 
-  | 'hidden' 
-  | 'emerging' 
+type BossState = 
   | 'idle' 
-  | 'charging' 
-  | 'jumpWindup' 
-  | 'jumping' 
-  | 'landing'
-  | 'burrowing' 
-  | 'burrowed' 
-  | 'surfacing'
-  | 'hurt' 
+  | 'groundPound' 
+  | 'chargeAttack' 
+  | 'sporeBurst' 
+  | 'roarAttack'
+  | 'staggered' 
+  | 'recovering'
   | 'dead';
 
+const CFG = bossData.mossTitan;
+
 export class MossTitan extends Phaser.Physics.Arcade.Sprite {
-  private cfg: EnemyCombatConfig;
-  private aiState: MossTitanAIState = 'hidden';
-  private currentHp: number;
-  private maxHp: number;
+  private gameScene: GameScene;
+  private bossHp: number;
+  private bossMaxHp: number;
+  private bossState: BossState = 'idle';
+  private stateTimer = 0;
+  private cooldown = 0;
+  private facing: 1 | -1 = -1;
+  private dead = false;
+  
+  // Stagger system
+  private staggerDamage = 0;
+  private isStaggered = false;
+  private headHitbox: Phaser.GameObjects.Rectangle | null = null;
+  private headExposed = false;
+  
+  // Combat tracking
+  private fightStartTime = 0;
+  private totalDamageDealt = 0;
+  
+  // Attack state
+  private poundPhase: 'windup' | 'hanging' | 'slam' | 'landed' = 'windup';
+  private chargeTimer = 0;
+  private sporeParticles: Phaser.GameObjects.GameObject[] = [];
+  private roarPhase: 'windup' | 'roaring' | 'recovering' = 'windup';
+  private roarRing: Phaser.GameObjects.Ellipse | null = null;
   
   // Arena bounds
-  private arenaLeft: number;
-  private arenaRight: number;
+  private arenaLeft = 0;
+  private arenaRight = 0;
   
-  // Movement
-  private facingDir: 1 | -1 = 1;
-  
-  // Combat timers
-  private hitstunTimer = 0;
-  private invulnTimer = 0;
-  private hurtFlashTimer = 0;
-  private actionCooldown = 0;
-  private stateTimer = 0;
-  
-  // Charge attack
-  private readonly CHARGE_SPEED = 400;
-  private readonly CHARGE_DAMAGE = 2;
-  
-  // Jump attack
-  private jumpTargetX = 0;
-  private jumpTargetY = 0;
-  private readonly JUMP_HEIGHT = 300;
-  private readonly JUMP_DAMAGE = 2;
-  
-  // Burrow
-  private burrowTargetX = 0;
-  private hitsBeforeRetreat = 0;
-  private readonly HITS_TO_BURROW = 4;
-  
-  // State durations
-  private readonly EMERGE_TIME = 1000;
-  private readonly IDLE_TIME = 800;
-  private readonly JUMP_WINDUP_TIME = 500;
-  private readonly LANDING_TIME = 400;
-  private readonly BURROW_TIME = 600;
-  private readonly BURROWED_TIME = 1200;
-  private readonly SURFACE_TIME = 500;
-  private readonly ACTION_COOLDOWN = 1000;
-  
-  // Track if already dead
-  private isDead = false;
-  
-  // Hit tracking
-  private lastHitBySwingId = -1;
-  
-  // Visuals
-  private moundSprite: Phaser.GameObjects.Ellipse | null = null;
-  private bodyGraphics: Phaser.GameObjects.Container | null = null;
-  private eyeGlow: Phaser.GameObjects.PointLight | null = null;
-  private dirtParticles: Phaser.GameObjects.Particles.ParticleEmitter | null = null;
+  // Arena gates
+  private leftGate: Phaser.GameObjects.Rectangle | null = null;
+  private rightGate: Phaser.GameObjects.Rectangle | null = null;
+  private gatesLocked = false;
 
-  constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig, arenaWidth: number = 800) {
+  constructor(scene: GameScene, x: number, y: number) {
     super(scene, x, y, 'mossTitan');
-    
-    this.cfg = { ...DEFAULT_ENEMY_CONFIG, ...config };
-    this.currentHp = this.cfg.hp;
-    this.maxHp = this.cfg.hp;
-    
-    // Arena bounds
-    this.arenaLeft = x - arenaWidth / 2 + 100;
-    this.arenaRight = x + arenaWidth / 2 - 100;
+    this.gameScene = scene;
+    this.bossMaxHp = CFG.maxHp;
+    this.bossHp = this.bossMaxHp;
+    this.fightStartTime = scene.time.now;
     
     scene.add.existing(this);
     scene.physics.add.existing(this);
     
-    // Large hitbox
-    this.setSize(this.cfg.width, this.cfg.height);
+    this.setSize(CFG.width, CFG.height);
     this.setCollideWorldBounds(true);
+    this.clearTint();
+    this.setScale(CFG.scale);
     
-    // Start hidden
-    this.setVisible(false);
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.enable = false;
-    
-    // Create hidden mound visual
-    this.createMoundVisual();
-    
-    this.facingDir = 1;
-    this.hitsBeforeRetreat = this.HITS_TO_BURROW;
-  }
-  
-  private createMoundVisual(): void {
-    // Mossy mound showing when hidden
-    this.moundSprite = this.scene.add.ellipse(
-      this.x, 
-      this.y + 20, 
-      80, 
-      30, 
-      0x2d5a3d
-    );
-    this.moundSprite.setStrokeStyle(2, 0x1a3a25);
-    
-    // Add some moss texture dots
-    for (let i = 0; i < 5; i++) {
-      const dot = this.scene.add.circle(
-        this.x + Phaser.Math.Between(-30, 30),
-        this.y + 15 + Phaser.Math.Between(-5, 10),
-        Phaser.Math.Between(3, 6),
-        0x3d7a4d,
-        0.7
-      );
-      dot.setData('isMoundDecor', true);
-    }
-  }
-  
-  private createBodyVisual(): void {
-    // Massive moss body
-    this.bodyGraphics = this.scene.add.container(this.x, this.y);
-    
-    // Main body - elongated
-    const body = this.scene.add.ellipse(0, 0, this.cfg.width, this.cfg.height * 0.7, 0x2d5a3d);
-    body.setStrokeStyle(3, 0x1a3a25);
-    this.bodyGraphics.add(body);
-    
-    // Face area (darker)
-    const face = this.scene.add.ellipse(this.cfg.width * 0.3, -5, 40, 35, 0x1a3a25);
-    this.bodyGraphics.add(face);
-    
-    // Glowing orange eyes
-    const leftEye = this.scene.add.circle(this.cfg.width * 0.25, -8, 5, 0xff6600);
-    const rightEye = this.scene.add.circle(this.cfg.width * 0.35, -8, 5, 0xff6600);
-    this.bodyGraphics.add(leftEye);
-    this.bodyGraphics.add(rightEye);
-    
-    // Moss/leaf details
-    for (let i = 0; i < 8; i++) {
-      const leaf = this.scene.add.ellipse(
-        Phaser.Math.Between(-this.cfg.width * 0.4, this.cfg.width * 0.4),
-        Phaser.Math.Between(-this.cfg.height * 0.3, this.cfg.height * 0.3),
-        Phaser.Math.Between(8, 15),
-        Phaser.Math.Between(5, 10),
-        0x3d7a4d,
-        0.8
-      );
-      this.bodyGraphics.add(leaf);
-    }
+    // Set up arena bounds
+    this.arenaLeft = x - 500;
+    this.arenaRight = x + 500;
+
+    this.cooldown = 1500;
   }
 
   update(time: number, delta: number, player: Player): void {
-    if (this.isDead) return;
+    if (this.dead) return;
     
-    this.updateTimers(delta);
-    this.updateAIState(player, delta);
-    this.applyMovement(player);
-    this.updateVisuals();
-    this.updateBodyPosition();
-  }
-
-  private updateTimers(delta: number): void {
-    if (this.hitstunTimer > 0) this.hitstunTimer -= delta;
-    if (this.invulnTimer > 0) this.invulnTimer -= delta;
-    if (this.hurtFlashTimer > 0) this.hurtFlashTimer -= delta;
-    if (this.actionCooldown > 0) this.actionCooldown -= delta;
-    if (this.stateTimer > 0) this.stateTimer -= delta;
-  }
-  
-  private updateBodyPosition(): void {
-    if (this.bodyGraphics) {
-      this.bodyGraphics.setPosition(this.x, this.y);
-      this.bodyGraphics.setScale(this.facingDir, 1);
+    this.stateTimer += delta;
+    this.cooldown -= delta;
+    
+    // Update facing toward player
+    if (this.bossState === 'idle') {
+      this.facing = player.x > this.x ? 1 : -1;
+      this.setFlipX(this.facing < 0);
     }
-  }
-
-  private updateAIState(player: Player, delta: number): void {
-    // Handle hurt state
-    if (this.aiState === 'hurt') {
-      if (this.hitstunTimer <= 0) {
-        // Check if should burrow after taking hits
-        if (this.hitsBeforeRetreat <= 0) {
-          this.startBurrowing();
-        } else {
-          this.aiState = 'idle';
-          this.stateTimer = this.IDLE_TIME;
-        }
+    
+    // Check head exposure conditions
+    this.checkHeadExposure(time);
+    
+    // Update roar ring
+    if (this.roarRing) {
+      this.roarRing.scale += delta * 0.003;
+      this.roarRing.alpha -= delta * 0.001;
+      if (this.roarRing.alpha <= 0) {
+        this.roarRing.destroy();
+        this.roarRing = null;
       }
-      return;
     }
     
-    if (this.aiState === 'dead') return;
-    
-    const dist = Math.abs(player.x - this.x);
-    
-    // HIDDEN STATE - waiting for player
-    if (this.aiState === 'hidden') {
-      if (dist < 100) {
-        this.startEmerging();
-      }
-      return;
-    }
-    
-    // EMERGING STATE
-    if (this.aiState === 'emerging') {
-      if (this.stateTimer <= 0) {
-        this.completeEmerging();
-      }
-      return;
-    }
-    
-    // IDLE STATE - choose next action
-    if (this.aiState === 'idle') {
-      if (this.stateTimer <= 0 && this.actionCooldown <= 0) {
-        this.chooseNextAction(player, dist);
-      }
-      return;
-    }
-    
-    // CHARGING STATE
-    if (this.aiState === 'charging') {
-      const body = this.body as Phaser.Physics.Arcade.Body;
-      // Stop when hitting wall or reaching arena edge
-      if (body.blocked.left || body.blocked.right ||
-          this.x <= this.arenaLeft || this.x >= this.arenaRight) {
-        this.endCharge();
-      }
-      return;
-    }
-    
-    // JUMP WINDUP
-    if (this.aiState === 'jumpWindup') {
-      if (this.stateTimer <= 0) {
-        this.executeJump(player);
-      }
-      return;
-    }
-    
-    // JUMPING
-    if (this.aiState === 'jumping') {
-      const body = this.body as Phaser.Physics.Arcade.Body;
-      if (body.blocked.down || this.y > this.jumpTargetY) {
-        this.startLanding();
-      }
-      return;
-    }
-    
-    // LANDING
-    if (this.aiState === 'landing') {
-      if (this.stateTimer <= 0) {
-        this.aiState = 'idle';
-        this.stateTimer = this.IDLE_TIME;
-        this.actionCooldown = this.ACTION_COOLDOWN;
-      }
-      return;
-    }
-    
-    // BURROWING
-    if (this.aiState === 'burrowing') {
-      if (this.stateTimer <= 0) {
-        this.enterBurrowed();
-      }
-      return;
-    }
-    
-    // BURROWED - moving underground
-    if (this.aiState === 'burrowed') {
-      if (this.stateTimer <= 0) {
-        this.startSurfacing();
-      }
-      return;
-    }
-    
-    // SURFACING
-    if (this.aiState === 'surfacing') {
-      if (this.stateTimer <= 0) {
-        this.completeSurfacing();
-      }
-      return;
-    }
-  }
-  
-  private startEmerging(): void {
-    this.aiState = 'emerging';
-    this.stateTimer = this.EMERGE_TIME;
-    
-    // Destroy mound
-    if (this.moundSprite) {
-      this.scene.tweens.add({
-        targets: this.moundSprite,
-        scaleX: 1.5,
-        scaleY: 0,
-        alpha: 0,
-        duration: 300,
-        onComplete: () => {
-          this.moundSprite?.destroy();
-          this.moundSprite = null;
-        }
-      });
-    }
-    
-    // Scream effect - screen shake
-    this.scene.cameras.main.shake(500, 0.02);
-    
-    // Create body visual
-    this.createBodyVisual();
-    if (this.bodyGraphics) {
-      this.bodyGraphics.setScale(0.3);
-      this.bodyGraphics.setAlpha(0);
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        scaleX: this.facingDir,
-        scaleY: 1,
-        alpha: 1,
-        y: this.y,
-        duration: this.EMERGE_TIME,
-        ease: 'Back.easeOut'
-      });
-    }
-    
-    // Rising dirt particles
-    this.createDirtBurst(20);
-  }
-  
-  private completeEmerging(): void {
-    this.aiState = 'idle';
-    this.stateTimer = this.IDLE_TIME;
-    
-    // Enable physics
-    this.setVisible(true);
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.enable = true;
+
+    switch (this.bossState) {
+      case 'idle':
+        body.setVelocityX(0);
+        if (this.cooldown <= 0) {
+          this.chooseNextAttack(player);
+        }
+        break;
+        
+      case 'groundPound':
+        this.updateGroundPound(body, player, delta);
+        break;
+        
+      case 'chargeAttack':
+        this.updateChargeAttack(body, player, delta);
+        break;
+        
+      case 'sporeBurst':
+        this.updateSporeBurst(body, player, delta);
+        break;
+        
+      case 'roarAttack':
+        this.updateRoarAttack(body, player, delta);
+        break;
+        
+      case 'staggered':
+        body.setVelocityX(0);
+        if (this.stateTimer > CFG.staggerDuration) {
+          this.recoverFromStagger();
+        }
+        break;
+        
+      case 'recovering':
+        if (this.stateTimer > CFG.staggerRecoveryRageTime) {
+          this.bossState = 'idle';
+          this.cooldown = 1000;
+        }
+        break;
+    }
     
-    // Heavy thud
-    this.scene.cameras.main.shake(200, 0.015);
+    // Update head hitbox position if exposed
+    if (this.headHitbox && this.headExposed && this.isStaggered) {
+      this.headHitbox.setPosition(this.x, this.y - 80);
+    }
   }
-  
-  private chooseNextAction(player: Player, dist: number): void {
+
+  private chooseNextAttack(player: Player): void {
+    const distance = Math.abs(player.x - this.x);
     const rand = Math.random();
     
-    // Face player
-    this.facingDir = player.x > this.x ? 1 : -1;
-    
-    if (dist < 150 || rand < 0.6) {
-      // Charge attack - most common
-      this.startCharge(player);
+    // Choose based on distance and randomness
+    if (distance > 300 || rand < 0.35) {
+      this.startGroundPound(player);
+    } else if (rand < 0.65) {
+      this.startChargeAttack(player);
+    } else if (rand < 0.8) {
+      this.startSporeBurst();
     } else {
-      // Jump attack for distant player
-      this.startJumpWindup(player);
+      this.startRoarAttack();
     }
   }
-  
-  private startCharge(player: Player): void {
-    this.aiState = 'charging';
-    this.facingDir = player.x > this.x ? 1 : -1;
+
+  private startGroundPound(player: Player): void {
+    this.bossState = 'groundPound';
+    this.stateTimer = 0;
+    this.poundPhase = 'windup';
+    this.cooldown = CFG.attackPatterns.groundPound.cooldown;
     
-    // Quick roar animation
-    this.scene.cameras.main.shake(100, 0.01);
-    
-    // Start moving
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocityX(this.facingDir * this.CHARGE_SPEED);
-    
-    // Create dirt trail during charge
-    this.createDirtTrail();
+    // Face player
+    this.facing = player.x > this.x ? 1 : -1;
+    this.setFlipX(this.facing < 0);
   }
-  
-  private createDirtTrail(): void {
-    if (this.aiState !== 'charging') return;
+
+  private updateGroundPound(body: Phaser.Physics.Arcade.Body, player: Player, delta: number): void {
+    const cfg = CFG.attackPatterns.groundPound;
     
-    // Create dirt particle behind
-    const dirt = this.scene.add.circle(
-      this.x - this.facingDir * 40,
-      this.y + 25,
-      Phaser.Math.Between(4, 8),
-      0x8b7355,
+    switch (this.poundPhase) {
+      case 'windup':
+        // Crouch animation
+        if (this.stateTimer > cfg.windupTime) {
+          this.poundPhase = 'hanging';
+          this.stateTimer = 0;
+        }
+        break;
+        
+      case 'hanging':
+        // Lift off ground slightly
+        body.setVelocityY(-200);
+        if (this.stateTimer > 300) {
+          this.poundPhase = 'slam';
+          this.stateTimer = 0;
+        }
+        break;
+        
+      case 'slam':
+        // Slam down
+        body.setVelocityY(cfg.slamSpeed);
+        if (body.blocked.down || this.y > this.gameScene.currentLevel.height - 100) {
+          this.poundPhase = 'landed';
+          this.stateTimer = 0;
+          this.createShockwave();
+          this.gameScene.cameras.main.shake(300, 0.04);
+          body.setVelocityY(0);
+        }
+        break;
+        
+      case 'landed':
+        if (this.stateTimer > 500) {
+          this.bossState = 'idle';
+        }
+        break;
+    }
+  }
+
+  private createShockwave(): void {
+    const cfg = CFG.attackPatterns.groundPound;
+    const shockwave = this.scene.add.rectangle(
+      this.x, 
+      this.y + CFG.height * CFG.scale / 2, 
+      0, 
+      30, 
+      0x44ff44, 
       0.8
     );
     
+    // Animate shockwave expanding
     this.scene.tweens.add({
-      targets: dirt,
-      y: dirt.y - Phaser.Math.Between(20, 40),
+      targets: shockwave,
+      width: cfg.shockwaveWidth * 2,
+      alpha: 0,
+      duration: 400,
+      ease: 'Power2',
+      onComplete: () => shockwave.destroy()
+    });
+    
+    // Check player collision with shockwave
+    this.scene.time.delayedCall(50, () => {
+      const player = this.gameScene.player;
+      const shockBounds = shockwave.getBounds();
+      const playerBounds = player.getBounds();
+      
+      if (Phaser.Geom.Rectangle.Overlaps(shockBounds, playerBounds)) {
+        player.takeDamage(cfg.shockwaveDamage, this.x);
+      }
+    });
+  }
+
+  private startChargeAttack(player: Player): void {
+    this.bossState = 'chargeAttack';
+    this.stateTimer = 0;
+    this.chargeTimer = 0;
+    this.cooldown = CFG.attackPatterns.chargeAttack.cooldown;
+    
+    this.facing = player.x > this.x ? 1 : -1;
+    this.setFlipX(this.facing < 0);
+    
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocityX(0);
+  }
+
+  private updateChargeAttack(body: Phaser.Physics.Arcade.Body, player: Player, delta: number): void {
+    const cfg = CFG.attackPatterns.chargeAttack;
+    this.chargeTimer += delta;
+    
+    if (this.chargeTimer < cfg.windupTime) {
+      // Windup - slight back animation
+    } else if (this.chargeTimer < cfg.windupTime + cfg.chargeDuration) {
+      // Charging forward
+      body.setVelocityX(this.facing * cfg.chargeSpeed);
+      
+      // Create dust trail
+      if (Math.random() < 0.3) {
+        this.createDustParticle();
+      }
+      
+      // Check player collision
+      const player = this.gameScene.player;
+      const dist = Math.abs(player.x - this.x);
+      if (dist < 60 && Math.abs(player.y - this.y) < 80) {
+        player.takeDamage(cfg.damage, this.x);
+      }
+    } else {
+      // End charge
+      this.bossState = 'idle';
+      body.setVelocityX(0);
+      this.gameScene.cameras.main.shake(200, 0.02);
+    }
+  }
+
+  private startSporeBurst(): void {
+    this.bossState = 'sporeBurst';
+    this.stateTimer = 0;
+    this.cooldown = CFG.attackPatterns.sporeBurst.cooldown;
+    
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocityX(0);
+  }
+
+  private updateSporeBurst(body: Phaser.Physics.Arcade.Body, player: Player, delta: number): void {
+    const cfg = CFG.attackPatterns.sporeBurst;
+    
+    if (this.stateTimer > cfg.windupTime && this.sporeParticles.length === 0) {
+      // Release spores
+      const player = this.gameScene.player;
+      const angleToPlayer = Math.atan2(player.y - this.y, player.x - this.x);
+      
+      for (let i = 0; i < cfg.sporeCount; i++) {
+        const angle = angleToPlayer + (i - cfg.sporeCount / 2) * 0.3;
+        this.createSpore(angle);
+      }
+    }
+    
+    if (this.stateTimer > 1500) {
+      this.bossState = 'idle';
+    }
+  }
+
+  private createSpore(angle: number): void {
+    const speed = 200;
+    const spore = this.scene.add.ellipse(this.x, this.y - 40, 15, 10, 0x66ff66, 0.9);
+    this.scene.physics.add.existing(spore);
+    
+    const sporeBody = spore.body as Phaser.Physics.Arcade.Body;
+    sporeBody.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
+    sporeBody.setCollideWorldBounds(true);
+    sporeBody.setBounce(0.6);
+    
+    this.sporeParticles.push(spore);
+    
+    // Animate spore
+    this.scene.tweens.add({
+      targets: spore,
+      scaleX: 0.5,
+      scaleY: 0.5,
+      alpha: 0,
+      duration: 2000,
+      delay: 500,
+      ease: 'Power2',
+      onComplete: () => {
+        spore.destroy();
+        const idx = this.sporeParticles.indexOf(spore);
+        if (idx > -1) this.sporeParticles.splice(idx, 1);
+      }
+    });
+    
+    // Check player collision
+    this.scene.time.addEvent({
+      delay: 50,
+      repeat: 20,
+      callback: () => {
+        if (!spore.active) return;
+        const player = this.gameScene.player;
+        const sporeBounds = spore.getBounds();
+        const playerBounds = player.getBounds();
+        
+        if (Phaser.Geom.Rectangle.Overlaps(sporeBounds, playerBounds)) {
+          player.takeDamage(CFG.attackPatterns.sporeBurst.sporeDamage, this.x);
+          spore.destroy();
+          const idx = this.sporeParticles.indexOf(spore);
+          if (idx > -1) this.sporeParticles.splice(idx, 1);
+        }
+      }
+    });
+  }
+
+  private startRoarAttack(): void {
+    this.bossState = 'roarAttack';
+    this.stateTimer = 0;
+    this.roarPhase = 'windup';
+    this.cooldown = CFG.attackPatterns.roarAttack.cooldown;
+    
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocityX(0);
+  }
+
+  private updateRoarAttack(body: Phaser.Physics.Arcade.Body, player: Player, delta: number): void {
+    const cfg = CFG.attackPatterns.roarAttack;
+    
+    switch (this.roarPhase) {
+      case 'windup':
+        if (this.stateTimer > cfg.windupTime) {
+          this.roarPhase = 'roaring';
+          this.stateTimer = 0;
+          this.createRoarRing();
+          this.gameScene.cameras.main.shake(400, 0.03);
+          
+          // Check player in range
+          const player = this.gameScene.player;
+          const dist = Math.abs(player.x - this.x);
+          if (dist < cfg.roarRange) {
+            player.takeDamage(cfg.roarDamage, this.x);
+          }
+        }
+        break;
+        
+      case 'roaring':
+        if (this.stateTimer > 800) {
+          this.roarPhase = 'recovering';
+          this.stateTimer = 0;
+        }
+        break;
+        
+      case 'recovering':
+        if (this.stateTimer > 500) {
+          this.bossState = 'idle';
+        }
+        break;
+    }
+  }
+
+  private createRoarRing(): void {
+    this.roarRing = this.scene.add.ellipse(
+      this.x,
+      this.y - 40,
+      50,
+      30,
+      0x88ff88,
+      0.8
+    );
+    this.roarRing.setStrokeStyle(4, 0x44ff44);
+    this.roarRing.setDepth(100);
+  }
+
+  private createDustParticle(): void {
+    const dust = this.scene.add.circle(
+      this.x - this.facing * 60,
+      this.y + 20,
+      Phaser.Math.Between(5, 12),
+      0x5a8a5a,
+      0.7
+    );
+    
+    this.scene.tweens.add({
+      targets: dust,
+      x: dust.x - this.facing * 20,
+      y: dust.y - Phaser.Math.Between(10, 30),
       alpha: 0,
       scale: 0.3,
       duration: 300,
-      onComplete: () => dirt.destroy()
+      onComplete: () => dust.destroy()
     });
-    
-    // Continue trail while charging
-    this.scene.time.delayedCall(50, () => this.createDirtTrail());
   }
-  
-  private endCharge(): void {
-    this.aiState = 'idle';
-    this.stateTimer = this.IDLE_TIME;
-    this.actionCooldown = this.ACTION_COOLDOWN;
+
+  private checkHeadExposure(time: number): void {
+    const timePassed = (time - this.fightStartTime) / 1000;
+    const damageRatio = this.totalDamageDealt / this.bossMaxHp;
+    
+    const cfg = CFG.headExposureCondition;
+    if (timePassed >= cfg.timeThresholdSec || damageRatio >= cfg.damageThresholdRatio) {
+      this.headExposed = true;
+    }
+  }
+
+  private showHeadHitbox(): void {
+    if (!this.headHitbox) {
+      this.headHitbox = this.scene.add.rectangle(
+        this.x,
+        this.y - 80,
+        60,
+        50,
+        0xff8800,
+        0.8
+      );
+    }
+    this.headHitbox.setVisible(true);
+  }
+
+  private hideHeadHitbox(): void {
+    if (this.headHitbox) {
+      this.headHitbox.setVisible(false);
+    }
+  }
+
+  takeDamage(amount: number, fromX: number, swingId?: number): boolean {
+    if (this.dead || this.isInvulnerable()) return false;
+    
+    this.totalDamageDealt += amount;
+    
+    // If staggered and head exposed, damage main HP
+    if (this.isStaggered && this.headExposed) {
+      this.bossHp -= amount;
+      this.flashGreen();
+      
+      if (this.bossHp <= 0) {
+        this.die();
+      }
+      return true;
+    } else if (!this.isStaggered) {
+      // Add to stagger meter
+      this.staggerDamage += amount;
+      this.flashGreen();
+      
+      if (this.staggerDamage >= CFG.staggerThreshold) {
+        this.enterStagger();
+      }
+      return true;
+    }
+    
+    return false;
+  }
+
+  private flashGreen(): void {
+    this.setTint(0x88ff88);
+    this.scene.time.delayedCall(100, () => {
+      if (!this.dead) {
+        this.clearTint();
+      }
+    });
+  }
+
+  private enterStagger(): void {
+    this.isStaggered = true;
+    this.bossState = 'staggered';
+    this.stateTimer = 0;
+    this.staggerDamage = 0;
     
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityX(0);
     
-    // Impact dust
-    this.createDirtBurst(8);
+    // Show head hitbox if conditions met
+    if (this.headExposed) {
+      this.showHeadHitbox();
+    }
+    
+    // Stagger animation
+    this.scene.tweens.add({
+      targets: this,
+      y: this.y + 10,
+      duration: 200,
+      yoyo: true,
+      ease: 'Bounce.easeOut'
+    });
+    
+    // Camera shake
+    this.gameScene.cameras.main.shake(150, 0.02);
   }
   
-  private startJumpWindup(player: Player): void {
-    this.aiState = 'jumpWindup';
-    this.stateTimer = this.JUMP_WINDUP_TIME;
+  private recoverFromStagger(): void {
+    this.isStaggered = false;
+    this.staggerDamage = 0;
     
-    // Store target
-    this.jumpTargetX = player.x;
-    this.jumpTargetY = this.y;
+    this.clearTint();
+    this.setAngle(0);
     
-    // Crouch animation
-    if (this.bodyGraphics) {
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        scaleY: 0.7,
-        duration: this.JUMP_WINDUP_TIME,
-        ease: 'Power2'
-      });
-    }
-  }
-  
-  private executeJump(player: Player): void {
-    this.aiState = 'jumping';
+    this.hideHeadHitbox();
     
-    // Update target to current player position
-    this.jumpTargetX = player.x;
-    
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    
-    // Calculate arc
-    const distX = this.jumpTargetX - this.x;
-    const timeToLand = 0.8; // seconds
-    
-    body.setVelocity(
-      distX / timeToLand,
-      -this.JUMP_HEIGHT
-    );
-    
-    // Stretch animation
-    if (this.bodyGraphics) {
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        scaleY: 1.3,
-        duration: 200,
-        yoyo: true
-      });
-    }
-    
-    this.createDirtBurst(10);
-  }
-  
-  private startLanding(): void {
-    this.aiState = 'landing';
-    this.stateTimer = this.LANDING_TIME;
-    
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0, 0);
-    
-    // Screen shake on impact
-    this.scene.cameras.main.shake(300, 0.025);
-    
-    // Squash animation
-    if (this.bodyGraphics) {
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        scaleY: 0.6,
-        duration: 100,
-        yoyo: true,
-        ease: 'Bounce'
-      });
-    }
-    
-    // Big dust burst
-    this.createDirtBurst(15);
-  }
-  
-  private startBurrowing(): void {
-    this.aiState = 'burrowing';
-    this.stateTimer = this.BURROW_TIME;
-    this.hitsBeforeRetreat = this.HITS_TO_BURROW;
-    
-    // Choose opposite side of arena
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0, 0);
-    
-    this.burrowTargetX = this.x < (this.arenaLeft + this.arenaRight) / 2
-      ? this.arenaRight - 50
-      : this.arenaLeft + 50;
-    
-    // Sinking animation
-    if (this.bodyGraphics) {
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        y: this.y + 50,
-        alpha: 0,
-        scaleY: 0.5,
-        duration: this.BURROW_TIME,
-        ease: 'Power2'
-      });
-    }
-    
-    // Become invulnerable
-    this.invulnTimer = this.BURROW_TIME + this.BURROWED_TIME + this.SURFACE_TIME;
-    
-    this.createDirtBurst(15);
-  }
-  
-  private enterBurrowed(): void {
-    this.aiState = 'burrowed';
-    this.stateTimer = this.BURROWED_TIME;
-    
-    // Disable physics and hide
-    this.setVisible(false);
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.enable = false;
-    
-    // Move to target position
-    this.x = this.burrowTargetX;
-  }
-  
-  private startSurfacing(): void {
-    this.aiState = 'surfacing';
-    this.stateTimer = this.SURFACE_TIME;
-    
-    // Enable physics
-    this.setVisible(true);
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    body.enable = true;
-    
-    // Rising animation
-    if (this.bodyGraphics) {
-      this.bodyGraphics.setPosition(this.x, this.y + 50);
-      this.bodyGraphics.setAlpha(0);
-      this.bodyGraphics.setScale(this.facingDir, 0.5);
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        y: this.y,
-        alpha: 1,
-        scaleY: 1,
-        duration: this.SURFACE_TIME,
-        ease: 'Back.easeOut'
-      });
-    }
-    
-    this.createDirtBurst(12);
-    this.scene.cameras.main.shake(200, 0.01);
-  }
-  
-  private completeSurfacing(): void {
-    this.aiState = 'idle';
-    this.stateTimer = this.IDLE_TIME;
-    this.invulnTimer = 0;
-    this.actionCooldown = this.ACTION_COOLDOWN;
-  }
-  
-  private createDirtBurst(count: number): void {
-    for (let i = 0; i < count; i++) {
-      const dirt = this.scene.add.circle(
-        this.x + Phaser.Math.Between(-40, 40),
-        this.y + 20,
-        Phaser.Math.Between(4, 10),
-        Phaser.Math.RND.pick([0x8b7355, 0x6b5344, 0x3d5a3d]),
-        0.9
-      );
-      
-      const angle = Phaser.Math.Between(-150, -30) * Phaser.Math.DEG_TO_RAD;
-      const speed = Phaser.Math.Between(80, 200);
-      
-      this.scene.tweens.add({
-        targets: dirt,
-        x: dirt.x + Math.cos(angle) * speed * 0.5,
-        y: dirt.y + Math.sin(angle) * speed * 0.5,
-        alpha: 0,
-        scale: 0.3,
-        duration: Phaser.Math.Between(400, 700),
-        ease: 'Power2',
-        onComplete: () => dirt.destroy()
-      });
-    }
-  }
-
-  private applyMovement(player: Player): void {
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    
-    switch (this.aiState) {
-      case 'hidden':
-      case 'emerging':
-      case 'idle':
-      case 'jumpWindup':
-      case 'landing':
-      case 'burrowing':
-      case 'burrowed':
-      case 'surfacing':
-      case 'dead':
-        if (body.enable) body.setVelocityX(0);
-        break;
-        
-      case 'charging':
-        // Velocity already set in startCharge
-        break;
-        
-      case 'jumping':
-        // Gravity handles vertical, horizontal set in executeJump
-        break;
-        
-      case 'hurt':
-        if (body.enable) {
-          body.setVelocityX(body.velocity.x * 0.9);
-        }
-        break;
-    }
-  }
-
-  private updateVisuals(): void {
-    if (this.hurtFlashTimer > 0) {
-      if (this.bodyGraphics) {
-        this.bodyGraphics.setAlpha(0.5);
-      }
-      this.setTint(0xffffff);
-    } else if (this.invulnTimer > 0 && this.aiState !== 'burrowing' && this.aiState !== 'burrowed') {
-      const flicker = Math.sin(Date.now() * 0.02) > 0 ? 1 : 0.6;
-      if (this.bodyGraphics) this.bodyGraphics.setAlpha(flicker);
-    } else {
-      this.clearTint();
-      if (this.bodyGraphics && this.aiState !== 'burrowing' && this.aiState !== 'burrowed') {
-        this.bodyGraphics.setAlpha(1);
-      }
-    }
-  }
-
-  /**
-   * Take damage from player attack
-   */
-  takeDamage(amount: number, fromX: number, swingId: number = -1): boolean {
-    if (this.isDead) return false;
-    if (this.aiState === 'hidden' || this.aiState === 'burrowed') return false;
-    
-    // Check invulnerability
-    if (this.invulnTimer > 0) return false;
-    
-    // Check if already hit by this swing
-    if (swingId !== -1 && swingId === this.lastHitBySwingId) return false;
-    this.lastHitBySwingId = swingId;
-    
-    // Apply damage
-    this.currentHp -= amount;
-    this.hitsBeforeRetreat--;
-    
-    // Enter hurt state
-    this.aiState = 'hurt';
-    this.hitstunTimer = this.cfg.hitstunMs;
-    this.invulnTimer = this.cfg.invulnOnHitMs;
-    this.hurtFlashTimer = this.cfg.hurtFlashMs;
-    
-    // Apply knockback (reduced for big enemy)
-    const knockDir = this.x > fromX ? 1 : -1;
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    if (body.enable) {
-      body.setVelocityX(knockDir * this.cfg.knockbackOnHit.x * 0.5);
-    }
-    
-    // Check for death
-    if (this.currentHp <= 0) {
-      this.die();
-    }
-    
-    return true;
+    this.bossState = 'recovering';
+    this.stateTimer = 0;
   }
 
   private die(): void {
-    if (this.isDead) return;
+    this.dead = true;
+    this.bossState = 'dead';
     
-    this.isDead = true;
-    this.aiState = 'dead';
-    
-    // Disable physics body
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.enable = false;
+    body.setVelocity(0, 0);
     
-    // Big screen shake
-    this.scene.cameras.main.shake(500, 0.03);
+    // Clean up attacks
+    if (this.headHitbox) this.headHitbox.destroy();
+    if (this.roarRing) this.roarRing.destroy();
+    this.sporeParticles.forEach(s => s.destroy());
     
-    // Moss explodes
-    this.createMossExplosion();
+    // Open gates
+    this.openGates();
     
-    // Spawn escaped bug that runs away
-    this.spawnEscapedBug();
+    // === DEATH SEQUENCE ===
     
-    // Spawn large shell drops
-    const dropCount = Phaser.Math.Between(
-      this.cfg.dropShells.min,
-      this.cfg.dropShells.max
-    );
+    // Phase 1: Roar (1s)
+    this.scene.time.delayedCall(0, () => {
+      this.createDeathRoar();
+    });
     
-    for (let i = 0; i < dropCount; i++) {
-      const offsetX = Phaser.Math.Between(-60, 60);
-      const offsetY = Phaser.Math.Between(-30, 30);
-      
-      this.scene.time.delayedCall(i * 30, () => {
-        const pickup = new Pickup(
-          this.scene, 
-          this.x + offsetX, 
-          this.y + offsetY, 
-          'shells', 
-          1
-        );
-        
-        const gameScene = this.scene as any;
-        if (gameScene.getPickupsGroup) {
-          gameScene.getPickupsGroup().add(pickup);
-        }
-        
-        const pickupBody = pickup.body as Phaser.Physics.Arcade.Body;
-        if (pickupBody) {
-          pickupBody.setVelocity(
-            Phaser.Math.Between(-100, 100),
-            Phaser.Math.Between(-200, -100)
-          );
-          this.scene.time.delayedCall(400, () => {
-            if (pickup.active && pickupBody) {
-              pickupBody.setVelocity(0, 0);
-              pickupBody.moves = false;
-            }
-          });
-        }
-      });
-    }
-    
-    // Fade body graphics
-    if (this.bodyGraphics) {
-      this.scene.tweens.add({
-        targets: this.bodyGraphics,
-        alpha: 0,
-        scaleX: 1.5,
-        scaleY: 0.3,
-        duration: 500,
-        ease: 'Power2',
-        onComplete: () => {
-          this.bodyGraphics?.destroy();
-          this.bodyGraphics = null;
-        }
-      });
-    }
-    
-    // Destroy self after delay
+    // Phase 2: Moss explosion (2s)
     this.scene.time.delayedCall(1000, () => {
-      this.destroy();
+      this.createMossExplosion();
+    });
+    
+    // Phase 3: Collapse (4s)
+    this.scene.time.delayedCall(3000, () => {
+      this.createCollapse();
+    });
+    
+    // Phase 4: Final (5s)
+    this.scene.time.delayedCall(5000, () => {
+      this.gameScene.handleBossDefeated();
     });
   }
-  
+
+  private createDeathRoar(): void {
+    // Massive roar effect
+    for (let i = 0; i < 5; i++) {
+      this.scene.time.delayedCall(i * 150, () => {
+        const ring = this.scene.add.ellipse(this.x, this.y - 40, 50 + i * 20, 30, 0x44ff44, 0.6);
+        ring.setStrokeStyle(3, 0x22aa22);
+        ring.setDepth(100);
+        
+        this.scene.tweens.add({
+          targets: ring,
+          scaleX: 3,
+          scaleY: 3,
+          alpha: 0,
+          duration: 600,
+          ease: 'Power2',
+          onComplete: () => ring.destroy()
+        });
+      });
+    }
+    
+    this.gameScene.cameras.main.shake(600, 0.03);
+  }
+
   private createMossExplosion(): void {
-    // Big moss/leaf particles
-    for (let i = 0; i < 30; i++) {
-      const isLeaf = Math.random() > 0.5;
-      const size = isLeaf ? Phaser.Math.Between(8, 15) : Phaser.Math.Between(4, 10);
-      const color = Phaser.Math.RND.pick([0x2d5a3d, 0x3d7a4d, 0x4d8a5d, 0x1a3a25]);
+    // Burst of moss and spores
+    for (let i = 0; i < 40; i++) {
+      const size = Phaser.Math.Between(10, 25);
+      const color = Phaser.Math.RND.pick([0x44ff44, 0x66dd66, 0x88bb88, 0x33aa33]);
       
       const particle = this.scene.add.ellipse(
-        this.x + Phaser.Math.Between(-40, 40),
-        this.y + Phaser.Math.Between(-30, 30),
+        this.x + Phaser.Math.Between(-60, 60),
+        this.y + Phaser.Math.Between(-50, 30),
         size,
-        size * 0.6,
-        color,
-        1
+        size * 0.7,
+        color
       );
       
       const angle = Math.random() * Math.PI * 2;
-      const distance = Phaser.Math.Between(80, 200);
+      const distance = Phaser.Math.Between(100, 250);
       
       this.scene.tweens.add({
         targets: particle,
         x: particle.x + Math.cos(angle) * distance,
-        y: particle.y + Math.sin(angle) * distance - 50,
+        y: particle.y + Math.sin(angle) * distance - 80,
         alpha: 0,
         rotation: Phaser.Math.Between(-3, 3),
-        duration: Phaser.Math.Between(600, 1000),
-        ease: 'Power2',
+        duration: Phaser.Math.Between(800, 1500),
+        ease: 'Cubic.easeOut',
         onComplete: () => particle.destroy()
       });
     }
     
-    // Central bright flash
-    const flash = this.scene.add.circle(this.x, this.y, 40, 0x88ff88, 0.9);
+    // Central flash
+    const flash = this.scene.add.circle(this.x, this.y, 80, 0x88ff88, 0.9);
     this.scene.tweens.add({
       targets: flash,
-      radius: 100,
+      radius: 150,
       alpha: 0,
-      duration: 300,
+      duration: 400,
       ease: 'Power2',
       onComplete: () => flash.destroy()
     });
   }
-  
-  private spawnEscapedBug(): void {
-    // Small defenseless bug that runs away
-    const bug = this.scene.add.ellipse(this.x, this.y, 15, 10, 0x554433);
-    this.scene.physics.add.existing(bug);
-    
-    const bugBody = bug.body as Phaser.Physics.Arcade.Body;
-    bugBody.setCollideWorldBounds(true);
-    
-    // Run away from center
-    const runDir = this.x < (this.arenaLeft + this.arenaRight) / 2 ? -1 : 1;
-    bugBody.setVelocity(runDir * 150, -100);
-    
-    // Destroy after running off
-    this.scene.time.delayedCall(3000, () => {
-      if (bug.active) bug.destroy();
+
+  private createCollapse(): void {
+    // Fall over with thud
+    this.scene.tweens.add({
+      targets: this,
+      angle: this.facing * 90,
+      y: this.y + 40,
+      duration: 600,
+      ease: 'Bounce.easeOut',
+      onComplete: () => {
+        this.gameScene.cameras.main.shake(400, 0.05);
+        this.createCorpse();
+      }
     });
   }
 
-  // Public getters
-  getContactDamage(): number { 
-    // Higher damage during attacks
-    if (this.aiState === 'charging' || this.aiState === 'jumping') {
-      return this.CHARGE_DAMAGE;
+  private createCorpse(): void {
+    // Mossy corpse
+    const corpseX = this.x;
+    const corpseY = this.y + 30;
+    
+    // Main body mound
+    const bodyMound = this.scene.add.ellipse(corpseX, corpseY, 160, 80, 0x338833);
+    bodyMound.setDepth(-1);
+    
+    // Moss patches
+    for (let i = 0; i < 8; i++) {
+      const patch = this.scene.add.ellipse(
+        corpseX + Phaser.Math.Between(-70, 70),
+        corpseY + Phaser.Math.Between(-30, 30),
+        Phaser.Math.Between(20, 40),
+        Phaser.Math.Between(15, 25),
+        0x44aa44
+      );
+      patch.setDepth(-0.9);
     }
-    return this.cfg.contactDamage; 
+    
+    // Glowing spores lingering
+    for (let i = 0; i < 6; i++) {
+      const spore = this.scene.add.circle(
+        corpseX + Phaser.Math.Between(-50, 50),
+        corpseY + Phaser.Math.Between(-20, 20),
+        Phaser.Math.Between(5, 10),
+        0x66ff66,
+        0.6
+      );
+      spore.setDepth(-0.8);
+      
+      this.scene.tweens.add({
+        targets: spore,
+        alpha: 0.2,
+        duration: 1500,
+        yoyo: true,
+        repeat: -1
+      });
+    }
+    
+    // Hide actual boss
+    this.setVisible(false);
+    this.setActive(false);
+  }
+
+  // Gate management
+  lockGates(leftGate: Phaser.GameObjects.Rectangle, rightGate: Phaser.GameObjects.Rectangle): void {
+    this.leftGate = leftGate;
+    this.rightGate = rightGate;
+    this.gatesLocked = true;
+  }
+
+  private openGates(): void {
+    if (this.leftGate) {
+      this.scene.tweens.add({
+        targets: this.leftGate,
+        y: this.leftGate.y - 250,
+        duration: 500,
+        ease: 'Power2'
+      });
+    }
+    if (this.rightGate) {
+      this.scene.tweens.add({
+        targets: this.rightGate,
+        y: this.rightGate.y - 250,
+        duration: 500,
+        ease: 'Power2'
+      });
+    }
+  }
+
+  // Public getters
+  getHp(): number { return this.bossHp; }
+  getMaxHp(): number { return this.bossMaxHp; }
+  getName(): string { return CFG.name; }
+  getSubtitle(): string { return CFG.subtitle; }
+  getNameColor(): string { return CFG.nameColor; }
+  isDying(): boolean { return this.dead; }
+  isInStagger(): boolean { return this.isStaggered; }
+  isInvulnerable(): boolean { 
+    // Staggered with exposed head is vulnerable, recovering is invulnerable
+    if (this.isStaggered && this.headExposed) return false;
+    return this.dead || this.bossState === 'recovering';
   }
   
   getHitRect(): Phaser.Geom.Rectangle {
     return new Phaser.Geom.Rectangle(
-      this.x - this.cfg.width / 2, 
-      this.y - this.cfg.height / 2, 
-      this.cfg.width, 
-      this.cfg.height
+      this.x - (CFG.width * CFG.scale) / 2,
+      this.y - (CFG.height * CFG.scale) / 2,
+      CFG.width * CFG.scale,
+      CFG.height * CFG.scale
     );
   }
   
-  isDying(): boolean { 
-    return this.isDead; 
+  getHeadBounds(): Phaser.Geom.Rectangle | null {
+    if (this.headHitbox && this.headHitbox.visible) {
+      return this.headHitbox.getBounds();
+    }
+    return null;
   }
   
-  getAIState(): MossTitanAIState {
-    return this.aiState;
-  }
-  
-  getCurrentHp(): number {
-    return this.currentHp;
-  }
-  
-  getMaxHp(): number {
-    return this.maxHp;
-  }
-  
-  isInvulnerable(): boolean {
-    return this.invulnTimer > 0 || this.aiState === 'hidden' || this.aiState === 'burrowed';
-  }
-  
-  getDisplayName(): string {
-    return this.cfg.displayName;
-  }
-  
-  isHidden(): boolean {
-    return this.aiState === 'hidden';
+  // Enemy interface compatibility for when spawned as regular enemy
+  getContactDamage(): number {
+    return CFG.contactDamage;
   }
 }
