@@ -820,8 +820,8 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
   
   const roomOrder = generateGreenwayRoomOrder();
   
-  // Generate 20 rooms (extended Greenway with Moss Titan at room 20)
-  for (let i = 0; i < 20; i++) {
+  // Generate 10 rooms (Greenway with Moss Titan at room 10)
+  for (let i = 0; i < 10; i++) {
     const roomType = roomOrder[i % roomOrder.length];
     let roomData: GreenwayRoomData;
     
@@ -883,8 +883,8 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     if (room.meleeDoors) allMeleeDoors.push(...room.meleeDoors);
   });
   
-  // Add Moss Titan boss in room 20 (last room)
-  const bossRoomX = 19 * ROOM_WIDTH;
+  // Add Moss Titan boss in room 10 (last room)
+  const bossRoomX = 9 * ROOM_WIDTH;
   allEnemies.push({
     type: 'mossTitan',
     x: bossRoomX + ROOM_WIDTH / 2,
@@ -892,7 +892,7 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
   });
   
   // Add transitions between rooms
-  for (let i = 0; i < 19; i++) {
+  for (let i = 0; i < 9; i++) {
     const xPos = (i + 1) * ROOM_WIDTH - 30;
     
     allTriggers.push({
