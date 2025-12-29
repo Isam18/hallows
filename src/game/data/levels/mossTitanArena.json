@@ -5,7 +5,7 @@
   "height": 600,
   "backgroundColor": "#0a1810",
   "spawnPoint": {
-    "x": 600,
+    "x": 150,
     "y": 500
   },
   "platforms": [
@@ -46,36 +46,19 @@
       "height": 50
     }
   ],
-  "enemies": [
-    {
-      "type": "mossWarrior",
-      "x": 300,
-      "y": 500
-    },
-    {
-      "type": "mossWarrior",
-      "x": 900,
-      "y": 500
-    }
-  ],
-  "triggers": [
-    {
-      "type": "bossGate",
-      "x": 500,
-      "y": 200,
-      "width": 200,
-      "height": 100
-    }
-  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [],
   "bossArena": {
-    "x": 400,
-    "y": 200,
-    "width": 400,
-    "height": 350,
+    "x": 0,
+    "y": 0,
+    "width": 1200,
+    "height": 600,
     "bossSpawn": {
-      "x": 600,
+      "x": 900,
       "y": 450
-    }
+    },
+    "bossType": "mossTitan"
   },
   "biome": "greenway",
   "spawns": {
@@ -84,7 +67,7 @@
       "y": 500
     },
     "arena": {
-      "x": 500,
+      "x": 150,
       "y": 500
     }
   }
