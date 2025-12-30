@@ -12,6 +12,7 @@ import { CharmShop } from '@/components/game/CharmShop';
 import { ClimbingOverlay } from '@/components/game/ClimbingOverlay';
 import { ToBeContinued } from '@/components/game/ToBeContinued';
 import { GreenDoorDialog } from '@/components/game/GreenDoorDialog';
+import { TheMedullaDialog } from '@/components/game/TheMedullaDialog';
 import { ZoneTransition } from '@/components/game/ZoneTransition';
 
 const Index = () => {
@@ -27,6 +28,7 @@ const Index = () => {
   const [showClimbing, setShowClimbing] = useState(false);
   const [showEnding, setShowEnding] = useState(false);
   const [showGreenwayDialog, setShowGreenwayDialog] = useState(false);
+  const [showTheMedullaDialog, setShowTheMedullaDialog] = useState(false);
   const [showZoneTransition, setShowZoneTransition] = useState(false);
   const [transitionZone, setTransitionZone] = useState('');
 
@@ -91,6 +93,18 @@ const Index = () => {
     }
   }, []);
 
+  // Handle The Medulla door dialog
+  const handleTheMedullaDialogNo = useCallback(() => {
+    setShowTheMedullaDialog(false);
+    gameState.setState('playing');
+  }, []);
+
+  const handleTheMedullaDialogYes = useCallback(() => {
+    setShowTheMedullaDialog(false);
+    setTransitionZone('THE MEDULLA');
+    setShowZoneTransition(true);
+  }, []);
+
   useEffect(() => {
     if (gameContainer.current && !gameRef.current) {
       gameRef.current = createGame(gameContainer.current);
@@ -123,6 +137,9 @@ const Index = () => {
               gameState.setState('bench');
             } else if (event === 'showGreenwayDialog') {
               setShowGreenwayDialog(true);
+              gameState.setState('bench');
+            } else if (event === 'showTheMedullaDialog') {
+              setShowTheMedullaDialog(true);
               gameState.setState('bench');
             }
             // Clear the event
@@ -160,7 +177,7 @@ const Index = () => {
           )}
           {uiState === 'paused' && <PauseMenu gameRef={gameRef} />}
           {uiState === 'death' && <DeathScreen gameRef={gameRef} />}
-          {uiState === 'bench' && !showShop && !showClimbing && !showEnding && !showGreenwayDialog && <BenchScreen gameRef={gameRef} />}
+          {uiState === 'bench' && !showShop && !showClimbing && !showEnding && !showGreenwayDialog && !showTheMedullaDialog && <BenchScreen gameRef={gameRef} />}
           {uiState === 'victory' && <VictoryScreen onContinue={handleVictoryContinue} />}
         </div>
       )}
@@ -170,6 +187,7 @@ const Index = () => {
       {showClimbing && <ClimbingOverlay onComplete={handleClimbingComplete} />}
       {showEnding && <ToBeContinued onMainMenu={handleEndingMainMenu} onStay={handleEndingStay} />}
       {showGreenwayDialog && <GreenDoorDialog onYes={handleGreenwayDialogYes} onNo={handleGreenwayDialogNo} />}
+      {showTheMedullaDialog && <TheMedullaDialog onYes={handleTheMedullaDialogYes} onNo={handleTheMedullaDialogNo} />}
       {showZoneTransition && <ZoneTransition zoneName={transitionZone} onComplete={handleZoneTransitionComplete} />}
     </div>
   );
