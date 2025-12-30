@@ -590,6 +590,8 @@ export class MossTitan extends Phaser.Physics.Arcade.Sprite {
     // Phase 4: Final (5s)
     this.scene.time.delayedCall(5000, () => {
       this.gameScene.handleBossDefeated();
+      // Show victory message
+      this.gameScene.showMossTitanVictory();
     });
   }
 

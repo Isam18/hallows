@@ -1,0 +1,51 @@
+{
+  "id": "theMedulla",
+  "name": "The Medulla",
+  "width": 800,
+  "height": 900,
+  "backgroundColor": "#1a0808",
+  "spawnPoint": { "x": 100, "y": 800 },
+  "platforms": [
+    { "x": 0, "y": 850, "width": 800, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 800, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 820, "type": "wall" },
+    { "x": 770, "y": 30, "width": 30, "height": 820, "type": "wall" },
+    { "x": 300, "y": 700, "width": 200, "height": 20, "type": "platform" },
+    { "x": 150, "y": 550, "width": 120, "height": 20, "type": "platform" },
+    { "x": 530, "y": 550, "width": 120, "height": 20, "type": "platform" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "skeletonWithWeapon",
+      "type": "skeleton",
+      "x": 370,
+      "y": 780,
+      "width": 60,
+      "height": 70
+    },
+    {
+      "id": "lavaDoor",
+      "type": "lavaDoor",
+      "x": 720,
+      "y": 750,
+      "width": 50,
+      "height": 100
+    },
+    {
+      "id": "exitToBoss",
+      "type": "transition",
+      "x": 30,
+      "y": 750,
+      "width": 30,
+      "height": 100,
+      "target": "mossTitanArena",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 800 },
+    "fromBoss": { "x": 100, "y": 800 }
+  }
+}

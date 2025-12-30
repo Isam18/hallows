@@ -40,6 +40,7 @@ import ruinedCrossroadsData from '../data/levels/ruinedCrossroads.json';
 import chainRoomData from '../data/levels/chainRoom.json';
 import greenwayData from '../data/levels/greenway.json';
 import mossTitanArenaData from '../data/levels/mossTitanArena.json';
+import theMedullaData from '../data/levels/theMedulla.json';
 import enemiesData from '../data/enemies.json';
 
 // Generate procedural levels
@@ -54,6 +55,7 @@ const LEVELS: Record<string, LevelConfig> = {
   greenway: greenwayData as LevelConfig,
   greenwayGenerated: greenwayGeneratedData as LevelConfig,
   mossTitanArena: mossTitanArenaData as LevelConfig,
+  theMedulla: theMedullaData as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -352,6 +354,12 @@ export class GameScene extends Phaser.Scene {
       } else if (t.type === 'greenwayDoor') {
         // Door to Greenway with dialogue
         this.createGreenwayDoor(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'skeleton') {
+        // Skeleton with new weapon
+        this.createSkeletonVisual(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'lavaDoor') {
+        // Lava door to The Medulla
+        this.createLavaDoor(t.x, t.y, t.width, t.height);
       }
     });
     
@@ -992,6 +1000,70 @@ export class GameScene extends Phaser.Scene {
     });
     this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
   }
+  
+  showMossTitanVictory(): void {
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+    
+    // Background bar
+    const bgBar = this.add.rectangle(centerX, centerY, 0, 80, 0x000000, 0.9);
+    bgBar.setScrollFactor(0);
+    bgBar.setDepth(1000);
+    
+    // Victory text - green fancy letters
+    const victoryText = this.add.text(centerX, centerY, 'MOSS TITAN HAS BEEN DEFEATED', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '36px',
+      color: '#44ff44',
+      fontStyle: 'bold italic',
+      stroke: '#000000',
+      strokeThickness: 6,
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: '#006600',
+        blur: 5,
+        fill: true
+      }
+    });
+    victoryText.setOrigin(0.5);
+    victoryText.setScrollFactor(0);
+    victoryText.setDepth(1001);
+    victoryText.setAlpha(0);
+    
+    // Animate in
+    this.tweens.add({
+      targets: bgBar,
+      width: 700,
+      duration: 400,
+      ease: 'Power2'
+    });
+    
+    this.tweens.add({
+      targets: victoryText,
+      alpha: 1,
+      scale: { from: 0.8, to: 1 },
+      duration: 600,
+      delay: 300,
+      ease: 'Elastic.easeOut'
+    });
+    
+    // Hold for 4 seconds, then transition to The Medulla
+    this.time.delayedCall(4000, () => {
+      this.tweens.add({
+        targets: [victoryText, bgBar],
+        alpha: 0,
+        duration: 500,
+        ease: 'Power2',
+        onComplete: () => {
+          victoryText.destroy();
+          bgBar.destroy();
+          // Transition to The Medulla room
+          this.transitionToLevel('theMedulla', 'fromBoss');
+        }
+      });
+    });
+  }
 
   /**
    * Handle player death - drop currency, show death screen
@@ -1187,6 +1259,15 @@ export class GameScene extends Phaser.Scene {
         this.emitUIEvent('showGreenwayDialog', null);
       }
     }
+    
+    // Check lava door interaction
+    if (this.lavaDoorZone && this.lavaDoorPromptText) {
+      const inRange = this.physics.overlap(this.player, this.lavaDoorZone);
+      this.lavaDoorPromptText.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.emitUIEvent('showTheMedullaDialog', null);
+      }
+    }
   }
   
   private createChainVisual(x: number, y: number, width: number, height: number): void {
@@ -1362,6 +1443,127 @@ export class GameScene extends Phaser.Scene {
     // Interaction zone
     this.greenwayDoorZone = this.add.zone(doorX, doorY, width + 40, height + 40);
     this.physics.add.existing(this.greenwayDoorZone, true);
+  }
+  
+  private createSkeletonVisual(x: number, y: number, width: number, height: number): void {
+    const centerX = x + width / 2;
+    const centerY = y + height / 2;
+    
+    // Skeleton body (ribcage)
+    const ribcage = this.add.rectangle(centerX, centerY - 10, 20, 25, 0xcccccc);
+    ribcage.setDepth(6);
+    
+    // Skull
+    const skull = this.add.ellipse(centerX, centerY - 30, 15, 18, 0xd0d0d0);
+    skull.setDepth(7);
+    
+    // Eye sockets
+    this.add.ellipse(centerX - 4, centerY - 32, 4, 5, 0x1a1a20).setDepth(8);
+    this.add.ellipse(centerX + 4, centerY - 32, 4, 5, 0x1a1a20).setDepth(8);
+    
+    // Arms
+    this.add.rectangle(centerX - 12, centerY - 5, 5, 25, 0xcccccc).setDepth(6);
+    this.add.rectangle(centerX + 12, centerY - 5, 5, 25, 0xcccccc).setDepth(6);
+    
+    // Legs
+    this.add.rectangle(centerX - 5, centerY + 15, 6, 20, 0xcccccc).setDepth(6);
+    this.add.rectangle(centerX + 5, centerY + 15, 6, 20, 0xcccccc).setDepth(6);
+    
+    // New weapon (placeholder - glowing sword)
+    const weapon = this.add.rectangle(centerX + 20, centerY, 5, 35, 0x44aaff);
+    weapon.setDepth(7);
+    const weaponGlow = this.add.rectangle(centerX + 20, centerY, 8, 38, 0x4488ff, 0.3);
+    weaponGlow.setDepth(6);
+    
+    // Weapon glow animation
+    this.tweens.add({
+      targets: weaponGlow,
+      alpha: { from: 0.3, to: 0.6 },
+      duration: 1000,
+      yoyo: true,
+      repeat: -1
+    });
+    
+    // Faint glow around skeleton
+    const glow = this.add.ellipse(centerX, centerY, 50, 60, 0xffffff, 0.05);
+    glow.setDepth(5);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.03, to: 0.08 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1
+    });
+  }
+  
+  private lavaDoorZone: Phaser.GameObjects.Zone | null = null;
+  private lavaDoorPromptText: Phaser.GameObjects.Text | null = null;
+  
+  private createLavaDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+    
+    // Door frame with burnt stone texture
+    const frame = this.add.rectangle(doorX, doorY, width + 20, height + 10, 0x2a2020);
+    frame.setDepth(5);
+    
+    // Door panels with lava cracks
+    const door = this.add.rectangle(doorX, doorY, width, height, 0x3a3030);
+    door.setDepth(6);
+    
+    // Lava crack lines
+    const crack1 = this.add.rectangle(doorX - 6, doorY - 20, 2, 40, 0xff6600).setDepth(7);
+    const crack2 = this.add.rectangle(doorX + 8, doorY + 15, 2, 30, 0xff4400).setDepth(7);
+    const crack3 = this.add.rectangle(doorX, doorY, 3, 25, 0xff5500).setDepth(7);
+    
+    // Lava glow
+    const glow = this.add.rectangle(doorX, doorY, width + 30, height + 20, 0xff4400, 0.15);
+    glow.setDepth(4);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.1, to: 0.25 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1
+    });
+    
+    // Lava dripping effect
+    for (let i = 0; i < 5; i++) {
+      const drop = this.add.ellipse(doorX - 10 + i * 8, doorY - height / 2, 3, 5, 0xff6600, 0.8);
+      drop.setDepth(8);
+      
+      // Animate lava drip
+      this.tweens.add({
+        targets: drop,
+        y: doorY + height / 2,
+        alpha: 0,
+        scaleY: 0.3,
+        duration: 1500 + i * 300,
+        delay: i * 200,
+        repeat: -1,
+        onStart: () => {
+          drop.setAlpha(0.8);
+          drop.setScale(1);
+          drop.setY(doorY - height / 2);
+        },
+        ease: 'Linear'
+      });
+    }
+    
+    // Prompt text - store reference for update loop
+    this.lavaDoorPromptText = this.add.text(doorX, doorY + 60, '[ENTER]', {
+      fontSize: '14px',
+      color: '#ff6600',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    });
+    this.lavaDoorPromptText.setOrigin(0.5);
+    this.lavaDoorPromptText.setDepth(100);
+    this.lavaDoorPromptText.setVisible(false);
+    
+    // Interaction zone
+    this.lavaDoorZone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(this.lavaDoorZone, true);
   }
   
   // Greenway environment visuals
