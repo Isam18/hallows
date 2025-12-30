@@ -828,8 +828,14 @@ export class GameScene extends Phaser.Scene {
       spawnId = 'default';
     }
     
-    this.cameras.main.fadeOut(200, 0, 0, 0);
+    console.log(`[TRANSITION] From ${this.levelId} to ${levelId} (spawn: ${spawnId})`);
+    
+    // Fade out camera
+    this.cameras.main.fadeOut(300, 0, 0, 0);
+    
+    // Wait for fade to complete, then restart scene with new level
     this.cameras.main.once('camerafadeoutcomplete', () => {
+      console.log(`[TRANSITION] Fade complete, restarting scene...`);
       this.scene.restart({ levelId, spawnId });
     });
   }
