@@ -251,7 +251,7 @@ function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRo
       type: 'platform'
     } as any);
     
-    // Mosskin on alternating platforms
+  // Mosskin on alternating platforms
     if (i % 2 === 1) {
       enemies.push({
         type: 'mosskin',
@@ -259,6 +259,15 @@ function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRo
         y: py - 30
       });
     }
+  }
+  
+  // Moss Warrior guardian (60% chance)
+  if (random() > 0.4) {
+    enemies.push({
+      type: 'mossWarrior',
+      x: xOffset + ROOM_WIDTH / 2,
+      y: ROOM_HEIGHT - 180
+    });
   }
   
   // Add stepping stones in acid for emergency recovery
@@ -436,6 +445,15 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
       type: 'squit',
       x: xOffset + randomInt(100, ROOM_WIDTH - 100),
       y: randomInt(100, ROOM_HEIGHT - 200)
+    });
+  }
+  
+  // Moss Warrior guarding the ascent (50% chance)
+  if (random() > 0.5) {
+    enemies.push({
+      type: 'mossWarrior',
+      x: xOffset + ROOM_WIDTH / 2,
+      y: ROOM_HEIGHT - 250
     });
   }
   
@@ -661,8 +679,8 @@ function generateThicketGauntlet(roomIndex: number, xOffset: number): GreenwayRo
     { type: 'mosskin', x: xOffset + ROOM_WIDTH - 180, y: ROOM_HEIGHT - 90 }
   );
   
-  // Moss Warrior guarding the hidden geo (rare spawn)
-  if (random() > 0.6) {
+  // Moss Warrior guarding the hidden geo (80% chance - more common now)
+  if (random() > 0.2) {
     enemies.push({
       type: 'mossWarrior',
       x: xOffset + 400,
@@ -748,6 +766,15 @@ function generateInfectedOvergrowth(roomIndex: number, xOffset: number): Greenwa
       type: 'squit',
       x: xOffset + 100 + randomInt(0, ROOM_WIDTH - 200),
       y: randomInt(100, ROOM_HEIGHT - 250)
+    });
+  }
+  
+  // Moss Warrior guarding the bridge (70% chance)
+  if (random() > 0.3) {
+    enemies.push({
+      type: 'mossWarrior',
+      x: xOffset + ROOM_WIDTH - 150,
+      y: ROOM_HEIGHT - 140
     });
   }
   
