@@ -32,15 +32,15 @@ const Index = () => {
   const [showZoneTransition, setShowZoneTransition] = useState(false);
   const [transitionZone, setTransitionZone] = useState('');
 
-  // Handle victory continue - transition to chain room
+  // Handle victory continue - transition to The Medulla
   const handleVictoryContinue = useCallback(() => {
     gameState.setBossDefeated(true);
     gameState.setState('playing');
     
-    // Get the game scene and transition to chain room
+    // Get the game scene and transition to The Medulla
     const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
     if (gameScene) {
-      gameScene.transitionToLevel?.('chainRoom', 'fromBoss');
+      gameScene.transitionToLevel?.('theMedulla', 'fromBoss');
     }
   }, []);
 
@@ -101,8 +101,32 @@ const Index = () => {
 
   const handleTheMedullaDialogYes = useCallback(() => {
     setShowTheMedullaDialog(false);
-    setTransitionZone('THE MEDULLA');
+    setTransitionZone('THE MEDULLA\nThe burnt lands');
     setShowZoneTransition(true);
+  }, []);
+
+  const handleTheMedullaDialogNoTransition = useCallback(() => {
+    setShowZoneTransition(false);
+    gameState.setState('playing');
+    
+    // Get the game scene and move player back away from the door
+    const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
+    if (gameScene && gameScene.player) {
+      // Move player to the left, away from the lava door
+      gameScene.player.x = 100;
+    }
+  }, []);
+
+  // Handle Medulla zone transition complete
+  const handleMedullaTransitionComplete = useCallback(() => {
+    setShowZoneTransition(false);
+    gameState.setState('playing');
+    
+    // Get the game scene and transition to medulla
+    const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
+    if (gameScene) {
+      gameScene.transitionToLevel('theMedullaRoom', 'default');
+    }
   }, []);
 
   useEffect(() => {
@@ -188,7 +212,7 @@ const Index = () => {
       {showEnding && <ToBeContinued onMainMenu={handleEndingMainMenu} onStay={handleEndingStay} />}
       {showGreenwayDialog && <GreenDoorDialog onYes={handleGreenwayDialogYes} onNo={handleGreenwayDialogNo} />}
       {showTheMedullaDialog && <TheMedullaDialog onYes={handleTheMedullaDialogYes} onNo={handleTheMedullaDialogNo} />}
-      {showZoneTransition && <ZoneTransition zoneName={transitionZone} onComplete={handleZoneTransitionComplete} />}
+      {showZoneTransition && <ZoneTransition zoneName={transitionZone} onComplete={transitionZone.includes('MEDULLA') ? handleMedullaTransitionComplete : handleZoneTransitionComplete} />}
     </div>
   );
 };

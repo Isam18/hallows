@@ -29,33 +29,25 @@ export function TheMedullaDialog({ onYes, onNo }: TheMedullaDialogProps) {
           {/* Fiery glow effect */}
           <div className="absolute inset-0 bg-orange-500/5 pointer-events-none" />
 
-          {/* Big fiery THE MEDULLA text */}
-          <div className="relative z-10 mb-4">
-            <h1 className="text-5xl md:text-6xl font-bold tracking-widest bg-gradient-to-b from-orange-400 via-orange-500 to-red-600 bg-clip-text text-transparent drop-shadow-lg animate-pulse">
-              THE MEDULLA
-            </h1>
+          {/* Warning message */}
+          <div className="relative z-10 mb-6">
+            <p className="text-orange-200 text-xl md:text-2xl leading-relaxed font-medium drop-shadow-md">
+              The door seems hot. Whatever is on the other side must be dangerous.
+            </p>
+            <p className="text-orange-300 text-2xl mt-4 font-bold tracking-wide">
+              Would you still proceed?
+            </p>
           </div>
-
-          {/* Lava dripping lines */}
-          <div className="relative z-10 flex justify-center gap-2 mb-6">
-            {[...Array(8)].map((_, i) => (
-              <div
-                key={i}
-                className="w-1 h-8 bg-gradient-to-b from-orange-400 to-red-600 rounded-full"
-                style={{
-                  animation: `lavaDripText 2s ${i * 0.15}s infinite`,
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Subtitle */}
-          <p className="relative z-10 text-orange-300 text-2xl mb-8 font-title tracking-wide italic drop-shadow-md">
-            the burnt lands
-          </p>
 
           {/* Decorative Line */}
-          <div className="relative z-10 w-48 h-0.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-8" />
+          <div className="relative z-10 w-48 h-0.5 bg-gradient-to-r from-transparent via-orange-500 to-transparent mx-auto mb-6" />
+
+          {/* Small THE MEDULLA label */}
+          <div className="relative z-10 mb-6">
+            <p className="text-orange-400 text-lg italic tracking-widest">
+              THE MEDULLA
+            </p>
+          </div>
 
           {/* Buttons */}
           <div className="relative z-10 flex gap-4 justify-center">
@@ -74,36 +66,45 @@ export function TheMedullaDialog({ onYes, onNo }: TheMedullaDialogProps) {
           </div>
         </div>
       </div>
-
-      <style jsx>{`
-        @keyframes lavaDrip {
-          0% {
-            transform: translateY(-10px);
-            opacity: 0.6;
-            height: 20px;
-          }
-          50% {
-            opacity: 0.8;
-            height: 40px;
-          }
-          100% {
-            transform: translateY(400px);
-            opacity: 0;
-            height: 20px;
-          }
-        }
-
-        @keyframes lavaDripText {
-          0% {
-            transform: translateY(0);
-            opacity: 0.8;
-          }
-          100% {
-            transform: translateY(15px);
-            opacity: 0;
-          }
-        }
-      `}</style>
     </div>
   );
+}
+
+// Add global styles for animations
+if (typeof document !== 'undefined') {
+  const styleId = 'medulla-dialog-animations';
+  if (!document.getElementById(styleId)) {
+    const style = document.createElement('style');
+    style.id = styleId;
+    style.textContent = `
+      @keyframes lavaDrip {
+        0% {
+          transform: translateY(-10px);
+          opacity: 0.6;
+          height: 20px;
+        }
+        50% {
+          opacity: 0.8;
+          height: 40px;
+        }
+        100% {
+          transform: translateY(400px);
+          opacity: 0;
+          height: 20px;
+        }
+      }
+
+      @keyframes lavaDripText {
+        0% {
+          transform: translateY(0);
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(15px);
+          opacity: 0;
+        }
+      }
+    `;
+    document.head.appendChild(style);
+  }
 }
