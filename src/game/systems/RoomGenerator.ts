@@ -132,6 +132,15 @@ function generateVerticalShaft(roomIndex: number, xOffset: number): RoomData {
     });
   }
   
+  // Sometimes add an infected husk on a lower platform
+  if (randomInt(0, 1) === 1) {
+    enemies.push({
+      type: 'infectedHusk',
+      x: xOffset + randomInt(150, ROOM_WIDTH - 150),
+      y: ROOM_HEIGHT - 150
+    });
+  }
+  
   // Random pickup positions on platforms
   const pickups: PickupConfig[] = [];
   const pickupCount = randomInt(1, 3);
@@ -197,17 +206,23 @@ function generateGuardedCorridor(roomIndex: number, xOffset: number): RoomData {
     });
   }
   
-  // Randomized Husk Guard positions (at least 2 per the requirement)
+  // Husk Guard positions - both on the RIGHT side to make it easier
   const guardCount = 2;
-  const guardSpacing = (ROOM_WIDTH - 300) / guardCount;
   
   for (let i = 0; i < guardCount; i++) {
     enemies.push({
       type: 'huskGuard',
-      x: xOffset + 150 + (i * guardSpacing) + randomInt(-30, 30),
+      x: xOffset + 550 + (i * 100) + randomInt(-20, 20),
       y: ROOM_HEIGHT - 120
     });
   }
+  
+  // Add 1 regular husk on the right side with the guards
+  enemies.push({
+    type: 'crawlingHusk',
+    x: xOffset + 650 + randomInt(-30, 30),
+    y: ROOM_HEIGHT - 80
+  });
   
   // BREAKABLE BACKGROUND OBJECTS (old signposts and poles that drop currency)
   const breakableCount = randomInt(2, 4);
@@ -221,12 +236,12 @@ function generateGuardedCorridor(roomIndex: number, xOffset: number): RoomData {
     });
   }
   
-  // Random ground enemies (fewer since we have guards)
+  // Only add spiky grubs on the LEFT side (safe from guards)
   const grubCount = randomInt(0, 2);
   for (let i = 0; i < grubCount; i++) {
     enemies.push({
-      type: randomChoice(['spikyGrub', 'crawlingHusk']),
-      x: xOffset + randomInt(80, ROOM_WIDTH - 80),
+      type: 'spikyGrub',
+      x: xOffset + randomInt(80, 300),
       y: ROOM_HEIGHT - 80
     });
   }
@@ -505,7 +520,8 @@ function generateBossRoom(roomIndex: number, xOffset: number): RoomData {
  * Generate randomized room order with constraints
  */
 function generateRoomOrder(): RoomType[] {
-  // Must have: at least 2 resting stations, 2-3 guarded corridors, 1-2 vertical shafts, 1-2 cul-de-sacs
+  // Must have: at least 2 resting stations, 2-3 guarded corridors, 1-2 vertical shafts
+  // Removed infectedCuldesac rooms (too hard with parkour)
   const roomPool: RoomType[] = [
     'guardedCorridor',
     'guardedCorridor',
@@ -514,8 +530,8 @@ function generateRoomOrder(): RoomType[] {
     'verticalShaft',
     'restingStation',
     'restingStation',
-    'infectedCuldesac',
-    'infectedCuldesac',
+    'restingStation',
+    'guardedCorridor',
     'guardedCorridor'
   ];
   
@@ -528,13 +544,7 @@ function generateRoomOrder(): RoomType[] {
     [shuffled[0], shuffled[corridorIndex]] = [shuffled[corridorIndex], shuffled[0]];
   }
   
-  // Ensure last room before boss isn't a cul-de-sac (need exit)
-  if (shuffled[9] === 'infectedCuldesac') {
-    const swapIndex = shuffled.findIndex((r, i) => i < 9 && r !== 'infectedCuldesac');
-    if (swapIndex >= 0) {
-      [shuffled[9], shuffled[swapIndex]] = [shuffled[swapIndex], shuffled[9]];
-    }
-  }
+  // Infected husks are now added to guarded corridors instead of separate rooms
   
   return shuffled;
 }
@@ -608,19 +618,17 @@ export function generateForgottenCrossroads(): LevelConfig {
     const roomType = roomOrder[i];
     const xPos = (i + 1) * ROOM_WIDTH - 30;
     
-    // Skip transition for cul-de-sac (dead end)
-    if (roomType !== 'infectedCuldesac') {
-      allTriggers.push({
-        id: `transition_room${i}_to_room${i + 1}`,
-        type: 'transition',
-        x: xPos,
-        y: ROOM_HEIGHT - 150,
-        width: 30,
-        height: 100,
-        target: 'forgottenCrossroads',
-        targetSpawn: `room${i + 1}_entry`
-      });
-    }
+    // All rooms now have transitions (removed cul-de-sac dead ends)
+    allTriggers.push({
+      id: `transition_room${i}_to_room${i + 1}`,
+      type: 'transition',
+      x: xPos,
+      y: ROOM_HEIGHT - 150,
+      width: 30,
+      height: 100,
+      target: 'forgottenCrossroads',
+      targetSpawn: `room${i + 1}_entry`
+    });
   }
   
   return {
