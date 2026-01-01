@@ -12,6 +12,7 @@ import { CharmShop } from '@/components/game/CharmShop';
 import { ClimbingOverlay } from '@/components/game/ClimbingOverlay';
 import { ToBeContinued } from '@/components/game/ToBeContinued';
 import { GreenDoorDialog } from '@/components/game/GreenDoorDialog';
+import { TheMedullaDialog } from '@/components/game/TheMedullaDialog';
 import { ZoneTransition } from '@/components/game/ZoneTransition';
 
 const Index = () => {
@@ -27,18 +28,19 @@ const Index = () => {
   const [showClimbing, setShowClimbing] = useState(false);
   const [showEnding, setShowEnding] = useState(false);
   const [showGreenwayDialog, setShowGreenwayDialog] = useState(false);
+  const [showTheMedullaDialog, setShowTheMedullaDialog] = useState(false);
   const [showZoneTransition, setShowZoneTransition] = useState(false);
   const [transitionZone, setTransitionZone] = useState('');
 
-  // Handle victory continue - transition to chain room
+  // Handle victory continue - transition to The Medulla
   const handleVictoryContinue = useCallback(() => {
     gameState.setBossDefeated(true);
     gameState.setState('playing');
     
-    // Get the game scene and transition to chain room
+    // Get the game scene and transition to The Medulla
     const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
     if (gameScene) {
-      gameScene.transitionToLevel?.('chainRoom', 'fromBoss');
+      gameScene.transitionToLevel?.('theMedulla', 'fromBoss');
     }
   }, []);
 
@@ -91,6 +93,42 @@ const Index = () => {
     }
   }, []);
 
+  // Handle The Medulla door dialog
+  const handleTheMedullaDialogNo = useCallback(() => {
+    setShowTheMedullaDialog(false);
+    gameState.setState('playing');
+  }, []);
+
+  const handleTheMedullaDialogYes = useCallback(() => {
+    setShowTheMedullaDialog(false);
+    setTransitionZone('THE MEDULLA\nThe burnt lands');
+    setShowZoneTransition(true);
+  }, []);
+
+  const handleTheMedullaDialogNoTransition = useCallback(() => {
+    setShowZoneTransition(false);
+    gameState.setState('playing');
+    
+    // Get the game scene and move player back away from the door
+    const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
+    if (gameScene && gameScene.player) {
+      // Move player to the left, away from the lava door
+      gameScene.player.x = 100;
+    }
+  }, []);
+
+  // Handle Medulla zone transition complete
+  const handleMedullaTransitionComplete = useCallback(() => {
+    setShowZoneTransition(false);
+    gameState.setState('playing');
+    
+    // Get the game scene and transition to medulla
+    const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
+    if (gameScene) {
+      gameScene.transitionToLevel('theMedullaRoom', 'default');
+    }
+  }, []);
+
   useEffect(() => {
     if (gameContainer.current && !gameRef.current) {
       gameRef.current = createGame(gameContainer.current);
@@ -123,6 +161,9 @@ const Index = () => {
               gameState.setState('bench');
             } else if (event === 'showGreenwayDialog') {
               setShowGreenwayDialog(true);
+              gameState.setState('bench');
+            } else if (event === 'showTheMedullaDialog') {
+              setShowTheMedullaDialog(true);
               gameState.setState('bench');
             }
             // Clear the event
@@ -160,7 +201,7 @@ const Index = () => {
           )}
           {uiState === 'paused' && <PauseMenu gameRef={gameRef} />}
           {uiState === 'death' && <DeathScreen gameRef={gameRef} />}
-          {uiState === 'bench' && !showShop && !showClimbing && !showEnding && !showGreenwayDialog && <BenchScreen gameRef={gameRef} />}
+          {uiState === 'bench' && !showShop && !showClimbing && !showEnding && !showGreenwayDialog && !showTheMedullaDialog && <BenchScreen gameRef={gameRef} />}
           {uiState === 'victory' && <VictoryScreen onContinue={handleVictoryContinue} />}
         </div>
       )}
@@ -170,7 +211,8 @@ const Index = () => {
       {showClimbing && <ClimbingOverlay onComplete={handleClimbingComplete} />}
       {showEnding && <ToBeContinued onMainMenu={handleEndingMainMenu} onStay={handleEndingStay} />}
       {showGreenwayDialog && <GreenDoorDialog onYes={handleGreenwayDialogYes} onNo={handleGreenwayDialogNo} />}
-      {showZoneTransition && <ZoneTransition zoneName={transitionZone} onComplete={handleZoneTransitionComplete} />}
+      {showTheMedullaDialog && <TheMedullaDialog onYes={handleTheMedullaDialogYes} onNo={handleTheMedullaDialogNo} />}
+      {showZoneTransition && <ZoneTransition zoneName={transitionZone} onComplete={transitionZone.includes('MEDULLA') ? handleMedullaTransitionComplete : handleZoneTransitionComplete} />}
     </div>
   );
 };

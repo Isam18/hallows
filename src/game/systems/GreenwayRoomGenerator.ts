@@ -142,8 +142,9 @@ function generateOvergrownParkour(roomIndex: number, xOffset: number): GreenwayR
       y: p.y,
       width: p.width,
       height: 18,
-      type: 'platform'
-    } as any);
+      type: 'platform',
+      mossy: true
+    } as PlatformConfig);
   });
   
   // Add stepping stones in longer acid sections for safety
@@ -248,8 +249,9 @@ function generateMosskinGauntlet(roomIndex: number, xOffset: number): GreenwayRo
       y: py,
       width,
       height: 20,
-      type: 'platform'
-    } as any);
+      type: 'platform',
+      mossy: true
+    } as PlatformConfig);
     
   // Mosskin on alternating platforms
     if (i % 2 === 1) {
@@ -425,8 +427,9 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
       y: py,
       width: randomInt(60, 100),
       height: 18,
-      type: 'platform'
-    } as any);
+      type: 'platform',
+      mossy: true
+    } as PlatformConfig);
   }
   
   // Final platform near top-right exit
@@ -435,8 +438,9 @@ function generateVerticalThicket(roomIndex: number, xOffset: number): GreenwayRo
     y: 120,
     width: 80,
     height: 18,
-    type: 'platform'
-  } as any);
+    type: 'platform',
+    mossy: true
+  } as PlatformConfig);
   
   // Flying enemies to knock player down - use Squits in Greenway
   const flyerCount = randomInt(3, 5);
@@ -748,8 +752,9 @@ function generateInfectedOvergrowth(roomIndex: number, xOffset: number): Greenwa
       y: ROOM_HEIGHT - randomInt(130, 180),
       width: randomInt(50, 70),
       height: 18,
-      type: 'platform'
-    } as any);
+      type: 'platform',
+      mossy: true
+    } as PlatformConfig);
   }
   
   // Higher platforms for safety
@@ -910,14 +915,6 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     if (room.meleeDoors) allMeleeDoors.push(...room.meleeDoors);
   });
   
-  // Add Moss Titan boss in room 10 (last room)
-  const bossRoomX = 9 * ROOM_WIDTH;
-  allEnemies.push({
-    type: 'mossTitan',
-    x: bossRoomX + ROOM_WIDTH / 2,
-    y: ROOM_HEIGHT - 150
-  });
-  
   // Add transitions between rooms
   for (let i = 0; i < 9; i++) {
     const xPos = (i + 1) * ROOM_WIDTH - 30;
@@ -933,6 +930,18 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
       targetSpawn: `room${i + 1}_entry`
     });
   }
+  
+  // Transition from last room (room 9) to Moss Titan Arena
+  allTriggers.push({
+    id: 'transition_to_moss_titan_arena',
+    type: 'transition',
+    x: totalWidth - 30,
+    y: ROOM_HEIGHT - 150,
+    width: 30,
+    height: 100,
+    target: 'mossTitanArena',
+    targetSpawn: 'arena'
+  });
   
   // Exit back to chain room at the start
   allTriggers.push({
@@ -969,7 +978,7 @@ export function generateGreenway(): LevelConfig & { acidPools?: AcidPoolConfig[]
     infectionGlobules: allInfectionGlobules,
     meleeDoors: allMeleeDoors,
     biome: 'greenway'
-  } as any;
+  } as LevelConfig & { acidPools?: AcidPoolConfig[], breakableVines?: BreakableVineConfig[], movingPlatforms?: MovingPlatformConfig[] };
 }
 
 export { ROOM_WIDTH as GREENWAY_ROOM_WIDTH, ROOM_HEIGHT as GREENWAY_ROOM_HEIGHT };
