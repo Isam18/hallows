@@ -15,6 +15,9 @@ import { Mosskin } from '../entities/Mosskin';
 import { MossCreep } from '../entities/MossCreep';
 import { MossWarrior } from '../entities/MossWarrior';
 import { Squit } from '../entities/Squit';
+import { SkullScuttler } from '../entities/SkullScuttler';
+import { AdaptedSkuller } from '../entities/AdaptedSkuller';
+import { SkullRavanger } from '../entities/SkullRavanger';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { Pickup } from '../entities/Pickup';
@@ -24,6 +27,8 @@ import { DeathMarker } from '../entities/DeathMarker';
 import { Spike } from '../entities/Spike';
 import { Breakable } from '../entities/Breakable';
 import { AcidPool } from '../entities/AcidPool';
+import { Lava } from '../entities/Lava';
+import { Magma } from '../entities/Magma';
 import { MeleeDoor } from '../entities/MeleeDoor';
 import { InfectionGlobule, InfectionParticles } from '../entities/InfectionGlobule';
 import { ParallaxBackground } from '../systems/ParallaxBackground';
@@ -71,6 +76,8 @@ export class GameScene extends Phaser.Scene {
   private spikes!: Phaser.Physics.Arcade.StaticGroup;
   private breakables!: Phaser.Physics.Arcade.StaticGroup;
   private acidPools!: Phaser.Physics.Arcade.StaticGroup;
+  private lavaPools!: Phaser.Physics.Arcade.StaticGroup;
+  private magmaPlatforms!: Phaser.Physics.Arcade.StaticGroup;
   private meleeDoors!: Phaser.Physics.Arcade.StaticGroup;
   private deathMarker: DeathMarker | null = null;
   private boss: Boss | null = null;
@@ -154,6 +161,8 @@ export class GameScene extends Phaser.Scene {
     this.spikes = this.physics.add.staticGroup();
     this.breakables = this.physics.add.staticGroup();
     this.acidPools = this.physics.add.staticGroup();
+    this.lavaPools = this.physics.add.staticGroup();
+    this.magmaPlatforms = this.physics.add.staticGroup();
     this.meleeDoors = this.physics.add.staticGroup();
     
     // Create visual effects based on level biome
@@ -391,6 +400,23 @@ export class GameScene extends Phaser.Scene {
           // Squit - Greenway flying enemy with lunge attack
           const squit = new Squit(this, e.x, e.y, config);
           this.enemies.add(squit);
+        } else if (e.type === 'skullScuttler') {
+          // Skull Scuttler - passive patrol enemy
+          const skullScuttler = new SkullScuttler(this, e.x, e.y, config);
+          this.enemies.add(skullScuttler);
+        } else if (e.type === 'adaptedSkuller') {
+          // Adapted Skuller - rare aggressive variant with charge
+          const adaptedSkuller = new AdaptedSkuller(this, e.x, e.y, config);
+          this.enemies.add(adaptedSkuller);
+        } else if (e.type === 'skullRavanger') {
+          // Skull Ravager - mini boss
+          const skullRavanger = new SkullRavanger(this, e.x, e.y);
+          this.boss = skullRavanger as any;
+          this.physics.add.collider(skullRavanger, this.platforms);
+          this.physics.add.collider(skullRavanger, this.walls);
+          this.physics.add.overlap(this.player, skullRavanger,
+            () => this.handlePlayerBossContact()
+          );
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
@@ -461,6 +487,22 @@ export class GameScene extends Phaser.Scene {
       });
     }
     
+    // Lava pools (The Medulla hazard)
+    if ((this.currentLevel as any).lavaPools) {
+      (this.currentLevel as any).lavaPools.forEach((l: any) => {
+        const lava = new Lava(this, l.x, l.y, l.width, l.height || 40);
+        this.lavaPools.add(lava);
+      });
+    }
+    
+    // Magma platforms (The Medulla - replace normal platforms)
+    if ((this.currentLevel as any).magmaPlatforms) {
+      (this.currentLevel as any).magmaPlatforms.forEach((m: any) => {
+        const magma = new Magma(this, m.x, m.y, m.width, m.height || 20);
+        this.magmaPlatforms.add(magma);
+      });
+    }
+    
     // Melee doors
     if ((this.currentLevel as any).meleeDoors) {
       (this.currentLevel as any).meleeDoors.forEach((d: any) => {
@@ -521,6 +563,23 @@ export class GameScene extends Phaser.Scene {
       (player, acid) => {
         const a = acid as AcidPool;
         a.onPlayerContact(this.player, this.lastSafeX, this.lastSafeY);
+      }
+    );
+    
+    // Player vs lava pools (The Medulla hazard)
+    this.physics.add.overlap(this.player, this.lavaPools,
+      (player, lava) => {
+        const l = lava as Lava;
+        l.onPlayerContact(this.player);
+      }
+    );
+    
+    // Player vs magma platforms (The Medulla - time-based damage)
+    this.physics.add.collider(this.player, this.magmaPlatforms);
+    this.physics.add.overlap(this.player, this.magmaPlatforms,
+      (player, magma) => {
+        const m = magma as Magma;
+        m.onPlayerContact(this.player);
       }
     );
     
