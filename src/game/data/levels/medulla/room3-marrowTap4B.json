@@ -1,0 +1,112 @@
+{
+  "id": "medullaRoom3",
+  "name": "Marrow-Tap 4-B",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#2a0808",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 750, "width": 1200, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 710, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 710, "type": "wall" }
+  ],
+  "magmaPlatforms": [],
+  "lavaPools": [
+    { "x": 0, "y": 720, "width": 1200, "height": 80 }
+  ],
+  "enemies": [
+    { "type": "adaptedSkuller", "x": 200, "y": 700 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "femurPipe1",
+      "type": "decoration",
+      "x": 100,
+      "y": 300,
+      "width": 100,
+      "height": 400
+    },
+    {
+      "id": "femurPipe2",
+      "type": "decoration",
+      "x": 300,
+      "y": 300,
+      "width": 100,
+      "height": 400
+    },
+    {
+      "id": "femurPipe3",
+      "type": "decoration",
+      "x": 500,
+      "y": 300,
+      "width": 100,
+      "height": 400
+    },
+    {
+      "id": "slimeZone1",
+      "type": "hazard",
+      "x": 100,
+      "y": 650,
+      "width": 400,
+      "height": 100,
+      "damage": 0,
+      "effect": "slow"
+    },
+    {
+      "id": "slimeZone2",
+      "type": "hazard",
+      "x": 600,
+      "y": 550,
+      "width": 300,
+      "height": 100,
+      "damage": 0,
+      "effect": "slow"
+    },
+    {
+      "id": "platform1",
+      "type": "platform",
+      "x": 100,
+      "y": 550,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platform2",
+      "type": "platform",
+      "x": 600,
+      "y": 450,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platform3",
+      "type": "platform",
+      "x": 200,
+      "y": 300,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 250,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom4",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 560, "y": 150 }
+  },
+  "special": {
+    "slimePools": true,
+    "slowMovement": true,
+    "bruteExitGuard": true
+  }
+}

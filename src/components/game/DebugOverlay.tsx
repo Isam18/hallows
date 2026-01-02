@@ -25,7 +25,8 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
     if (!visible || !gameRef) return;
 
     const interval = setInterval(() => {
-      const scene = gameRef.scene.getScene('GameScene') as any;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const scene = gameRef.scene.getScene('GameScene') as any; // eslint-disable-line @typescript-eslint/no-explicit-any
       if (scene?.player) {
         setDebugState(scene.player.getDebugState());
       }
@@ -59,6 +60,15 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
       <span className="w-12 text-right font-mono">{value}ms</span>
     </div>
   );
+
+  const handleTeleport = (roomId: string) => {
+    if (!gameRef) return;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scene = gameRef.scene.getScene('GameScene') as any;
+    if (scene && scene.loadRoom) {
+      scene.loadRoom(roomId);
+    }
+  };
 
   return (
     <div className="fixed top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-4 font-mono text-sm z-50 min-w-[280px] shadow-lg">
@@ -109,6 +119,55 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
         <TimerBar label="Dash Buf" value={debugState.dashBufferTimer} max={100} color="bg-purple-400" />
         <TimerBar label="Wall Stick" value={debugState.wallStickTimer} max={80} color="bg-yellow-500" />
         <TimerBar label="WJ Lock" value={debugState.wallJumpLockout} max={150} color="bg-orange-500" />
+      </div>
+
+      {/* Teleport Section */}
+      <div className="mt-3 pt-2 border-t border-border">
+        <div className="text-xs font-semibold text-muted-foreground mb-2">Teleport to Medulla</div>
+        <div className="grid grid-cols-2 gap-1.5">
+          <button
+            onClick={() => handleTeleport('medullaRoom1')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+          >
+            Room 1: Rib-Gate
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom2')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+          >
+            Room 2: Shaft
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom3')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+          >
+            Room 3: Marrow-Tap
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom4')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+          >
+            Room 4: Vertebrae
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom5')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+          >
+            Room 5: Vent
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom6')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+          >
+            Room 6: Femur
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom7')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors col-span-2"
+          >
+            Room 7: Ossuary Gate
+          </button>
+        </div>
       </div>
 
       <div className="mt-3 pt-2 border-t border-border text-xs text-muted-foreground text-center">

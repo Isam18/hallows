@@ -1,0 +1,82 @@
+{
+  "id": "medullaRoom2",
+  "name": "Skittering Shaft",
+  "biome": "medulla",
+  "width": 600,
+  "height": 1200,
+  "backgroundColor": "#2a0808",
+  "spawnPoint": { "x": 500, "y": 1100 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 40, "height": 1200, "type": "wall" },
+    { "x": 560, "y": 0, "width": 40, "height": 1200, "type": "wall" },
+    { "x": 0, "y": 0, "width": 600, "height": 40, "type": "wall" }
+  ],
+  "magmaPlatforms": [
+    { "x": 40, "y": 200, "width": 40, "height": 100 },
+    { "x": 40, "y": 500, "width": 40, "height": 100 },
+    { "x": 40, "y": 800, "width": 40, "height": 100 }
+  ],
+  "lavaPools": [
+    { "x": 40, "y": 1100, "width": 520, "height": 100 }
+  ],
+  "enemies": [
+    { "type": "skullScuttler", "x": 100, "y": 300 },
+    { "type": "skullScuttler", "x": 500, "y": 600 },
+    { "type": "skullScuttler", "x": 100, "y": 900 },
+    { "type": "skullScuttler", "x": 500, "y": 400 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "platform1",
+      "type": "platform",
+      "x": 200,
+      "y": 1000,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platform2",
+      "type": "platform",
+      "x": 200,
+      "y": 750,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platform3",
+      "type": "platform",
+      "x": 200,
+      "y": 500,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platform4",
+      "type": "platform",
+      "x": 200,
+      "y": 250,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 560,
+      "y": 150,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom3",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 500, "y": 1100 },
+    "fromPrevious": { "x": 560, "y": 700 }
+  },
+  "special": {
+    "verticalClimb": true,
+    "ceilingSkutlers": true,
+    "wallMagmaPatches": true
+  }
+}
