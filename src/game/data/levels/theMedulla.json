@@ -4,7 +4,7 @@
   "biome": "medulla",
   "width": 1200,
   "height": 1000,
-  "backgroundColor": "#0a0505",
+  "backgroundColor": "#2a0808",
   "spawnPoint": { "x": 1100, "y": 900 },
   "platforms": [
     { "x": 0, "y": 950, "width": 1200, "height": 50, "type": "ground" },
