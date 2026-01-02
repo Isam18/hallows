@@ -1,51 +1,59 @@
 {
   "id": "theMedulla",
   "name": "The Medulla",
-  "width": 800,
-  "height": 900,
-  "backgroundColor": "#1a0808",
-  "spawnPoint": { "x": 100, "y": 800 },
+  "biome": "medulla",
+  "width": 1200,
+  "height": 1000,
+  "backgroundColor": "#0a0505",
+  "spawnPoint": { "x": 1100, "y": 900 },
   "platforms": [
-    { "x": 0, "y": 850, "width": 800, "height": 50, "type": "ground" },
-    { "x": 0, "y": 0, "width": 800, "height": 30, "type": "wall" },
-    { "x": 0, "y": 30, "width": 30, "height": 820, "type": "wall" },
-    { "x": 770, "y": 30, "width": 30, "height": 820, "type": "wall" },
-    { "x": 300, "y": 700, "width": 200, "height": 20, "type": "platform" },
-    { "x": 150, "y": 550, "width": 120, "height": 20, "type": "platform" },
-    { "x": 530, "y": 550, "width": 120, "height": 20, "type": "platform" }
+    { "x": 0, "y": 950, "width": 1200, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 910, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 910, "type": "wall" },
+    
+    { "x": 900, "y": 800, "width": 200, "height": 20, "type": "platform" },
+    { "x": 600, "y": 700, "width": 180, "height": 20, "type": "platform" },
+    { "x": 300, "y": 800, "width": 200, "height": 20, "type": "platform" },
+    { "x": 100, "y": 650, "width": 150, "height": 20, "type": "platform" },
+    { "x": 400, "y": 550, "width": 200, "height": 20, "type": "platform" },
+    { "x": 750, "y": 500, "width": 180, "height": 20, "type": "platform" },
+    { "x": 200, "y": 400, "width": 150, "height": 20, "type": "platform" },
+    { "x": 500, "y": 300, "width": 200, "height": 20, "type": "platform" },
+    { "x": 850, "y": 350, "width": 150, "height": 20, "type": "platform" }
   ],
   "enemies": [],
   "pickups": [],
   "triggers": [
     {
-      "id": "skeletonWithWeapon",
-      "type": "skeleton",
-      "x": 370,
-      "y": 780,
-      "width": 60,
-      "height": 70
+      "id": "cauterizedBody1",
+      "type": "decoration",
+      "x": 100,
+      "y": 600,
+      "width": 40,
+      "height": 60
     },
     {
-      "id": "lavaDoor",
-      "type": "lavaDoor",
-      "x": 720,
-      "y": 750,
-      "width": 50,
-      "height": 100
+      "id": "cauterizedBody2", 
+      "type": "decoration",
+      "x": 1100,
+      "y": 450,
+      "width": 40,
+      "height": 60
     },
     {
       "id": "exitToBoss",
       "type": "transition",
-      "x": 30,
-      "y": 750,
-      "width": 30,
+      "x": 1160,
+      "y": 850,
+      "width": 40,
       "height": 100,
       "target": "mossTitanArena",
       "targetSpawn": "default"
     }
   ],
   "spawns": {
-    "default": { "x": 100, "y": 800 },
-    "fromBoss": { "x": 100, "y": 800 }
+    "default": { "x": 1100, "y": 900 },
+    "fromBoss": { "x": 1100, "y": 900 }
   }
 }

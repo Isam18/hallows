@@ -42,14 +42,15 @@
       "height": 100
     },
     {
-      "id": "exitToRuins",
+      "id": "medullaEntrance",
       "type": "transition",
       "x": 30,
       "y": 750,
       "width": 30,
       "height": 100,
-      "target": "ruinedCrossroads",
-      "targetSpawn": "fromBoss"
+      "target": "theMedulla",
+      "targetSpawn": "default",
+      "showZoneTitle": true
     }
   ],
   "spawns": {

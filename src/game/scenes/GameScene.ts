@@ -33,6 +33,7 @@ import { generateForgottenCrossroads } from '../systems/RoomGenerator';
 import { generateGreenway } from '../systems/GreenwayRoomGenerator';
 import { GreenwayParallax } from '../systems/GreenwayParallax';
 import { LeafParticles } from '../systems/LeafParticles';
+import { MedullaParallax } from '../systems/MedullaParallax';
 
 // Import level data
 import fadingTownData from '../data/levels/fadingTown.json';
@@ -81,6 +82,7 @@ export class GameScene extends Phaser.Scene {
   // Visual systems
   private parallaxBg: ParallaxBackground | null = null;
   private greenwayParallax: GreenwayParallax | null = null;
+  private medullaParallax: MedullaParallax | null = null;
   private dustParticles: DustParticles | null = null;
   private leafParticles: LeafParticles | null = null;
   private flyingSpawner: FlyingEnemySpawner | null = null;
@@ -163,6 +165,9 @@ export class GameScene extends Phaser.Scene {
       this.greenwayParallax = new GreenwayParallax(this);
       this.leafParticles = new LeafParticles(this, this.currentLevel.height);
       this.createGreenwayEnvironment();
+    } else if (biome === 'medulla' || this.levelId === 'theMedulla') {
+      this.medullaParallax = new MedullaParallax(this);
+      this.createMedullaEnvironment();
     }
     
     // Build level
@@ -612,6 +617,11 @@ export class GameScene extends Phaser.Scene {
       // Update parallax background
       if (this.parallaxBg) {
         this.parallaxBg.update();
+      }
+      
+      // Update Medulla parallax (with time for pulsing lava)
+      if (this.medullaParallax) {
+        this.medullaParallax.update(time);
       }
       
       // Check if all enemies are dead in boss arena and summon boss
@@ -1675,6 +1685,125 @@ export class GameScene extends Phaser.Scene {
             repeat: -1
           });
         }
+      }
+    });
+  }
+  
+  // The Medulla environment visuals - volcanic hellscape
+  private createMedullaEnvironment(): void {
+    const width = this.currentLevel.width;
+    const height = this.currentLevel.height;
+    
+    // Deep volcanic gradient background
+    const bgGradient = this.add.graphics();
+    bgGradient.fillStyle(0x0a0505);
+    bgGradient.fillRect(0, 0, width, height);
+    bgGradient.setDepth(-15);
+    
+    // Add more cauterized bodies reaching from walls
+    this.createCauterizedBodies();
+    
+    // Create glowing lava cracks on the ground
+    for (let i = 0; i < 8; i++) {
+      const crackX = Phaser.Math.Between(100, width - 100);
+      const crackWidth = Phaser.Math.Between(40, 80);
+      const crack = this.add.rectangle(crackX, height - 45, crackWidth, 6, 0xff4400);
+      crack.setAlpha(0.6);
+      crack.setDepth(-4);
+      
+      // Pulse glow
+      this.tweens.add({
+        targets: crack,
+        alpha: 0.3,
+        duration: 1000 + Math.random() * 1500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    }
+    
+    // Obsidian glass reflections on platforms
+    this.currentLevel.platforms.forEach(p => {
+      if (p.type === 'platform') {
+        // Glass-like reflection on top
+        const reflection = this.add.rectangle(
+          p.x + p.width / 2,
+          p.y + 3,
+          p.width - 10,
+          4,
+          0x332020
+        );
+        reflection.setAlpha(0.5);
+        reflection.setDepth(2);
+      }
+    });
+    
+    // Ambient heat distortion zones
+    for (let i = 0; i < 5; i++) {
+      const heatX = Phaser.Math.Between(100, width - 100);
+      const heatY = Phaser.Math.Between(200, height - 200);
+      const heat = this.add.ellipse(heatX, heatY, 80, 40, 0xff2200, 0.05);
+      heat.setDepth(-3);
+      
+      // Shimmer effect
+      this.tweens.add({
+        targets: heat,
+        scaleX: 1.2,
+        scaleY: 0.8,
+        alpha: 0.02,
+        duration: 2000 + Math.random() * 1000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+    }
+  }
+  
+  // Create cauterized explorers fused into walls
+  private createCauterizedBodies(): void {
+    const height = this.currentLevel.height;
+    
+    const bodyPositions = [
+      { x: 80, y: 400, flipX: false },
+      { x: 1120, y: 500, flipX: true },
+      { x: 70, y: 700, flipX: false },
+      { x: 1130, y: 750, flipX: true },
+    ];
+    
+    bodyPositions.forEach(pos => {
+      const g = this.add.graphics();
+      g.setDepth(-8);
+      
+      const dir = pos.flipX ? -1 : 1;
+      
+      // Body merged with rock
+      g.fillStyle(0x2a1a1a, 0.9);
+      g.fillEllipse(pos.x, pos.y, 35, 55);
+      
+      // Reaching arm
+      g.lineStyle(10, 0x1a1010, 0.9);
+      g.beginPath();
+      g.moveTo(pos.x, pos.y - 15);
+      g.lineTo(pos.x + dir * 35, pos.y - 40);
+      g.lineTo(pos.x + dir * 60, pos.y - 60);
+      g.strokePath();
+      
+      // Hand
+      g.fillStyle(0x1a0808, 0.95);
+      g.fillCircle(pos.x + dir * 60, pos.y - 60, 10);
+      
+      // Spread fingers reaching out desperately
+      for (let i = 0; i < 5; i++) {
+        const angle = (i - 2) * 0.25 + (pos.flipX ? Math.PI : 0);
+        const fingerLen = 10 + Math.random() * 5;
+        g.lineStyle(3, 0x1a0808, 0.9);
+        g.beginPath();
+        g.moveTo(pos.x + dir * 60, pos.y - 60);
+        g.lineTo(
+          pos.x + dir * 60 + Math.cos(angle) * fingerLen * dir,
+          pos.y - 60 - Math.sin(angle) * fingerLen
+        );
+        g.strokePath();
       }
     });
   }
