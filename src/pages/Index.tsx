@@ -122,10 +122,10 @@ const Index = () => {
     setShowZoneTransition(false);
     gameState.setState('playing');
     
-    // Get the game scene and transition to medulla
+    // Get the game scene and transition to The Medulla
     const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
     if (gameScene) {
-      gameScene.transitionToLevel('theMedullaRoom', 'default');
+      gameScene.transitionToLevel('theMedulla', 'default');
     }
   }, []);
 
