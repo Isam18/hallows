@@ -25,17 +25,18 @@ export class MedullaParallax {
   private warningTexts: Phaser.GameObjects.Text[] = [];
   
   private static readonly COLORS = {
-    pitchBlack: 0x0a0505,
-    obsidian: 0x1a0808,
-    basalt: 0x2a1010,
-    darkRock: 0x3a1515,
+    pitchBlack: 0x1a0505,
+    obsidian: 0x2a0808,
+    basalt: 0x3a1010,
+    darkRock: 0x4a1818,
     lavaCore: 0xffffee,
     lavaBright: 0xff6600,
     lavaOrange: 0xff4400,
     lavaDark: 0xcc3300,
     ash: 0x888888,
     ashDark: 0x555555,
-    charred: 0x2a1a1a,
+    charred: 0x3a1a1a,
+    deepRed: 0x200505,
   };
 
   constructor(scene: Phaser.Scene) {
@@ -50,14 +51,14 @@ export class MedullaParallax {
   }
 
   private createTextures(): void {
-    // Far background - deep volcanic gradient with massive basalt ribs
+    // Far background - deep red volcanic gradient with massive basalt ribs
     if (!this.scene.textures.exists('medulla_bg_far')) {
       const g = this.scene.make.graphics({ x: 0, y: 0 });
       
-      // Deep volcanic gradient - pitch black to dark red
+      // Deep red volcanic gradient
       for (let y = 0; y < 600; y++) {
         const ratio = y / 600;
-        const r = Math.floor(10 + ratio * 30);
+        const r = Math.floor(30 + ratio * 40);
         const gVal = Math.floor(5 + ratio * 8);
         const b = Math.floor(5 + ratio * 5);
         g.fillStyle(Phaser.Display.Color.GetColor(r, gVal, b));

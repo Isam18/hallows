@@ -1064,7 +1064,7 @@ export class GameScene extends Phaser.Scene {
       ease: 'Elastic.easeOut'
     });
     
-    // Hold for 4 seconds, then transition to The Medulla
+    // Hold for 4 seconds, then transition to Chain Room
     this.time.delayedCall(4000, () => {
       this.tweens.add({
         targets: [victoryText, bgBar],
@@ -1074,8 +1074,8 @@ export class GameScene extends Phaser.Scene {
         onComplete: () => {
           victoryText.destroy();
           bgBar.destroy();
-          // Transition to The Medulla room
-          this.transitionToLevel('theMedulla', 'fromBoss');
+          // Transition to Chain Room first
+          this.transitionToLevel('chainRoom', 'fromBoss');
         }
       });
     });
@@ -1694,9 +1694,9 @@ export class GameScene extends Phaser.Scene {
     const width = this.currentLevel.width;
     const height = this.currentLevel.height;
     
-    // Deep volcanic gradient background
+    // Deep red volcanic gradient background
     const bgGradient = this.add.graphics();
-    bgGradient.fillStyle(0x0a0505);
+    bgGradient.fillStyle(0x2a0808);
     bgGradient.fillRect(0, 0, width, height);
     bgGradient.setDepth(-15);
     
