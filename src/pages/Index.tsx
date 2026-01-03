@@ -32,15 +32,15 @@ const Index = () => {
   const [showZoneTransition, setShowZoneTransition] = useState(false);
   const [transitionZone, setTransitionZone] = useState('');
 
-  // Handle victory continue - transition to The Medulla
+  // Handle victory continue - transition to Chain Room
   const handleVictoryContinue = useCallback(() => {
     gameState.setBossDefeated(true);
     gameState.setState('playing');
     
-    // Get the game scene and transition to The Medulla
+    // Get the game scene and transition to Chain Room (transition area before Medulla)
     const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
     if (gameScene) {
-      gameScene.transitionToLevel?.('theMedulla', 'fromBoss');
+      gameScene.transitionToLevel?.('chainRoom', 'fromBoss');
     }
   }, []);
 

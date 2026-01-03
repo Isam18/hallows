@@ -2,81 +2,62 @@
   "id": "medullaRoom2",
   "name": "Skittering Shaft",
   "biome": "medulla",
-  "width": 600,
+  "width": 800,
   "height": 1200,
-  "backgroundColor": "#2a0808",
-  "spawnPoint": { "x": 500, "y": 1100 },
+  "backgroundColor": "#1a0505",
+  "spawnPoint": { "x": 400, "y": 1050 },
   "platforms": [
-    { "x": 0, "y": 0, "width": 40, "height": 1200, "type": "wall" },
-    { "x": 560, "y": 0, "width": 40, "height": 1200, "type": "wall" },
-    { "x": 0, "y": 0, "width": 600, "height": 40, "type": "wall" }
+    { "x": 0, "y": 1150, "width": 800, "height": 50, "type": "ground", "texture": "crackedBone" },
+    { "x": 0, "y": 0, "width": 800, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 1110, "type": "wall" },
+    { "x": 760, "y": 40, "width": 40, "height": 1110, "type": "wall" },
+    { "x": 100, "y": 950, "width": 120, "height": 20, "type": "platform" },
+    { "x": 580, "y": 850, "width": 120, "height": 20, "type": "platform" },
+    { "x": 150, "y": 750, "width": 150, "height": 20, "type": "platform" },
+    { "x": 500, "y": 650, "width": 150, "height": 20, "type": "platform" },
+    { "x": 200, "y": 550, "width": 180, "height": 20, "type": "platform" },
+    { "x": 420, "y": 450, "width": 180, "height": 20, "type": "platform" },
+    { "x": 100, "y": 350, "width": 150, "height": 20, "type": "platform" },
+    { "x": 550, "y": 250, "width": 150, "height": 20, "type": "platform" },
+    { "x": 300, "y": 150, "width": 200, "height": 20, "type": "platform" }
   ],
-  "magmaPlatforms": [
-    { "x": 40, "y": 200, "width": 40, "height": 100 },
-    { "x": 40, "y": 500, "width": 40, "height": 100 },
-    { "x": 40, "y": 800, "width": 40, "height": 100 }
-  ],
-  "lavaPools": [
-    { "x": 40, "y": 1100, "width": 520, "height": 100 }
+  "magmaPools": [],
+  "magmaHazards": [
+    { "x": 0, "y": 200, "width": 30, "height": 100, "damage": 1 },
+    { "x": 770, "y": 300, "width": 30, "height": 100, "damage": 1 },
+    { "x": 0, "y": 500, "width": 30, "height": 100, "damage": 1 },
+    { "x": 770, "y": 600, "width": 30, "height": 100, "damage": 1 },
+    { "x": 0, "y": 800, "width": 30, "height": 100, "damage": 1 },
+    { "x": 770, "y": 900, "width": 30, "height": 100, "damage": 1 }
   ],
   "enemies": [
-    { "type": "skullScuttler", "x": 100, "y": 300 },
-    { "type": "skullScuttler", "x": 500, "y": 600 },
-    { "type": "skullScuttler", "x": 100, "y": 900 },
-    { "type": "skullScuttler", "x": 500, "y": 400 }
+    { "type": "skullScuttler", "x": 200, "y": 850 },
+    { "type": "skullScuttler", "x": 550, "y": 650 },
+    { "type": "skullScuttler", "x": 300, "y": 450 },
+    { "type": "skullScuttler", "x": 450, "y": 250 },
+    { "type": "skullScuttler", "x": 350, "y": 150 }
   ],
   "pickups": [],
   "triggers": [
     {
-      "id": "platform1",
-      "type": "platform",
-      "x": 200,
-      "y": 1000,
-      "width": 200,
-      "height": 30
-    },
-    {
-      "id": "platform2",
-      "type": "platform",
-      "x": 200,
-      "y": 750,
-      "width": 200,
-      "height": 30
-    },
-    {
-      "id": "platform3",
-      "type": "platform",
-      "x": 200,
-      "y": 500,
-      "width": 200,
-      "height": 30
-    },
-    {
-      "id": "platform4",
-      "type": "platform",
-      "x": 200,
-      "y": 250,
-      "width": 200,
-      "height": 30
-    },
-    {
       "id": "exit",
       "type": "transition",
-      "x": 560,
-      "y": 150,
+      "x": 40,
+      "y": 100,
       "width": 40,
       "height": 100,
       "target": "medullaRoom3",
-      "targetSpawn": "default"
+      "targetSpawn": "fromPrevious"
     }
   ],
   "spawns": {
-    "default": { "x": 500, "y": 1100 },
-    "fromPrevious": { "x": 560, "y": 700 }
+    "default": { "x": 400, "y": 1050 },
+    "fromPrevious": { "x": 760, "y": 100 },
+    "fromNext": { "x": 100, "y": 1050 }
   },
   "special": {
-    "verticalClimb": true,
-    "ceilingSkutlers": true,
-    "wallMagmaPatches": true
+    "verticalShaft": true,
+    "enemyBehavior": "spitOnJump",
+    "magmaWallPatches": true
   }
 }

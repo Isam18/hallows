@@ -26,14 +26,6 @@
       "height": 750
     },
     {
-      "id": "charmShop",
-      "type": "shop",
-      "x": 580,
-      "y": 780,
-      "width": 80,
-      "height": 70
-    },
-    {
       "id": "greenwayDoor",
       "type": "greenwayDoor",
       "x": 720,
@@ -42,20 +34,17 @@
       "height": 100
     },
     {
-      "id": "medullaEntrance",
-      "type": "transition",
+      "id": "lavaDoor",
+      "type": "lavaDoor",
       "x": 30,
       "y": 750,
-      "width": 30,
-      "height": 100,
-      "target": "theMedulla",
-      "targetSpawn": "default",
-      "showZoneTitle": true
+      "width": 50,
+      "height": 100
     }
   ],
   "spawns": {
-    "default": { "x": 100, "y": 800 },
-    "fromBoss": { "x": 100, "y": 800 },
+    "default": { "x": 200, "y": 800 },
+    "fromBoss": { "x": 200, "y": 800 },
     "fromGreenway": { "x": 700, "y": 800 }
   }
 }

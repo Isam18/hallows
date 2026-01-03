@@ -289,5 +289,25 @@
     "isMedulla": true,
     "isElite": true,
     "isBoss": true
+  },
+  "skullBrute": {
+    "id": "skullBrute",
+    "displayName": "Skull Brute",
+    "hp": 15,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 20,
+    "moveSpeedAggro": 350,
+    "aggroRangePx": 200,
+    "deaggroRangePx": 300,
+    "knockbackOnHit": { "x": 20, "y": 10 },
+    "hitstunMs": 80,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 20, "max": 35 },
+    "hurtFlashMs": 100,
+    "spriteKey": "skullBrute",
+    "width": 60,
+    "height": 55,
+    "isMedulla": true,
+    "isElite": true
   }
 }
