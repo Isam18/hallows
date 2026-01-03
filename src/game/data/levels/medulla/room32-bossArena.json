@@ -1,0 +1,80 @@
+{
+  "id": "medullaRoom32",
+  "name": "The Beast's Maw - Boss Arena",
+  "biome": "medulla",
+  "width": 1400,
+  "height": 900,
+  "backgroundColor": "#000000",
+  "spawnPoint": { "x": 1300, "y": 750 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1400, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 860, "type": "wall" },
+    { "x": 1360, "y": 40, "width": 40, "height": 860, "type": "wall" },
+    { "x": 0, "y": 850, "width": 1400, "height": 50, "type": "ground", "texture": "bossArena" },
+    { "x": 200, "y": 700, "width": 300, "height": 20, "type": "platform", "texture": "bossPlatform" },
+    { "x": 900, "y": 700, "width": 300, "height": 20, "type": "platform", "texture": "bossPlatform" },
+    { "x": 550, "y": 550, "width": 300, "height": 20, "type": "platform", "texture": "bossPlatform" },
+    { "x": 200, "y": 400, "width": 300, "height": 20, "type": "platform", "texture": "bossPlatform" },
+    { "x": 900, "y": 400, "width": 300, "height": 20, "type": "platform", "texture": "bossPlatform" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 200, "y": 780, "width": 200, "height": 70 },
+    { "x": 1000, "y": 780, "width": 200, "height": 70 }
+  ],
+  "enemies": [
+    {
+      "type": "boss",
+      "x": 700,
+      "y": 600,
+      "behavior": "boss",
+      "bossName": "The Beast",
+      "elite": true
+    }
+  ],
+  "pickups": [
+    { "type": "soul", "x": 300, "y": 750 },
+    { "type": "soul", "x": 1100, "y": 750 },
+    { "type": "soul", "x": 350, "y": 450 },
+    { "type": "soul", "x": 1050, "y": 450 },
+    { "type": "soul", "x": 700, "y": 600 }
+  ],
+  "triggers": [
+    {
+      "id": "bossArenaWalls",
+      "type": "decoration",
+      "x": 50,
+      "y": 50,
+      "width": 1300,
+      "height": 800,
+      "bossArena": true,
+      "cinematic": true
+    },
+    {
+      "id": "bossEntranceTrigger",
+      "type": "decoration",
+      "x": 1200,
+      "y": 700,
+      "width": 100,
+      "height": 100,
+      "bossIntro": true,
+      "cinematic": true
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1300, "y": 750 },
+    "fromPrevious": { "x": 1360, "y": 750 },
+    "bossStart": { "x": 1300, "y": 750 }
+  },
+  "special": {
+    "bossRoom": true,
+    "finalBoss": true,
+    "bossName": "The Beast",
+    "cinematicIntro": true,
+    "multiplePlatforms": true,
+    "lavaHazards": true,
+    "bossArena": true,
+    "finalConfrontation": true,
+    "victoryTransition": true
+  }
+}

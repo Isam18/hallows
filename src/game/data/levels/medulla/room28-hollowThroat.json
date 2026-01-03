@@ -1,0 +1,67 @@
+{
+  "id": "medullaRoom28",
+  "name": "The Hollow Throat",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#2a0504",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 200, "y": 650, "width": 800, "height": 20, "type": "platform", "texture": "hollow" },
+    { "x": 400, "y": 500, "width": 600, "height": 20, "type": "platform", "texture": "hollow" },
+    { "x": 600, "y": 350, "width": 400, "height": 20, "type": "platform", "texture": "hollow" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 0, "y": 680, "width": 1200, "height": 120 }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "echoChamber1",
+      "type": "decoration",
+      "x": 100,
+      "y": 100,
+      "width": 150,
+      "height": 150,
+      "echo": true,
+      "soundAmplification": true
+    },
+    {
+      "id": "echoChamber2",
+      "type": "decoration",
+      "x": 300,
+      "y": 100,
+      "width": 150,
+      "height": 150,
+      "echo": true,
+      "soundAmplification": true
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 150,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom29",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 680 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "hollowRoom": true,
+    "echoChamber": true,
+    "verticalClimbing": true,
+    "soundBasedMechanics": true,
+    "ambientHum": true
+  }
+}

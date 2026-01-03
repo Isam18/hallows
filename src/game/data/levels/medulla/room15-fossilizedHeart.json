@@ -1,0 +1,74 @@
+{
+  "id": "medullaRoom15",
+  "name": "The Fossilized Heart",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#0a0505",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 750, "width": 1200, "height": 50, "type": "ground", "texture": "crackedBone" },
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 710, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 710, "type": "wall" },
+    { "x": 450, "y": 580, "width": 300, "height": 50, "type": "platform" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [],
+  "enemies": [],
+  "pickups": [
+    { "type": "soul", "x": 600, "y": 550 },
+    { "type": "soul", "x": 620, "y": 550 },
+    { "type": "soul", "x": 640, "y": 550 }
+  ],
+  "triggers": [
+    {
+      "id": "fossilizedHeart",
+      "type": "decoration",
+      "x": 500,
+      "y": 500,
+      "width": 200,
+      "height": 80
+    },
+    {
+      "id": "bench",
+      "type": "bench",
+      "x": 550,
+      "y": 680,
+      "width": 100,
+      "height": 70
+    },
+    {
+      "id": "loreTablet",
+      "type": "lore",
+      "x": 700,
+      "y": 600,
+      "width": 40,
+      "height": 60,
+      "lore": "The Devourer consumed the heart of the world to ascend. Now only cold stone remains where life once pulsed."
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom16",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 1160, "y": 700 },
+    "fromNext": { "x": 100, "y": 700 },
+    "bench": { "x": 600, "y": 680 }
+  },
+  "special": {
+    "benchRoom": true,
+    "coldRoom": true,
+    "safeZone": true,
+    "lorePresent": true,
+    "temperatureDrop": true
+  }
+}

@@ -49,6 +49,40 @@ import mossTitanArenaData from '../data/levels/mossTitanArena.json';
 import theMedullaData from '../data/levels/theMedulla.json';
 import enemiesData from '../data/enemies.json';
 
+// Medulla room data (rooms 1-32)
+import medullaRoom1Data from '../data/levels/medulla/room1-ribGate.json';
+import medullaRoom2Data from '../data/levels/medulla/room2-skitteringShaft.json';
+import medullaRoom3Data from '../data/levels/medulla/room3-marrowTap4B.json';
+import medullaRoom4Data from '../data/levels/medulla/room4-vertebraeSteppingStones.json';
+import medullaRoom5Data from '../data/levels/medulla/room5-thermalVent.json';
+import medullaRoom6Data from '../data/levels/medulla/room6-shatteredFemur.json';
+import medullaRoom7Data from '../data/levels/medulla/room7-ossuaryGate.json';
+import medullaRoom8Data from '../data/levels/medulla/room8-theTyrant.json';
+import medullaRoom9Data from '../data/levels/medulla/room9-glassBoneGallery.json';
+import medullaRoom10Data from '../data/levels/medulla/room10-pistonForge.json';
+import medullaRoom11Data from '../data/levels/medulla/room11-incubationWall.json';
+import medullaRoom12Data from '../data/levels/medulla/room12-lowThroat.json';
+import medullaRoom13Data from '../data/levels/medulla/room13-steamMaze.json';
+import medullaRoom14Data from '../data/levels/medulla/room14-tyrantRematch.json';
+import medullaRoom15Data from '../data/levels/medulla/room15-fossilizedHeart.json';
+import medullaRoom16Data from '../data/levels/medulla/room16-obsidianSlide.json';
+import medullaRoom17Data from '../data/levels/medulla/room17-hangingRibs.json';
+import medullaRoom18Data from '../data/levels/medulla/room18-swarmPit.json';
+import medullaRoom19Data from '../data/levels/medulla/room19-stampedeTunnel.json';
+import medullaRoom20Data from '../data/levels/medulla/room20-tyrantSnipingPerch.json';
+import medullaRoom21Data from '../data/levels/medulla/room21-meltingArchive.json';
+import medullaRoom22Data from '../data/levels/medulla/room22-marrowBath.json';
+import medullaRoom23Data from '../data/levels/medulla/room23-trinityArena.json';
+import medullaRoom24Data from '../data/levels/medulla/room24-innerGullet.json';
+import medullaRoom25Data from '../data/levels/medulla/room25-deepStomach.json';
+import medullaRoom26Data from '../data/levels/medulla/room26-throatNarrowing.json';
+import medullaRoom27Data from '../data/levels/medulla/room27-teethOfTheTitan.json';
+import medullaRoom28Data from '../data/levels/medulla/room28-hollowThroat.json';
+import medullaRoom29Data from '../data/levels/medulla/room29-lipOfTheBeast.json';
+import medullaRoom30Data from '../data/levels/medulla/room30-palateArchway.json';
+import medullaRoom31Data from '../data/levels/medulla/room31-finalPassage.json';
+import medullaRoom32Data from '../data/levels/medulla/room32-bossArena.json';
+
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
 const greenwayGeneratedData = generateGreenway();
@@ -62,6 +96,39 @@ const LEVELS: Record<string, LevelConfig> = {
   greenwayGenerated: greenwayGeneratedData as LevelConfig,
   mossTitanArena: mossTitanArenaData as LevelConfig,
   theMedulla: theMedullaData as LevelConfig,
+  // Medulla rooms (1-32)
+  medullaRoom1: medullaRoom1Data as LevelConfig,
+  medullaRoom2: medullaRoom2Data as LevelConfig,
+  medullaRoom3: medullaRoom3Data as LevelConfig,
+  medullaRoom4: medullaRoom4Data as LevelConfig,
+  medullaRoom5: medullaRoom5Data as LevelConfig,
+  medullaRoom6: medullaRoom6Data as LevelConfig,
+  medullaRoom7: medullaRoom7Data as LevelConfig,
+  medullaRoom8: medullaRoom8Data as LevelConfig,
+  medullaRoom9: medullaRoom9Data as LevelConfig,
+  medullaRoom10: medullaRoom10Data as LevelConfig,
+  medullaRoom11: medullaRoom11Data as LevelConfig,
+  medullaRoom12: medullaRoom12Data as LevelConfig,
+  medullaRoom13: medullaRoom13Data as LevelConfig,
+  medullaRoom14: medullaRoom14Data as LevelConfig,
+  medullaRoom15: medullaRoom15Data as LevelConfig,
+  medullaRoom16: medullaRoom16Data as LevelConfig,
+  medullaRoom17: medullaRoom17Data as LevelConfig,
+  medullaRoom18: medullaRoom18Data as LevelConfig,
+  medullaRoom19: medullaRoom19Data as LevelConfig,
+  medullaRoom20: medullaRoom20Data as LevelConfig,
+  medullaRoom21: medullaRoom21Data as LevelConfig,
+  medullaRoom22: medullaRoom22Data as LevelConfig,
+  medullaRoom23: medullaRoom23Data as LevelConfig,
+  medullaRoom24: medullaRoom24Data as LevelConfig,
+  medullaRoom25: medullaRoom25Data as LevelConfig,
+  medullaRoom26: medullaRoom26Data as LevelConfig,
+  medullaRoom27: medullaRoom27Data as LevelConfig,
+  medullaRoom28: medullaRoom28Data as LevelConfig,
+  medullaRoom29: medullaRoom29Data as LevelConfig,
+  medullaRoom30: medullaRoom30Data as LevelConfig,
+  medullaRoom31: medullaRoom31Data as LevelConfig,
+  medullaRoom32: medullaRoom32Data as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -167,6 +234,7 @@ export class GameScene extends Phaser.Scene {
     
     // Create visual effects based on level biome
     const biome = (this.currentLevel as any).biome || 'crossroads';
+    const isMedullaRoom = this.levelId.startsWith('medullaRoom');
     if (this.levelId === 'forgottenCrossroads' || this.levelId === 'ruinedCrossroads') {
       this.parallaxBg = new ParallaxBackground(this);
       this.dustParticles = new DustParticles(this);
@@ -174,7 +242,7 @@ export class GameScene extends Phaser.Scene {
       this.greenwayParallax = new GreenwayParallax(this);
       this.leafParticles = new LeafParticles(this, this.currentLevel.height);
       this.createGreenwayEnvironment();
-    } else if (biome === 'medulla' || this.levelId === 'theMedulla') {
+    } else if (biome === 'medulla' || this.levelId === 'theMedulla' || isMedullaRoom) {
       this.medullaParallax = new MedullaParallax(this);
       this.createMedullaEnvironment();
     }

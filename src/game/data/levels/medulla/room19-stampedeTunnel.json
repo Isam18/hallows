@@ -1,0 +1,49 @@
+{
+  "id": "medullaRoom19",
+  "name": "The Stampede Tunnel",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 500,
+  "backgroundColor": "#4a0a06",
+  "spawnPoint": { "x": 1100, "y": 450 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 460, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 460, "type": "wall" },
+    { "x": 0, "y": 460, "width": 1200, "height": 40, "type": "ground", "texture": "crackedBone" },
+    { "x": 200, "y": 380, "width": 80, "height": 30, "type": "platform", "alcove": true },
+    { "x": 500, "y": 380, "width": 80, "height": 30, "type": "platform", "alcove": true },
+    { "x": 800, "y": 380, "width": 80, "height": 30, "type": "platform", "alcove": true }
+  ],
+  "magmaPools": [],
+  "lavaPools": [],
+  "enemies": [
+    { "type": "skullBrute", "x": 600, "y": 400, "behavior": "stampede", "backgroundCharge": true }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 350,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom20",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 430 },
+    "fromPrevious": { "x": 1160, "y": 430 },
+    "fromNext": { "x": 100, "y": 430 }
+  },
+  "special": {
+    "flatCorridor": true,
+    "stampedeEvent": true,
+    "threeBruteCharge": true,
+    "iFrameDashRequired": true,
+    "alcoveShelters": true,
+    "instantKill": 2
+  }
+}

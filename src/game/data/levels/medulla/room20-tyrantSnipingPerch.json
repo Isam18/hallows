@@ -1,0 +1,86 @@
+{
+  "id": "medullaRoom20",
+  "name": "Tyrant's Sniping Perch",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#4a0a06",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1000, "y": 650, "width": 120, "height": 20, "type": "platform" },
+    { "x": 800, "y": 550, "width": 120, "height": 20, "type": "platform" },
+    { "x": 600, "y": 450, "width": 120, "height": 20, "type": "platform" },
+    { "x": 400, "y": 350, "width": 120, "height": 20, "type": "platform" },
+    { "x": 200, "y": 250, "width": 120, "height": 20, "type": "platform" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 0, "y": 680, "width": 1200, "height": 120 }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "backgroundTyrant",
+      "type": "decoration",
+      "x": 600,
+      "y": 100,
+      "width": 150,
+      "height": 200,
+      "backgroundBoss": true,
+      "throwsBoulders": true
+    },
+    {
+      "id": "boulderTarget1",
+      "type": "decoration",
+      "x": 800,
+      "y": 650,
+      "width": 120,
+      "height": 20,
+      "destructiblePlatform": true
+    },
+    {
+      "id": "boulderTarget2",
+      "type": "decoration",
+      "x": 600,
+      "y": 550,
+      "width": 120,
+      "height": 20,
+      "destructiblePlatform": true
+    },
+    {
+      "id": "boulderTarget3",
+      "type": "decoration",
+      "x": 400,
+      "y": 450,
+      "width": 120,
+      "height": 20,
+      "destructiblePlatform": true
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 200,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom21",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 680 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "platformingRoom": true,
+    "backgroundBoss": true,
+    "boulderThrowing": true,
+    "destructiblePlatforms": true,
+    "platformsTurnToMagma": true
+  }
+}
