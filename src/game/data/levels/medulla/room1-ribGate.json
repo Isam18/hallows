@@ -49,6 +49,16 @@
       "height": 500
     },
     {
+      "id": "entranceToMedulla",
+      "type": "transition",
+      "x": 1160,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "theMedulla",
+      "targetSpawn": "fromRibGate"
+    },
+    {
       "id": "exit",
       "type": "transition",
       "x": 40,
