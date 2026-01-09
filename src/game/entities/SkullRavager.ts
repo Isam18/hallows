@@ -3,15 +3,16 @@ import { Enemy } from './Enemy';
 import { EnemyCombatConfig } from '../core/CombatConfig';
 
 /**
- * SkullRavager - Large, menacing skull creature (mini-boss tier)
- * Hollow Knight Silksong inspired - massive skull with glowing orange eyes
- * Very aggressive, performs jump attacks and charges
+ * SkullRavager - Large menacing skull based on reference image 3
+ * Massive cream skull, bright glowing orange-red eyes, tall multi-pronged crown
  */
 export class SkullRavager extends Enemy {
   private visualElements: Phaser.GameObjects.GameObject[] = [];
   private attackState: 'idle' | 'windup' | 'charging' | 'jumping' | 'cooldown' = 'idle';
   private attackTimer = 0;
   private jumpCount = 0;
+  private leftGlow: Phaser.GameObjects.Arc | null = null;
+  private rightGlow: Phaser.GameObjects.Arc | null = null;
   
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig) {
     super(scene, x, y, config);
@@ -19,132 +20,122 @@ export class SkullRavager extends Enemy {
   }
   
   private createVisuals(): void {
-    // Massive skull body - intimidating presence
-    const skullBody = this.scene.add.ellipse(0, 0, 55, 50, 0xf0e8e0);
-    skullBody.setDepth(this.depth + 1);
-    this.visualElements.push(skullBody);
+    // Massive skull body - cream/bone white like reference
+    const skullMain = this.scene.add.ellipse(0, 0, 70, 60, 0xf0e8e0);
+    skullMain.setStrokeStyle(3, 0x2a2828);
+    skullMain.setDepth(this.depth + 2);
+    this.visualElements.push(skullMain);
     
-    // Large crown/horns - majestic but menacing
-    const leftHorn = this.scene.add.polygon(0, 0, [
-      -22, -10,  // Base
-      -30, -40,  // Outer tip
-      -12, -25   // Inner
+    // Tall multi-pronged crown (5 spikes like reference image 3)
+    // Outer left horn
+    const hornOL = this.scene.add.polygon(0, 0, [
+      -28, -8, -34, -50, -20, -15
     ], 0xe8e0d8);
-    leftHorn.setDepth(this.depth + 1);
-    this.visualElements.push(leftHorn);
+    hornOL.setStrokeStyle(2, 0x2a2828);
+    hornOL.setDepth(this.depth + 2);
+    this.visualElements.push(hornOL);
     
-    const rightHorn = this.scene.add.polygon(0, 0, [
-      22, -10,   // Base
-      30, -40,   // Outer tip
-      12, -25    // Inner
+    // Inner left horn
+    const hornIL = this.scene.add.polygon(0, 0, [
+      -14, -12, -18, -55, -8, -18
+    ], 0xf0e8e0);
+    hornIL.setStrokeStyle(2, 0x2a2828);
+    hornIL.setDepth(this.depth + 2);
+    this.visualElements.push(hornIL);
+    
+    // Center horn (tallest)
+    const hornC = this.scene.add.polygon(0, 0, [
+      -6, -15, 0, -65, 6, -15
+    ], 0xf8f0e8);
+    hornC.setStrokeStyle(2, 0x2a2828);
+    hornC.setDepth(this.depth + 2);
+    this.visualElements.push(hornC);
+    
+    // Inner right horn
+    const hornIR = this.scene.add.polygon(0, 0, [
+      8, -18, 18, -55, 14, -12
+    ], 0xf0e8e0);
+    hornIR.setStrokeStyle(2, 0x2a2828);
+    hornIR.setDepth(this.depth + 2);
+    this.visualElements.push(hornIR);
+    
+    // Outer right horn
+    const hornOR = this.scene.add.polygon(0, 0, [
+      20, -15, 34, -50, 28, -8
     ], 0xe8e0d8);
-    rightHorn.setDepth(this.depth + 1);
-    this.visualElements.push(rightHorn);
+    hornOR.setStrokeStyle(2, 0x2a2828);
+    hornOR.setDepth(this.depth + 2);
+    this.visualElements.push(hornOR);
     
-    // Central crown spike
-    const centerSpike = this.scene.add.polygon(0, 0, [
-      0, -45,    // Top
-      -10, -18,  // Left base
-      10, -18    // Right base
-    ], 0xd8d0c8);
-    centerSpike.setDepth(this.depth + 1);
-    this.visualElements.push(centerSpike);
+    // Large menacing eye sockets - deep black
+    const leftEyeSocket = this.scene.add.ellipse(-18, -5, 22, 26, 0x0a0505);
+    leftEyeSocket.setDepth(this.depth + 3);
+    this.visualElements.push(leftEyeSocket);
     
-    // Secondary horn spikes
-    const leftSecondary = this.scene.add.polygon(0, 0, [
-      -12, -15, -18, -32, -6, -20
-    ], 0xd8d0c8);
-    leftSecondary.setDepth(this.depth + 1);
-    this.visualElements.push(leftSecondary);
+    const rightEyeSocket = this.scene.add.ellipse(18, -5, 22, 26, 0x0a0505);
+    rightEyeSocket.setDepth(this.depth + 3);
+    this.visualElements.push(rightEyeSocket);
     
-    const rightSecondary = this.scene.add.polygon(0, 0, [
-      12, -15, 18, -32, 6, -20
-    ], 0xd8d0c8);
-    rightSecondary.setDepth(this.depth + 1);
-    this.visualElements.push(rightSecondary);
-    
-    // Large menacing eye sockets
-    const leftEye = this.scene.add.ellipse(-14, -5, 18, 22, 0x0a0808);
-    leftEye.setDepth(this.depth + 2);
-    this.visualElements.push(leftEye);
-    
-    const rightEye = this.scene.add.ellipse(14, -5, 18, 22, 0x0a0808);
-    rightEye.setDepth(this.depth + 2);
-    this.visualElements.push(rightEye);
-    
-    // Bright glowing orange-red pupils - fierce
-    const leftPupil = this.scene.add.circle(-14, -5, 6, 0xff4400);
-    leftPupil.setDepth(this.depth + 3);
+    // BRIGHT GLOWING ORANGE-RED PUPILS (key feature from reference)
+    const leftPupil = this.scene.add.circle(-18, -3, 7, 0xff4400);
+    leftPupil.setDepth(this.depth + 5);
     this.visualElements.push(leftPupil);
     
-    const rightPupil = this.scene.add.circle(14, -5, 6, 0xff4400);
-    rightPupil.setDepth(this.depth + 3);
+    const rightPupil = this.scene.add.circle(18, -3, 7, 0xff4400);
+    rightPupil.setDepth(this.depth + 5);
     this.visualElements.push(rightPupil);
     
-    // Intense glow around pupils
-    const leftGlow = this.scene.add.circle(-14, -5, 10, 0xff6622);
-    leftGlow.setDepth(this.depth + 2);
-    leftGlow.setAlpha(0.5);
-    this.visualElements.push(leftGlow);
+    // Intense glow effect around pupils
+    this.leftGlow = this.scene.add.circle(-18, -3, 12, 0xff2200);
+    this.leftGlow.setAlpha(0.6);
+    this.leftGlow.setDepth(this.depth + 4);
+    this.visualElements.push(this.leftGlow);
     
-    const rightGlow = this.scene.add.circle(14, -5, 10, 0xff6622);
-    rightGlow.setDepth(this.depth + 2);
-    rightGlow.setAlpha(0.5);
-    this.visualElements.push(rightGlow);
+    this.rightGlow = this.scene.add.circle(18, -3, 12, 0xff2200);
+    this.rightGlow.setAlpha(0.6);
+    this.rightGlow.setDepth(this.depth + 4);
+    this.visualElements.push(this.rightGlow);
     
-    // Powerful jaw
-    const jaw = this.scene.add.ellipse(0, 18, 38, 20, 0xe8e0d8);
-    jaw.setDepth(this.depth + 1);
+    // Heavy jaw
+    const jaw = this.scene.add.ellipse(0, 22, 45, 22, 0xe8e0d8);
+    jaw.setStrokeStyle(2, 0x2a2828);
+    jaw.setDepth(this.depth + 2);
     this.visualElements.push(jaw);
     
-    // Rows of sharp fangs
-    for (let i = 0; i < 8; i++) {
-      const toothX = -14 + i * 4;
-      const toothHeight = i === 0 || i === 7 ? 6 : (i === 3 || i === 4 ? 10 : 8);
-      const tooth = this.scene.add.triangle(
-        toothX, 20,
-        -2, 0,
-        2, 0,
-        0, toothHeight,
-        0xffffff
-      );
-      tooth.setDepth(this.depth + 2);
+    // Many sharp teeth
+    for (let i = 0; i < 9; i++) {
+      const toothX = -16 + i * 4;
+      const toothH = (i === 0 || i === 8) ? 5 : (i === 4 ? 9 : 7);
+      const tooth = this.scene.add.triangle(0, 0, -2, 0, 2, 0, 0, toothH, 0xffffff);
+      tooth.setPosition(toothX, 18);
+      tooth.setDepth(this.depth + 4);
       this.visualElements.push(tooth);
     }
     
-    // Armored body segment
-    const bodyArmor = this.scene.add.ellipse(0, 38, 40, 25, 0xd0c8c0);
-    bodyArmor.setDepth(this.depth);
-    this.visualElements.push(bodyArmor);
+    // Powerful thick legs - 4 pairs
+    const legFL = this.createLeg(-24, 28, 28, -40);
+    const legFR = this.createLeg(24, 28, 28, 40);
+    const legML = this.createLeg(-28, 34, 24, -20);
+    const legMR = this.createLeg(28, 34, 24, 20);
+    const legBL = this.createLeg(-22, 38, 20, -5);
+    const legBR = this.createLeg(22, 38, 20, 5);
     
-    // Powerful legs - 4 thick limbs
-    const legConfigs = [
-      { x: -18, y: 45, length: 20, width: 6, angle: -25 },
-      { x: 18, y: 45, length: 20, width: 6, angle: 25 },
-      { x: -10, y: 50, length: 18, width: 5, angle: -10 },
-      { x: 10, y: 50, length: 18, width: 5, angle: 10 }
-    ];
-    
-    legConfigs.forEach(cfg => {
-      const leg = this.scene.add.rectangle(cfg.x, cfg.y, cfg.width, cfg.length, 0x2a2a2a);
-      leg.setAngle(cfg.angle);
-      leg.setDepth(this.depth);
-      this.visualElements.push(leg);
-    });
+    this.visualElements.push(legFL, legFR, legML, legMR, legBL, legBR);
     
     this.setAlpha(0);
   }
   
+  private createLeg(x: number, y: number, length: number, angle: number): Phaser.GameObjects.Rectangle {
+    const leg = this.scene.add.rectangle(x, y, 5, length, 0x1a1818);
+    leg.setAngle(angle);
+    leg.setDepth(this.depth + 1);
+    return leg;
+  }
+  
   update(time: number, delta: number, player: any): void {
     super.update(time, delta, player);
-    
-    // Update attack behavior
     this.updateAttackBehavior(delta, player);
-    
-    // Position visual elements
     this.updateVisualPositions();
-    
-    // Animate eye glow
     this.animateEyes(time);
   }
   
@@ -152,14 +143,12 @@ export class SkullRavager extends Enemy {
     if (this.isDying() || this.isInvulnerable()) return;
     
     this.attackTimer -= delta;
-    
     const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
     const body = this.body as Phaser.Physics.Arcade.Body;
     
     switch (this.attackState) {
       case 'idle':
         if (dist < 250 && this.attackTimer <= 0) {
-          // Choose attack based on distance
           if (dist > 150 || Math.random() > 0.5) {
             this.startJumpAttack(player);
           } else {
@@ -188,16 +177,13 @@ export class SkullRavager extends Enemy {
         
       case 'jumping':
         if (body.blocked.down && body.velocity.y >= 0) {
-          // Landed - create ground pound effect
           this.createGroundPound();
           this.jumpCount++;
-          
           if (this.jumpCount >= 3) {
             this.attackState = 'cooldown';
             this.attackTimer = 2000;
             this.jumpCount = 0;
           } else {
-            // Jump again
             this.scene.time.delayedCall(200, () => {
               if (this.active && this.attackState === 'jumping') {
                 this.performJump(player);
@@ -218,15 +204,6 @@ export class SkullRavager extends Enemy {
   private startCharge(player: any): void {
     this.attackState = 'windup';
     this.attackTimer = 400;
-    
-    // Visual windup - shake
-    this.scene.tweens.add({
-      targets: this.visualElements,
-      x: '+=2',
-      duration: 50,
-      yoyo: true,
-      repeat: 4
-    });
   }
   
   private startJumpAttack(player: any): void {
@@ -238,20 +215,15 @@ export class SkullRavager extends Enemy {
   private performJump(player: any): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
     const dirToPlayer = player.x > this.x ? 1 : -1;
-    
     body.setVelocityY(-400);
     body.setVelocityX(dirToPlayer * 150);
     this.flipX = dirToPlayer < 0;
   }
   
   private createGroundPound(): void {
-    // Screen shake
     this.scene.cameras.main.shake(150, 0.02);
-    
-    // Visual shockwave
-    const shockwave = this.scene.add.ellipse(this.x, this.y + 30, 20, 10, 0xff6600, 0.8);
+    const shockwave = this.scene.add.ellipse(this.x, this.y + 40, 20, 10, 0xff6600, 0.8);
     shockwave.setDepth(this.depth - 1);
-    
     this.scene.tweens.add({
       targets: shockwave,
       scaleX: 8,
@@ -263,49 +235,40 @@ export class SkullRavager extends Enemy {
   }
   
   private animateEyes(time: number): void {
-    // Pulse the eye glows
-    const glowAlpha = 0.4 + Math.sin(time * 0.005) * 0.2;
-    
-    // Eye glow elements are at indices 10 and 11
-    if (this.visualElements[10]) {
-      (this.visualElements[10] as Phaser.GameObjects.Arc).setAlpha(glowAlpha);
-    }
-    if (this.visualElements[11]) {
-      (this.visualElements[11] as Phaser.GameObjects.Arc).setAlpha(glowAlpha);
-    }
+    // Pulsing glow effect
+    const glowAlpha = 0.5 + Math.sin(time * 0.008) * 0.3;
+    if (this.leftGlow) this.leftGlow.setAlpha(glowAlpha);
+    if (this.rightGlow) this.rightGlow.setAlpha(glowAlpha);
   }
   
   private updateVisualPositions(): void {
     const offsets = [
-      { x: 0, y: -10 },     // skull body
-      { x: -18, y: -22 },   // left horn
-      { x: 18, y: -22 },    // right horn
-      { x: 0, y: -28 },     // center spike
-      { x: -10, y: -22 },   // left secondary
-      { x: 10, y: -22 },    // right secondary
-      { x: -14, y: -12 },   // left eye
-      { x: 14, y: -12 },    // right eye
-      { x: -14, y: -12 },   // left pupil
-      { x: 14, y: -12 },    // right pupil
-      { x: -14, y: -12 },   // left glow
-      { x: 14, y: -12 },    // right glow
-      { x: 0, y: 8 },       // jaw
+      { x: 0, y: -8 },      // skull main
+      { x: -26, y: -28 },   // horn OL
+      { x: -12, y: -32 },   // horn IL
+      { x: 0, y: -36 },     // horn C
+      { x: 12, y: -32 },    // horn IR
+      { x: 26, y: -28 },    // horn OR
+      { x: -18, y: -12 },   // left eye socket
+      { x: 18, y: -12 },    // right eye socket
+      { x: -18, y: -10 },   // left pupil
+      { x: 18, y: -10 },    // right pupil
+      { x: -18, y: -10 },   // left glow
+      { x: 18, y: -10 },    // right glow
+      { x: 0, y: 14 },      // jaw
     ];
     
-    // Add teeth offsets (8 teeth)
-    for (let i = 0; i < 8; i++) {
-      offsets.push({ x: -14 + i * 4, y: 14 });
+    // Teeth
+    for (let i = 0; i < 9; i++) {
+      offsets.push({ x: -16 + i * 4, y: 12 });
     }
     
-    // Body armor
-    offsets.push({ x: 0, y: 28 });
-    
-    // Add leg offsets (4 legs)
-    const legOffsets = [
-      { x: -18, y: 35 }, { x: 18, y: 35 },
-      { x: -10, y: 40 }, { x: 10, y: 40 }
-    ];
-    offsets.push(...legOffsets);
+    // Legs
+    offsets.push(
+      { x: -24, y: 24 }, { x: 24, y: 24 },
+      { x: -28, y: 30 }, { x: 28, y: 30 },
+      { x: -22, y: 34 }, { x: 22, y: 34 }
+    );
     
     this.visualElements.forEach((el, i) => {
       if (offsets[i]) {
@@ -321,6 +284,8 @@ export class SkullRavager extends Enemy {
   destroy(fromScene?: boolean): void {
     this.visualElements.forEach(el => el.destroy());
     this.visualElements = [];
+    this.leftGlow = null;
+    this.rightGlow = null;
     super.destroy(fromScene);
   }
 }
