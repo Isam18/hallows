@@ -3,9 +3,8 @@ import { Enemy } from './Enemy';
 import { EnemyCombatConfig } from '../core/CombatConfig';
 
 /**
- * SkullScuttler - Small, fast skull-spider creature
- * Based on Hollow Knight Silksong enemy - scuttling skull with spindly legs
- * Patrol enemy, doesn't actively chase player
+ * SkullScuttler - Small skull-spider based on reference image 1
+ * Rounded skull with single flame-like crest, hollow eyes, thin spider legs
  */
 export class SkullScuttler extends Enemy {
   private visualElements: Phaser.GameObjects.GameObject[] = [];
@@ -16,110 +15,108 @@ export class SkullScuttler extends Enemy {
   }
   
   private createVisuals(): void {
-    // Main skull body - elongated, insectoid shape (pale bone white)
-    const skullBody = this.scene.add.ellipse(0, 0, 28, 34, 0xe8e0d8);
-    skullBody.setDepth(this.depth + 1);
-    this.visualElements.push(skullBody);
+    // Main skull - rounded, compact shape (bone white/cream)
+    const skullMain = this.scene.add.ellipse(0, 0, 32, 36, 0xd4ccc4);
+    skullMain.setStrokeStyle(2, 0x2a2828);
+    skullMain.setDepth(this.depth + 2);
+    this.visualElements.push(skullMain);
     
-    // Skull crest/horn on top - flame-like point
+    // Single flame-like pointed crest on top
     const crest = this.scene.add.polygon(0, 0, [
-      0, -30,   // Top point
-      -8, -12,  // Left base
-      8, -12    // Right base
-    ], 0xd8d0c8);
-    crest.setDepth(this.depth + 1);
+      0, -32,    // Sharp top point
+      -10, -8,   // Left base
+      -4, -14,   // Left indent
+      0, -10,    // Center dip
+      4, -14,    // Right indent  
+      10, -8     // Right base
+    ], 0xc8c0b8);
+    crest.setStrokeStyle(2, 0x2a2828);
+    crest.setDepth(this.depth + 2);
     this.visualElements.push(crest);
     
-    // Dark hollow eye sockets - large, menacing
-    const leftEye = this.scene.add.ellipse(-7, -3, 10, 14, 0x0a0a0e);
-    leftEye.setDepth(this.depth + 2);
-    this.visualElements.push(leftEye);
+    // Large hollow left eye socket - dark black void
+    const leftEyeSocket = this.scene.add.ellipse(-8, -2, 12, 16, 0x0a0808);
+    leftEyeSocket.setDepth(this.depth + 3);
+    this.visualElements.push(leftEyeSocket);
     
-    const rightEye = this.scene.add.ellipse(7, -3, 10, 14, 0x0a0a0e);
-    rightEye.setDepth(this.depth + 2);
-    this.visualElements.push(rightEye);
+    // Large hollow right eye socket
+    const rightEyeSocket = this.scene.add.ellipse(8, -2, 12, 16, 0x0a0808);
+    rightEyeSocket.setDepth(this.depth + 3);
+    this.visualElements.push(rightEyeSocket);
     
-    // Small dim pupils - eerie red glow
-    const leftPupil = this.scene.add.circle(-7, -3, 2.5, 0xaa3333);
-    leftPupil.setDepth(this.depth + 3);
-    leftPupil.setAlpha(0.7);
+    // Tiny dim pupils deep in sockets
+    const leftPupil = this.scene.add.circle(-8, 0, 2, 0x444444);
+    leftPupil.setDepth(this.depth + 4);
     this.visualElements.push(leftPupil);
     
-    const rightPupil = this.scene.add.circle(7, -3, 2.5, 0xaa3333);
-    rightPupil.setDepth(this.depth + 3);
-    rightPupil.setAlpha(0.7);
+    const rightPupil = this.scene.add.circle(8, 0, 2, 0x444444);
+    rightPupil.setDepth(this.depth + 4);
     this.visualElements.push(rightPupil);
     
-    // Small lower jaw/mouth area
-    const jaw = this.scene.add.ellipse(0, 10, 16, 10, 0xd0c8c0);
-    jaw.setDepth(this.depth + 1);
-    this.visualElements.push(jaw);
+    // Small jaw/mouth opening
+    const mouth = this.scene.add.ellipse(0, 12, 14, 8, 0x1a1818);
+    mouth.setDepth(this.depth + 3);
+    this.visualElements.push(mouth);
     
-    // Sharp teeth
-    for (let i = 0; i < 4; i++) {
-      const toothX = -6 + i * 4;
-      const tooth = this.scene.add.triangle(
-        toothX, 12,
-        -1.5, 0,
-        1.5, 0,
-        0, 5,
-        0xf0f0e8
-      );
-      tooth.setDepth(this.depth + 2);
-      this.visualElements.push(tooth);
-    }
+    // Small fangs
+    const leftFang = this.scene.add.triangle(0, 0, -4, 10, -2, 10, -3, 16, 0xf0ece8);
+    leftFang.setDepth(this.depth + 4);
+    this.visualElements.push(leftFang);
     
-    // Spindly spider-like legs - 6 legs
-    const legConfigs = [
-      { x: -10, y: 12, length: 12, angle: -35 },
-      { x: 10, y: 12, length: 12, angle: 35 },
-      { x: -8, y: 15, length: 10, angle: -20 },
-      { x: 8, y: 15, length: 10, angle: 20 },
-      { x: -6, y: 17, length: 8, angle: -10 },
-      { x: 6, y: 17, length: 8, angle: 10 }
-    ];
+    const rightFang = this.scene.add.triangle(0, 0, 2, 10, 4, 10, 3, 16, 0xf0ece8);
+    rightFang.setDepth(this.depth + 4);
+    this.visualElements.push(rightFang);
     
-    legConfigs.forEach(cfg => {
-      const leg = this.scene.add.rectangle(cfg.x, cfg.y, 2, cfg.length, 0x2a2a2a);
-      leg.setAngle(cfg.angle);
-      leg.setDepth(this.depth);
-      this.visualElements.push(leg);
-    });
+    // Thin black spider legs - 6 total
+    // Front pair (angled forward)
+    const legFL = this.createLeg(-12, 8, 18, -50);
+    const legFR = this.createLeg(12, 8, 18, 50);
     
-    // Hide the sprite itself - we use visual elements
+    // Middle pair (angled out)
+    const legML = this.createLeg(-14, 12, 16, -30);
+    const legMR = this.createLeg(14, 12, 16, 30);
+    
+    // Back pair (angled back)
+    const legBL = this.createLeg(-10, 16, 14, -10);
+    const legBR = this.createLeg(10, 16, 14, 10);
+    
+    this.visualElements.push(legFL, legFR, legML, legMR, legBL, legBR);
+    
+    // Hide sprite body
     this.setAlpha(0);
+  }
+  
+  private createLeg(x: number, y: number, length: number, angle: number): Phaser.GameObjects.Rectangle {
+    const leg = this.scene.add.rectangle(x, y, 2, length, 0x1a1818);
+    leg.setAngle(angle);
+    leg.setDepth(this.depth + 1);
+    return leg;
   }
   
   update(time: number, delta: number, player: any): void {
     super.update(time, delta, player);
-    
-    // Position visual elements to follow the sprite
     this.updateVisualPositions();
   }
   
   private updateVisualPositions(): void {
     const offsets = [
-      { x: 0, y: -5 },      // skull body
-      { x: 0, y: -22 },     // crest
-      { x: -7, y: -8 },     // left eye
-      { x: 7, y: -8 },      // right eye
-      { x: -7, y: -8 },     // left pupil
-      { x: 7, y: -8 },      // right pupil
-      { x: 0, y: 5 },       // jaw
+      { x: 0, y: -4 },     // skull main
+      { x: 0, y: -18 },    // crest
+      { x: -8, y: -6 },    // left eye
+      { x: 8, y: -6 },     // right eye
+      { x: -8, y: -4 },    // left pupil
+      { x: 8, y: -4 },     // right pupil
+      { x: 0, y: 8 },      // mouth
+      { x: -3, y: 10 },    // left fang
+      { x: 3, y: 10 },     // right fang
+      // Legs
+      { x: -12, y: 10 },   // front left
+      { x: 12, y: 10 },    // front right
+      { x: -14, y: 14 },   // mid left
+      { x: 14, y: 14 },    // mid right
+      { x: -10, y: 18 },   // back left
+      { x: 10, y: 18 },    // back right
     ];
-    
-    // Add teeth offsets (4 teeth)
-    for (let i = 0; i < 4; i++) {
-      offsets.push({ x: -6 + i * 4, y: 10 });
-    }
-    
-    // Add leg offsets (6 legs)
-    const legOffsets = [
-      { x: -10, y: 12 }, { x: 10, y: 12 },
-      { x: -8, y: 15 }, { x: 8, y: 15 },
-      { x: -6, y: 17 }, { x: 6, y: 17 }
-    ];
-    offsets.push(...legOffsets);
     
     this.visualElements.forEach((el, i) => {
       if (offsets[i]) {
