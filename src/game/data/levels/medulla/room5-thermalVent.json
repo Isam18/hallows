@@ -87,6 +87,16 @@
       "height": 30
     },
     {
+      "id": "entranceFromRoom4",
+      "type": "transition",
+      "x": 1160,
+      "y": 250,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom4",
+      "targetSpawn": "fromPrevious"
+    },
+    {
       "id": "exit",
       "type": "transition",
       "x": 40,

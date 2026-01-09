@@ -24,6 +24,16 @@
   "pickups": [],
   "triggers": [
     {
+      "id": "entranceFromRoom7",
+      "type": "transition",
+      "x": 1160,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom7",
+      "targetSpawn": "default"
+    },
+    {
       "id": "skullPile",
       "type": "decoration",
       "x": 500,

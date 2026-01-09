@@ -23,6 +23,16 @@
   "pickups": [],
   "triggers": [
     {
+      "id": "entranceFromRoom5",
+      "type": "transition",
+      "x": 1360,
+      "y": 450,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom5",
+      "targetSpawn": "default"
+    },
+    {
       "id": "bridgeStart",
       "type": "platform",
       "x": 1200,

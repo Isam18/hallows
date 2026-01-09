@@ -56,6 +56,16 @@
       "movingCrusher": true
     },
     {
+      "id": "entranceFromRoom9",
+      "type": "transition",
+      "x": 1160,
+      "y": 250,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom9",
+      "targetSpawn": "fromPrevious"
+    },
+    {
       "id": "exit",
       "type": "transition",
       "x": 40,
