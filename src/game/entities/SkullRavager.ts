@@ -1,329 +1,326 @@
 import Phaser from 'phaser';
-import { Enemy, EnemyCombatConfig } from './Enemy';
+import { Enemy } from './Enemy';
+import { EnemyCombatConfig } from '../core/CombatConfig';
 
+/**
+ * SkullRavager - Large, menacing skull creature (mini-boss tier)
+ * Hollow Knight Silksong inspired - massive skull with glowing orange eyes
+ * Very aggressive, performs jump attacks and charges
+ */
 export class SkullRavager extends Enemy {
-  private chargeWindupTimer = 0;
-  private chargeDurationTimer = 0;
-  private jumpWindupTimer = 0;
-  private isCharging = false;
-  private isJumping = false;
-  private isMultiJumping = false;
-  private multiJumpCount = 0;
-  private attackCooldownTimer = 0;
+  private visualElements: Phaser.GameObjects.GameObject[] = [];
+  private attackState: 'idle' | 'windup' | 'charging' | 'jumping' | 'cooldown' = 'idle';
+  private attackTimer = 0;
+  private jumpCount = 0;
   
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig) {
     super(scene, x, y, config);
+    this.createVisuals();
   }
   
-  protected createVisuals(): void {
-    // Massive skull - boss-sized
-    const skullBody = this.scene.add.ellipse(0, -8, 85, 95, 0xf8f0e8);
-    skullBody.setDepth(2);
-    this.add(skullBody);
+  private createVisuals(): void {
+    // Massive skull body - intimidating presence
+    const skullBody = this.scene.add.ellipse(0, 0, 55, 50, 0xf0e8e0);
+    skullBody.setDepth(this.depth + 1);
+    this.visualElements.push(skullBody);
     
-    // Skull texture lines - battle damage
-    const textureLines = [
-      { x1: -20, y1: -25, x2: -25, y2: 10 },
-      { x1: 20, y1: -30, x2: 25, y2: 5 },
-      { x1: 0, y1: -35, x2: 5, y2: -5 },
-      { x1: -35, y1: 0, x2: -40, y2: 20 },
-      { x1: 35, y1: -5, x2: 40, y2: 15 }
-    ];
+    // Large crown/horns - majestic but menacing
+    const leftHorn = this.scene.add.polygon(0, 0, [
+      -22, -10,  // Base
+      -30, -40,  // Outer tip
+      -12, -25   // Inner
+    ], 0xe8e0d8);
+    leftHorn.setDepth(this.depth + 1);
+    this.visualElements.push(leftHorn);
     
-    textureLines.forEach(line => {
-      const lineObj = this.scene.add.line(line.x1, line.y1, line.x1, line.y1, line.x2, line.y2, 0x4a4038);
-      lineObj.setStrokeStyle(3, 0x4a4038);
-      lineObj.setDepth(3);
-      this.add(lineObj);
-    });
+    const rightHorn = this.scene.add.polygon(0, 0, [
+      22, -10,   // Base
+      30, -40,   // Outer tip
+      12, -25    // Inner
+    ], 0xe8e0d8);
+    rightHorn.setDepth(this.depth + 1);
+    this.visualElements.push(rightHorn);
     
-    // Enormous hollow eye sockets
-    const leftEye = this.scene.add.ellipse(-25, -15, 28, 35, 0x050505);
-    leftEye.setDepth(3);
-    this.add(leftEye);
+    // Central crown spike
+    const centerSpike = this.scene.add.polygon(0, 0, [
+      0, -45,    // Top
+      -10, -18,  // Left base
+      10, -18    // Right base
+    ], 0xd8d0c8);
+    centerSpike.setDepth(this.depth + 1);
+    this.visualElements.push(centerSpike);
     
-    const rightEye = this.scene.add.ellipse(25, -15, 28, 35, 0x050505);
-    rightEye.setDepth(3);
-    this.add(rightEye);
+    // Secondary horn spikes
+    const leftSecondary = this.scene.add.polygon(0, 0, [
+      -12, -15, -18, -32, -6, -20
+    ], 0xd8d0c8);
+    leftSecondary.setDepth(this.depth + 1);
+    this.visualElements.push(leftSecondary);
     
-    // Burning orange pupils - intense
-    const leftPupil = this.scene.add.circle(-25, -15, 7, 0xff4400);
-    leftPupil.setDepth(4);
-    leftPupil.setAlpha(0.95);
-    this.add(leftPupil);
+    const rightSecondary = this.scene.add.polygon(0, 0, [
+      12, -15, 18, -32, 6, -20
+    ], 0xd8d0c8);
+    rightSecondary.setDepth(this.depth + 1);
+    this.visualElements.push(rightSecondary);
     
-    const rightPupil = this.scene.add.circle(25, -15, 7, 0xff4400);
-    rightPupil.setDepth(4);
-    rightPupil.setAlpha(0.95);
-    this.add(rightPupil);
+    // Large menacing eye sockets
+    const leftEye = this.scene.add.ellipse(-14, -5, 18, 22, 0x0a0808);
+    leftEye.setDepth(this.depth + 2);
+    this.visualElements.push(leftEye);
+    
+    const rightEye = this.scene.add.ellipse(14, -5, 18, 22, 0x0a0808);
+    rightEye.setDepth(this.depth + 2);
+    this.visualElements.push(rightEye);
+    
+    // Bright glowing orange-red pupils - fierce
+    const leftPupil = this.scene.add.circle(-14, -5, 6, 0xff4400);
+    leftPupil.setDepth(this.depth + 3);
+    this.visualElements.push(leftPupil);
+    
+    const rightPupil = this.scene.add.circle(14, -5, 6, 0xff4400);
+    rightPupil.setDepth(this.depth + 3);
+    this.visualElements.push(rightPupil);
     
     // Intense glow around pupils
-    const leftGlow = this.scene.add.circle(-25, -15, 15, 0xff2200);
-    leftGlow.setDepth(3);
-    leftGlow.setAlpha(0.4);
-    this.add(leftGlow);
+    const leftGlow = this.scene.add.circle(-14, -5, 10, 0xff6622);
+    leftGlow.setDepth(this.depth + 2);
+    leftGlow.setAlpha(0.5);
+    this.visualElements.push(leftGlow);
     
-    const rightGlow = this.scene.add.circle(25, -15, 15, 0xff2200);
-    rightGlow.setDepth(3);
-    rightGlow.setAlpha(0.4);
-    this.add(rightGlow);
+    const rightGlow = this.scene.add.circle(14, -5, 10, 0xff6622);
+    rightGlow.setDepth(this.depth + 2);
+    rightGlow.setAlpha(0.5);
+    this.visualElements.push(rightGlow);
     
-    // Massive jaw with huge teeth
-    const jaw = this.scene.add.ellipse(0, 20, 55, 28, 0xf0e8e0);
-    jaw.setDepth(2);
-    this.add(jaw);
+    // Powerful jaw
+    const jaw = this.scene.add.ellipse(0, 18, 38, 20, 0xe8e0d8);
+    jaw.setDepth(this.depth + 1);
+    this.visualElements.push(jaw);
     
-    // Many large sharp teeth - terrifying
-    for (let i = 0; i < 12; i++) {
-      const toothX = -26 + i * 4.5;
+    // Rows of sharp fangs
+    for (let i = 0; i < 8; i++) {
+      const toothX = -14 + i * 4;
+      const toothHeight = i === 0 || i === 7 ? 6 : (i === 3 || i === 4 ? 10 : 8);
       const tooth = this.scene.add.triangle(
-        toothX, 22,
-        toothX - 3, 32,
-        toothX + 3, 32,
+        toothX, 20,
+        -2, 0,
+        2, 0,
+        0, toothHeight,
         0xffffff
       );
-      tooth.setDepth(3);
-      this.add(tooth);
+      tooth.setDepth(this.depth + 2);
+      this.visualElements.push(tooth);
     }
     
-    // Ornate crown/horns - boss-like
-    // Main crown
-    const crownBase = this.scene.add.triangle(
-      0, -45,
-      -25, -55,
-      25, -55,
-      0xe8e0d8
-    );
-    crownBase.setDepth(2);
-    this.add(crownBase);
+    // Armored body segment
+    const bodyArmor = this.scene.add.ellipse(0, 38, 40, 25, 0xd0c8c0);
+    bodyArmor.setDepth(this.depth);
+    this.visualElements.push(bodyArmor);
     
-    const crownMid = this.scene.add.triangle(
-      0, -52,
-      -15, -62,
-      15, -62,
-      0xe0d8d0
-    );
-    crownMid.setDepth(2);
-    this.add(crownMid);
-    
-    const crownTip = this.scene.add.triangle(
-      0, -58,
-      -8, -68,
-      8, -68,
-      0xd8d0c8
-    );
-    crownTip.setDepth(2);
-    this.add(crownTip);
-    
-    // Large curved horns
-    const leftHorn = this.scene.add.ellipse(-35, -50, 12, 28, 0xe0d8d0);
-    leftHorn.setAngle(-0.5);
-    leftHorn.setDepth(2);
-    this.add(leftHorn);
-    
-    const rightHorn = this.scene.add.ellipse(35, -50, 12, 28, 0xe0d8d0);
-    rightHorn.setAngle(0.5);
-    rightHorn.setDepth(2);
-    this.add(rightHorn);
-    
-    // Additional horn points
-    const leftHornTip = this.scene.add.ellipse(-42, -58, 6, 15, 0xd8d0c8);
-    leftHornTip.setAngle(-0.4);
-    leftHornTip.setDepth(3);
-    this.add(leftHornTip);
-    
-    const rightHornTip = this.scene.add.ellipse(42, -58, 6, 15, 0xd8d0c8);
-    rightHornTip.setAngle(0.4);
-    rightHornTip.setDepth(3);
-    this.add(rightHornTip);
-    
-    // Many powerful segmented legs - eight total
-    const legPositions = [
-      { x: -28, y: 32, width: 6, length: 20, angle: -0.5 },
-      { x: 28, y: 32, width: 6, length: 20, angle: 0.5 },
-      { x: -22, y: 38, width: 5, length: 18, angle: -0.3 },
-      { x: 22, y: 38, width: 5, length: 18, angle: 0.3 },
-      { x: -16, y: 42, width: 4, length: 16, angle: -0.15 },
-      { x: 16, y: 42, width: 4, length: 16, angle: 0.15 },
-      { x: -10, y: 45, width: 4, length: 14, angle: -0.05 },
-      { x: 10, y: 45, width: 4, length: 14, angle: 0.05 }
+    // Powerful legs - 4 thick limbs
+    const legConfigs = [
+      { x: -18, y: 45, length: 20, width: 6, angle: -25 },
+      { x: 18, y: 45, length: 20, width: 6, angle: 25 },
+      { x: -10, y: 50, length: 18, width: 5, angle: -10 },
+      { x: 10, y: 50, length: 18, width: 5, angle: 10 }
     ];
     
-    legPositions.forEach((pos) => {
-      const leg = this.scene.add.rectangle(pos.x, pos.y, pos.width, pos.length, 0xc0b8b0);
-      leg.setDepth(1);
-      leg.setAngle(pos.angle * 180 / Math.PI);
-      this.add(leg);
+    legConfigs.forEach(cfg => {
+      const leg = this.scene.add.rectangle(cfg.x, cfg.y, cfg.width, cfg.length, 0x2a2a2a);
+      leg.setAngle(cfg.angle);
+      leg.setDepth(this.depth);
+      this.visualElements.push(leg);
     });
     
-    // Spiked collar on back
-    for (let i = 0; i < 5; i++) {
-      const spikeX = -30 + i * 15;
-      const spike = this.scene.add.triangle(
-        spikeX, 0,
-        spikeX - 4, -10,
-        spikeX + 4, -10,
-        0xd8d0c8
-      );
-      spike.setDepth(2);
-      this.add(spike);
-    }
+    this.setAlpha(0);
   }
   
-  protected updateBehavior(time: number, delta: number, player: Phaser.GameObjects.Sprite): void {
+  update(time: number, delta: number, player: any): void {
+    super.update(time, delta, player);
+    
+    // Update attack behavior
+    this.updateAttackBehavior(delta, player);
+    
+    // Position visual elements
+    this.updateVisualPositions();
+    
+    // Animate eye glow
+    this.animateEyes(time);
+  }
+  
+  private updateAttackBehavior(delta: number, player: any): void {
     if (this.isDying() || this.isInvulnerable()) return;
     
-    // Update all timers
-    if (this.chargeWindupTimer > 0) {
-      this.chargeWindupTimer -= delta;
-    }
-    if (this.chargeDurationTimer > 0) {
-      this.chargeDurationTimer -= delta;
-    }
-    if (this.jumpWindupTimer > 0) {
-      this.jumpWindupTimer -= delta;
-    }
-    if (this.attackCooldownTimer > 0) {
-      this.attackCooldownTimer -= delta;
-    }
+    this.attackTimer -= delta;
     
-    // Decide on next attack
-    if (this.attackCooldownTimer <= 0 && !this.isCharging && !this.isJumping && !this.isMultiJumping) {
-      const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
-      
-      if (dist < 150) {
-        // Close range - charge attack
-        this.chargeWindupTimer = 500; // 0.5s windup
-        this.isCharging = true;
-        this.attackCooldownTimer = 3000;
-      } else if (dist > 400) {
-        // Far range - jump attack
-        this.jumpWindupTimer = 400; // 0.4s windup
-        this.isJumping = true;
-        this.attackCooldownTimer = 3500;
-      } else {
-        // Mid range - multi jump (random chance)
-        if (Math.random() > 0.6) {
-          this.isMultiJumping = true;
-          this.multiJumpCount = 5;
-          this.jumpWindupTimer = 300; // 0.3s windup
-          this.attackCooldownTimer = 5000;
-        } else {
-          // Default to charge
-          this.chargeWindupTimer = 500;
-          this.isCharging = true;
-          this.attackCooldownTimer = 3000;
+    const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    
+    switch (this.attackState) {
+      case 'idle':
+        if (dist < 250 && this.attackTimer <= 0) {
+          // Choose attack based on distance
+          if (dist > 150 || Math.random() > 0.5) {
+            this.startJumpAttack(player);
+          } else {
+            this.startCharge(player);
+          }
         }
-      }
-    }
-    
-    // Execute charge attack
-    if (this.chargeWindupTimer <= 0 && this.isCharging) {
-      this.performChargeAttack();
-      this.isCharging = false;
-    }
-    
-    // Execute jump attack
-    if (this.jumpWindupTimer <= 0 && this.isJumping) {
-      this.performJumpAttack(player);
-      this.isJumping = false;
-    }
-    
-    // Execute multi jump
-    if (this.jumpWindupTimer <= 0 && this.isMultiJumping) {
-      if (this.multiJumpCount > 0) {
-        this.performMultiJump();
-        this.multiJumpCount--;
-        if (this.multiJumpCount > 0) {
-          this.jumpWindupTimer = 400; // Delay between jumps
-        } else {
-          this.isMultiJumping = false;
+        break;
+        
+      case 'windup':
+        if (this.attackTimer <= 0) {
+          this.attackState = 'charging';
+          this.attackTimer = 600;
+          const chargeDir = player.x > this.x ? 1 : -1;
+          body.setVelocityX(chargeDir * 350);
+          this.flipX = chargeDir < 0;
         }
-      }
+        break;
+        
+      case 'charging':
+        if (this.attackTimer <= 0 || body.blocked.left || body.blocked.right) {
+          body.setVelocityX(0);
+          this.attackState = 'cooldown';
+          this.attackTimer = 1500;
+        }
+        break;
+        
+      case 'jumping':
+        if (body.blocked.down && body.velocity.y >= 0) {
+          // Landed - create ground pound effect
+          this.createGroundPound();
+          this.jumpCount++;
+          
+          if (this.jumpCount >= 3) {
+            this.attackState = 'cooldown';
+            this.attackTimer = 2000;
+            this.jumpCount = 0;
+          } else {
+            // Jump again
+            this.scene.time.delayedCall(200, () => {
+              if (this.active && this.attackState === 'jumping') {
+                this.performJump(player);
+              }
+            });
+          }
+        }
+        break;
+        
+      case 'cooldown':
+        if (this.attackTimer <= 0) {
+          this.attackState = 'idle';
+        }
+        break;
     }
   }
   
-  private performChargeAttack(): void {
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    const chargeDir = this.flipX ? -1 : 1;
+  private startCharge(player: any): void {
+    this.attackState = 'windup';
+    this.attackTimer = 400;
     
-    // Faster than player sprint
-    body.setVelocityX(chargeDir * 350);
-    
-    // Visual feedback - shake and glow
+    // Visual windup - shake
     this.scene.tweens.add({
-      targets: this,
-      alpha: 0.6,
-      duration: 80,
+      targets: this.visualElements,
+      x: '+=2',
+      duration: 50,
       yoyo: true,
-      repeat: 5
+      repeat: 4
     });
+  }
+  
+  private startJumpAttack(player: any): void {
+    this.attackState = 'jumping';
+    this.jumpCount = 0;
+    this.performJump(player);
+  }
+  
+  private performJump(player: any): void {
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    const dirToPlayer = player.x > this.x ? 1 : -1;
     
-    // Stop after 0.8s
-    this.chargeDurationTimer = 800;
+    body.setVelocityY(-400);
+    body.setVelocityX(dirToPlayer * 150);
+    this.flipX = dirToPlayer < 0;
+  }
+  
+  private createGroundPound(): void {
+    // Screen shake
+    this.scene.cameras.main.shake(150, 0.02);
     
-    this.scene.time.delayedCall(800, () => {
-      if (this.active) {
-        body.setVelocityX(0);
+    // Visual shockwave
+    const shockwave = this.scene.add.ellipse(this.x, this.y + 30, 20, 10, 0xff6600, 0.8);
+    shockwave.setDepth(this.depth - 1);
+    
+    this.scene.tweens.add({
+      targets: shockwave,
+      scaleX: 8,
+      scaleY: 2,
+      alpha: 0,
+      duration: 300,
+      onComplete: () => shockwave.destroy()
+    });
+  }
+  
+  private animateEyes(time: number): void {
+    // Pulse the eye glows
+    const glowAlpha = 0.4 + Math.sin(time * 0.005) * 0.2;
+    
+    // Eye glow elements are at indices 10 and 11
+    if (this.visualElements[10]) {
+      (this.visualElements[10] as Phaser.GameObjects.Arc).setAlpha(glowAlpha);
+    }
+    if (this.visualElements[11]) {
+      (this.visualElements[11] as Phaser.GameObjects.Arc).setAlpha(glowAlpha);
+    }
+  }
+  
+  private updateVisualPositions(): void {
+    const offsets = [
+      { x: 0, y: -10 },     // skull body
+      { x: -18, y: -22 },   // left horn
+      { x: 18, y: -22 },    // right horn
+      { x: 0, y: -28 },     // center spike
+      { x: -10, y: -22 },   // left secondary
+      { x: 10, y: -22 },    // right secondary
+      { x: -14, y: -12 },   // left eye
+      { x: 14, y: -12 },    // right eye
+      { x: -14, y: -12 },   // left pupil
+      { x: 14, y: -12 },    // right pupil
+      { x: -14, y: -12 },   // left glow
+      { x: 14, y: -12 },    // right glow
+      { x: 0, y: 8 },       // jaw
+    ];
+    
+    // Add teeth offsets (8 teeth)
+    for (let i = 0; i < 8; i++) {
+      offsets.push({ x: -14 + i * 4, y: 14 });
+    }
+    
+    // Body armor
+    offsets.push({ x: 0, y: 28 });
+    
+    // Add leg offsets (4 legs)
+    const legOffsets = [
+      { x: -18, y: 35 }, { x: 18, y: 35 },
+      { x: -10, y: 40 }, { x: 10, y: 40 }
+    ];
+    offsets.push(...legOffsets);
+    
+    this.visualElements.forEach((el, i) => {
+      if (offsets[i]) {
+        const flipMult = this.flipX ? -1 : 1;
+        (el as any).setPosition(
+          this.x + offsets[i].x * flipMult,
+          this.y + offsets[i].y
+        );
       }
     });
   }
   
-  private performJumpAttack(player: Phaser.GameObjects.Sprite): void {
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    
-    // Calculate jump direction towards player
-    const dx = player.x - this.x;
-    const dy = player.y - this.y;
-    const dist = Math.sqrt(dx * dx + dy * dy);
-    
-    body.setVelocityX((dx / dist) * 200);
-    body.setVelocityY(-400); // High jump
-    
-    // Spawn debris on landing
-    this.scene.time.delayedCall(800, () => {
-      this.spawnDebris(8); // 8 falling rocks
-    });
-  }
-  
-  private performMultiJump(): void {
-    const body = this.body as Phaser.Physics.Arcade.Body;
-    
-    // Stay in place, just jump up
-    body.setVelocityX(0);
-    body.setVelocityY(-350);
-    
-    // Spawn 3 debris per jump
-    this.scene.time.delayedCall(600, () => {
-      this.spawnDebris(3);
-    });
-  }
-  
-  private spawnDebris(count: number): void {
-    // Spawn falling rock debris at player's position
-    for (let i = 0; i < count; i++) {
-      const offsetX = Phaser.Math.Between(-150, 150);
-      const offsetY = Phaser.Math.Between(-100, 0);
-      
-      // This would create debris - you'd need a Debris entity class
-      // For now, we'll just create visual effects
-      const debris = this.scene.add.circle(
-        this.x + offsetX,
-        this.y + offsetY,
-        8,
-        0x6a5040
-      );
-      
-      this.scene.tweens.add({
-        targets: debris,
-        y: debris.y + 200,
-        alpha: 0,
-        duration: 1000,
-        ease: 'Power2',
-        onComplete: () => {
-          debris.destroy();
-        }
-      });
-    }
+  destroy(fromScene?: boolean): void {
+    this.visualElements.forEach(el => el.destroy());
+    this.visualElements = [];
+    super.destroy(fromScene);
   }
 }

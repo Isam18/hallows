@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { Player } from './Player';
 
 export class Lava extends Phaser.GameObjects.Rectangle {
-  private active = true;
+  private isActive = true;
   private damageCooldown = 0;
   private readonly DAMAGE_COOLDOWN_MS = 500;
   private readonly DAMAGE = 2;
@@ -91,7 +91,7 @@ export class Lava extends Phaser.GameObjects.Rectangle {
   }
   
   onPlayerContact(player: Player): void {
-    if (!this.active) return;
+    if (!this.isActive) return;
     
     const currentTime = this.scene.time.now;
     

@@ -1,133 +1,149 @@
 import Phaser from 'phaser';
-import { Enemy, EnemyCombatConfig } from './Enemy';
+import { Enemy } from './Enemy';
+import { EnemyCombatConfig } from '../core/CombatConfig';
 
+/**
+ * AdaptedSkuller - Medium skull creature with horns and cracks
+ * Hollow Knight Silksong inspired - shows battle damage/adaptation
+ * More aggressive than SkullScuttler, will charge at player
+ */
 export class AdaptedSkuller extends Enemy {
+  private visualElements: Phaser.GameObjects.GameObject[] = [];
   private chargeWindupTimer = 0;
   private isCharging = false;
   private chargeCooldownTimer = 0;
   
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig) {
     super(scene, x, y, config);
+    this.createVisuals();
   }
   
-  protected createVisuals(): void {
-    // Larger, more menacing skull - adapted variant
-    const skullBody = this.scene.add.ellipse(0, -5, 45, 52, 0xf0e8e0);
-    skullBody.setDepth(2);
-    this.add(skullBody);
+  private createVisuals(): void {
+    // Larger skull body - adapted, battle-worn
+    const skullBody = this.scene.add.ellipse(0, 0, 38, 44, 0xf0e8e0);
+    skullBody.setDepth(this.depth + 1);
+    this.visualElements.push(skullBody);
     
-    // Cracks in skull - showing adaptation/damage
-    const crack1 = this.scene.add.line(-12, -8, -8, -15, -5, 0, 0x3a3028);
+    // Large split horns/crest - distinctive silhouette
+    const leftHorn = this.scene.add.polygon(0, 0, [
+      -18, -15,  // Base left
+      -22, -35,  // Tip
+      -8, -20    // Base right
+    ], 0xe0d8d0);
+    leftHorn.setDepth(this.depth + 1);
+    this.visualElements.push(leftHorn);
+    
+    const rightHorn = this.scene.add.polygon(0, 0, [
+      18, -15,   // Base right
+      22, -35,   // Tip
+      8, -20     // Base left
+    ], 0xe0d8d0);
+    rightHorn.setDepth(this.depth + 1);
+    this.visualElements.push(rightHorn);
+    
+    // Center crest spike
+    const centerCrest = this.scene.add.polygon(0, 0, [
+      0, -38,    // Top point
+      -6, -18,   // Left base
+      6, -18     // Right base
+    ], 0xd8d0c8);
+    centerCrest.setDepth(this.depth + 1);
+    this.visualElements.push(centerCrest);
+    
+    // Battle crack lines on skull
+    const crack1 = this.scene.add.line(0, 0, -10, -5, -6, 8, 0x3a3028);
     crack1.setStrokeStyle(2, 0x3a3028);
-    crack1.setDepth(3);
-    this.add(crack1);
+    crack1.setDepth(this.depth + 2);
+    this.visualElements.push(crack1);
     
-    const crack2 = this.scene.add.line(15, -12, 12, -20, 18, 0, 0x3a3028);
+    const crack2 = this.scene.add.line(0, 0, 12, -8, 15, 5, 0x3a3028);
     crack2.setStrokeStyle(2, 0x3a3028);
-    crack2.setDepth(3);
-    this.add(crack2);
+    crack2.setDepth(this.depth + 2);
+    this.visualElements.push(crack2);
     
     // Large hollow eye sockets
-    const leftEye = this.scene.add.ellipse(-12, -12, 16, 20, 0x0a0a0e);
-    leftEye.setDepth(3);
-    this.add(leftEye);
+    const leftEye = this.scene.add.ellipse(-10, -5, 14, 18, 0x0a0a0e);
+    leftEye.setDepth(this.depth + 2);
+    this.visualElements.push(leftEye);
     
-    const rightEye = this.scene.add.ellipse(12, -12, 16, 20, 0x0a0a0e);
-    rightEye.setDepth(3);
-    this.add(rightEye);
+    const rightEye = this.scene.add.ellipse(10, -5, 14, 18, 0x0a0a0e);
+    rightEye.setDepth(this.depth + 2);
+    this.visualElements.push(rightEye);
     
-    // Bright glowing orange pupils - more aggressive
-    const leftPupil = this.scene.add.circle(-12, -12, 4, 0xff6600);
-    leftPupil.setDepth(4);
+    // Bright orange-red pupils - more aggressive
+    const leftPupil = this.scene.add.circle(-10, -5, 4, 0xff5500);
+    leftPupil.setDepth(this.depth + 3);
     leftPupil.setAlpha(0.9);
-    this.add(leftPupil);
+    this.visualElements.push(leftPupil);
     
-    const rightPupil = this.scene.add.circle(12, -12, 4, 0xff6600);
-    rightPupil.setDepth(4);
+    const rightPupil = this.scene.add.circle(10, -5, 4, 0xff5500);
+    rightPupil.setDepth(this.depth + 3);
     rightPupil.setAlpha(0.9);
-    this.add(rightPupil);
+    this.visualElements.push(rightPupil);
     
-    // Glow around pupils
-    const leftGlow = this.scene.add.circle(-12, -12, 8, 0xff4400);
-    leftGlow.setDepth(3);
+    // Pupil glow effect
+    const leftGlow = this.scene.add.circle(-10, -5, 7, 0xff4400);
+    leftGlow.setDepth(this.depth + 2);
     leftGlow.setAlpha(0.3);
-    this.add(leftGlow);
+    this.visualElements.push(leftGlow);
     
-    const rightGlow = this.scene.add.circle(12, -12, 8, 0xff4400);
-    rightGlow.setDepth(3);
+    const rightGlow = this.scene.add.circle(10, -5, 7, 0xff4400);
+    rightGlow.setDepth(this.depth + 2);
     rightGlow.setAlpha(0.3);
-    this.add(rightGlow);
+    this.visualElements.push(rightGlow);
     
-    // Powerful jaw with many teeth
-    const jaw = this.scene.add.ellipse(0, 15, 30, 18, 0xe8e0d8);
-    jaw.setDepth(2);
-    this.add(jaw);
+    // Strong jaw
+    const jaw = this.scene.add.ellipse(0, 12, 24, 14, 0xe8e0d8);
+    jaw.setDepth(this.depth + 1);
+    this.visualElements.push(jaw);
     
-    // Multiple sharp teeth - more aggressive
-    for (let i = 0; i < 8; i++) {
-      const toothX = -14 + i * 4;
+    // Multiple sharp teeth
+    for (let i = 0; i < 6; i++) {
+      const toothX = -10 + i * 4;
       const tooth = this.scene.add.triangle(
-        toothX, 18,
-        toothX - 2, 24,
-        toothX + 2, 24,
+        toothX, 14,
+        -2, 0,
+        2, 0,
+        0, 6,
         0xf8f0e8
       );
-      tooth.setDepth(3);
-      this.add(tooth);
+      tooth.setDepth(this.depth + 2);
+      this.visualElements.push(tooth);
     }
     
-    // Ornate skull crest - shows adaptation
-    const crestBase = this.scene.add.triangle(
-      0, -28,
-      -12, -38,
-      12, -38,
-      0xe0d8d0
-    );
-    crestBase.setDepth(2);
-    this.add(crestBase);
-    
-    const crestTip = this.scene.add.triangle(
-      0, -35,
-      -6, -42,
-      6, -42,
-      0xd8d0c8
-    );
-    crestTip.setDepth(2);
-    this.add(crestTip);
-    
-    // Curved horn-like protrusions
-    const leftHorn = this.scene.add.ellipse(-15, -32, 8, 18, 0xd8d0c8);
-    leftHorn.setAngle(-0.3);
-    leftHorn.setDepth(2);
-    this.add(leftHorn);
-    
-    const rightHorn = this.scene.add.ellipse(15, -32, 8, 18, 0xd8d0c8);
-    rightHorn.setAngle(0.3);
-    rightHorn.setDepth(2);
-    this.add(rightHorn);
-    
-    // Multiple segmented legs - adapted for speed
-    const legPositions = [
-      { x: -14, y: 22, width: 4, length: 14, angle: -0.4 },
-      { x: 14, y: 22, width: 4, length: 14, angle: 0.4 },
-      { x: -10, y: 26, width: 3, length: 12, angle: -0.2 },
-      { x: 10, y: 26, width: 3, length: 12, angle: 0.2 },
-      { x: -6, y: 28, width: 3, length: 10, angle: -0.1 },
-      { x: 6, y: 28, width: 3, length: 10, angle: 0.1 }
+    // Sturdy spider legs - 6 legs
+    const legConfigs = [
+      { x: -14, y: 18, length: 14, angle: -30 },
+      { x: 14, y: 18, length: 14, angle: 30 },
+      { x: -10, y: 22, length: 12, angle: -15 },
+      { x: 10, y: 22, length: 12, angle: 15 },
+      { x: -6, y: 24, length: 10, angle: -5 },
+      { x: 6, y: 24, length: 10, angle: 5 }
     ];
     
-    legPositions.forEach((pos) => {
-      const leg = this.scene.add.rectangle(pos.x, pos.y, pos.width, pos.length, 0xb0a8a0);
-      leg.setDepth(1);
-      leg.setAngle(pos.angle * 180 / Math.PI);
-      this.add(leg);
+    legConfigs.forEach(cfg => {
+      const leg = this.scene.add.rectangle(cfg.x, cfg.y, 3, cfg.length, 0x2a2a2a);
+      leg.setAngle(cfg.angle);
+      leg.setDepth(this.depth);
+      this.visualElements.push(leg);
     });
+    
+    this.setAlpha(0);
   }
   
-  protected updateBehavior(time: number, delta: number, player: Phaser.GameObjects.Sprite): void {
+  update(time: number, delta: number, player: any): void {
+    super.update(time, delta, player);
+    
+    // Update charge behavior
+    this.updateChargeBehavior(delta, player);
+    
+    // Position visual elements
+    this.updateVisualPositions();
+  }
+  
+  private updateChargeBehavior(delta: number, player: any): void {
     if (this.isDying() || this.isInvulnerable()) return;
     
-    // Update timers
     if (this.chargeWindupTimer > 0) {
       this.chargeWindupTimer -= delta;
     }
@@ -135,43 +151,93 @@ export class AdaptedSkuller extends Enemy {
       this.chargeCooldownTimer -= delta;
     }
     
-    // Check if player is in aggro range and facing this enemy
     const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
     const isFacingPlayer = (this.flipX && player.x < this.x) || (!this.flipX && player.x > this.x);
     
-    // Start charge windup if in range and facing player
-    if (dist < 200 && isFacingPlayer && this.chargeCooldownTimer <= 0 && !this.isCharging && this.chargeWindupTimer <= 0) {
-      this.chargeWindupTimer = 400; // 0.4s windup
+    // Start charge if in range and facing player
+    if (dist < 180 && isFacingPlayer && this.chargeCooldownTimer <= 0 && !this.isCharging && this.chargeWindupTimer <= 0) {
+      this.chargeWindupTimer = 400;
       this.isCharging = true;
     }
     
-    // Execute charge after windup
+    // Execute charge
     if (this.chargeWindupTimer <= 0 && this.isCharging) {
       this.performCharge();
       this.isCharging = false;
-      this.chargeCooldownTimer = 2000; // 2s cooldown
+      this.chargeCooldownTimer = 2000;
     }
   }
   
   private performCharge(): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
     const chargeDir = this.flipX ? -1 : 1;
-    body.setVelocityX(chargeDir * 350); // Quick lunge
+    body.setVelocityX(chargeDir * 300);
     
-    // Visual feedback - flash orange
-    this.scene.tweens.add({
-      targets: this,
-      alpha: 0.5,
-      duration: 100,
-      yoyo: true,
-      repeat: 3
+    // Flash effect during charge
+    this.visualElements.forEach(el => {
+      if ((el as any).setAlpha) {
+        this.scene.tweens.add({
+          targets: el,
+          alpha: 0.5,
+          duration: 100,
+          yoyo: true,
+          repeat: 2
+        });
+      }
     });
     
-    // Stop charge after short duration
-    this.scene.time.delayedCall(300, () => {
+    // Stop after short duration
+    this.scene.time.delayedCall(250, () => {
       if (this.active) {
         body.setVelocityX(0);
       }
     });
+  }
+  
+  private updateVisualPositions(): void {
+    const offsets = [
+      { x: 0, y: -8 },      // skull body
+      { x: -12, y: -20 },   // left horn
+      { x: 12, y: -20 },    // right horn
+      { x: 0, y: -25 },     // center crest
+      { x: -6, y: -2 },     // crack1
+      { x: 12, y: -3 },     // crack2
+      { x: -10, y: -10 },   // left eye
+      { x: 10, y: -10 },    // right eye
+      { x: -10, y: -10 },   // left pupil
+      { x: 10, y: -10 },    // right pupil
+      { x: -10, y: -10 },   // left glow
+      { x: 10, y: -10 },    // right glow
+      { x: 0, y: 6 },       // jaw
+    ];
+    
+    // Add teeth offsets
+    for (let i = 0; i < 6; i++) {
+      offsets.push({ x: -10 + i * 4, y: 10 });
+    }
+    
+    // Add leg offsets
+    const legOffsets = [
+      { x: -14, y: 15 }, { x: 14, y: 15 },
+      { x: -10, y: 18 }, { x: 10, y: 18 },
+      { x: -6, y: 20 }, { x: 6, y: 20 }
+    ];
+    offsets.push(...legOffsets);
+    
+    this.visualElements.forEach((el, i) => {
+      if (offsets[i]) {
+        const flipMult = this.flipX ? -1 : 1;
+        (el as any).setPosition(
+          this.x + offsets[i].x * flipMult,
+          this.y + offsets[i].y
+        );
+      }
+    });
+  }
+  
+  destroy(fromScene?: boolean): void {
+    this.visualElements.forEach(el => el.destroy());
+    this.visualElements = [];
+    super.destroy(fromScene);
   }
 }
