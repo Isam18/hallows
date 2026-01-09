@@ -1191,6 +1191,608 @@ victory ──(continue)──→ playing
 
 ---
 
+## Game Design Principles
+
+### Core Gameplay Philosophy
+
+**Challenging but Fair**
+- All challenges should be learnable and predictable
+- No cheap deaths or unavoidable damage
+- Clear telegraphing for enemy attacks and hazards
+- Player has tools to overcome any obstacle
+
+**Exploration Reward**
+- Players are rewarded for venturing off the beaten path
+- Hidden areas contain valuable items (charms, currency, health upgrades)
+- Environmental storytelling through level design
+- Non-linear progression allows for discovery
+
+**Risk vs Reward**
+- Focus healing requires standing still for 1.5 seconds
+- Death drops currency that must be recovered
+- Challenging areas contain greater rewards
+- Charm system allows players to customize their playstyle and risk tolerance
+
+**Player Agency**
+- Multiple ways to approach challenges
+- Movement options (jump, dash, wall-jump) provide freedom
+- Charm system builds allow different strategies
+- No forced tutorials - learning through play
+
+### Difficulty Curve
+
+**Gradual Progression**
+- Start with basic movement and combat
+- Introduce new mechanics one at a time
+- Difficulty spikes at biome transitions (boss fights)
+- Optional challenges for advanced players
+
+**Layered Complexity**
+- Basic mechanics (move, jump, attack) introduced early
+- Advanced mechanics (dash, wall-jump, focus) unlocked later
+- Enemy complexity increases gradually
+- Environmental hazards add layering
+
+**Adaptive Difficulty**
+- Charm system allows players to adjust difficulty
+- Early areas accessible with basic skills
+- Later areas require mastery of mechanics
+- Boss fights serve as skill checkpoints
+
+### Combat Philosophy
+
+**Intentional Design**
+- Every enemy has a purpose and pattern
+- No random damage or unfair attacks
+- Player has tools to counter every threat
+- Spacing and timing are rewarded
+
+**Flow State Combat**
+- Fast-paced but never overwhelming
+- Hitstop provides satisfaction on successful hits
+- Invulnerability frames prevent damage spam
+- Dash provides mobility and brief invulnerability
+
+**Strategic Depth**
+- Resource management (soul for healing)
+- Charm builds for different playstyles
+- Enemy patterns to learn and exploit
+- Boss phase progression teaches adaptation
+
+### Narrative Approach
+
+**Environmental Storytelling**
+- World tells its story through design
+- No forced exposition or dialogue dumps
+- Visual cues convey lore and history
+- Player pieces together story through exploration
+
+**Atmosphere over Plot**
+- Mood and tone are primary
+- Subtle narrative elements
+- Mystery and ambiguity
+- Player interpretation encouraged
+
+---
+
+## User Experience Flow
+
+### Onboarding Experience
+
+**Minimal Tutorial**
+- No explicit tutorial required
+- Basic controls intuitive (arrow keys, space)
+- Advanced mechanics discovered through play
+- Visual cues teach through observation
+
+**Progressive Discovery**
+- New areas unlock as player gains abilities
+- Environmental gates indicate required skills
+- Optional shortcuts for experienced players
+- Metroidvania backtracking rewarded
+
+**First Experience**
+- Start in safe area with basic enemies
+- Gradual introduction to mechanics
+- Early boss serves as skill check
+- Positive reinforcement for exploration
+
+### Core Gameplay Loop
+
+```
+Exploration → Combat → Resource Management → Progression → Repeat
+```
+
+**Exploration Phase**
+- Navigate through interconnected levels
+- Discover new areas and secrets
+- Find benches (checkpoints)
+- Encounter enemies and hazards
+
+**Combat Phase**
+- Fight enemies using learned patterns
+- Manage soul resource for healing
+- Dodge and counter enemy attacks
+- Learn enemy behaviors
+
+**Resource Management**
+- Collect shells (currency)
+- Manage soul for healing
+- Recover death markers
+- Purchase upgrades and charms
+
+**Progression**
+- Unlock new abilities
+- Access previously blocked areas
+- Defeat bosses
+- Customize build with charms
+
+### Death & Recovery Loop
+
+**Death Experience**
+- Sudden but not frustrating
+- Clear death marker shows where you died
+- Drop percentage (75%) feels fair
+- Respawn at last bench with brief invulnerability
+
+**Recovery Gameplay**
+- Return to death location (may need to refight enemies)
+- Collect death marker to recover shells
+- Risk/reward: may encounter more danger on return
+- Satisfaction of reclaiming lost progress
+
+**Psychological Flow**
+- Death feels like a learning opportunity
+- Recovery provides motivation to improve
+- Short respawn loop maintains engagement
+- Multiple deaths create tension without frustration
+
+### Biome Transition Experience
+
+**Visual Transition**
+- Fade effect between biomes
+- Distinct color palettes
+- Particle effects change (dust → leaves)
+- Audio atmosphere shifts
+
+**Gameplay Transition**
+- New enemy types introduced
+- Different environmental hazards
+- Unique mechanics per biome
+- Progressive difficulty
+
+**Crossroads → Greenway**
+- Transition from dark/moody to green/lush
+- Acid pools introduced as new hazard
+- Flying enemies increase in frequency
+- More verticality in level design
+
+**Greenway → Medulla**
+- Darker, more oppressive atmosphere
+- Bone-themed environment
+- New enemy behaviors (Skull enemies)
+- More complex platforming challenges
+
+### Boss Battle Flow
+
+**Preparation Phase**
+- Approach boss arena through door or gate
+- Visual indicator of upcoming challenge
+- Player can retreat if unprepared
+- Opportunity to heal or change charms
+
+**Battle Phase**
+- Multiple phases with distinct patterns
+- Telegraphed attacks for readability
+- Phase transitions marked by visual cues
+- Player learns patterns through repetition
+
+**Victory Phase**
+- Satisfying defeat animation
+- Reward (new ability or item)
+- Narrative progression
+- Sense of accomplishment
+
+**Retry Flow**
+- Quick respawn at boss arena entrance
+- No need to replay entire level
+- Maintain progress and currency
+- Encourages persistence
+
+### Progression Systems
+
+**Ability Progression**
+- New movement options (dash, wall-jump)
+- Combat upgrades
+- Access to new areas
+- Metroidvania gating
+
+**Charm System**
+- Strategic choices in build crafting
+- 5 charm slots create customization depth
+- Different charms for different challenges
+- Experimentation encouraged
+
+**Economy System**
+- Shells earned from combat and exploration
+- Charms purchased in shop
+- Risk/reward with death drops
+- Resource management adds tactical layer
+
+### Menu & UI Flow
+
+**Main Menu**
+- Clean, uncluttered design
+- Start, Settings, Quit options
+- Atmospheric background
+- Immediate game start
+
+**Pause Menu**
+- Instant access (Esc/P)
+- Resume, Settings, Quit to menu
+- No loading interruptions
+- Maintain immersion
+
+**HUD Design**
+- Minimal and unobtrusive
+- HP, Soul, Shells always visible
+- Charm slots show equipped items
+- Combat feedback integrated into gameplay
+
+**Shop Interface**
+- Clear charm descriptions
+- Visual charm preview
+- Price clearly displayed
+- Transaction confirmation
+
+---
+
+## Visual Design System
+
+### Color Palettes by Biome
+
+**Crossroads (Dark/Moody)**
+- Primary: #2d2d2d (dark gray)
+- Secondary: #3d3d3d (medium gray)
+- Accent: #8b7355 (muted brown)
+- Highlight: #c9b896 (soft beige)
+- Background: #1a1a1a (very dark gray)
+- Purpose: Creates atmosphere of decay and ancient ruins
+
+**Greenway (Vibrant/Lush)**
+- Primary: #228b22 (forest green)
+- Secondary: #32cd32 (lime green)
+- Accent: #90ee90 (light green)
+- Highlight: #98fb98 (pale green)
+- Background: #0a2f0a (dark green)
+- Purpose: Evokes overgrowth and nature reclaiming ruins
+
+**Medulla (Bone/Spooky)**
+- Primary: #d4c5a9 (bone white)
+- Secondary: #c4b59d (darker bone)
+- Accent: #8b0000 (dark red)
+- Highlight: #ff6b6b (blood red)
+- Background: #2a1a1a (dark red-brown)
+- Purpose: Creates unsettling, skeletal atmosphere
+
+**UI Elements**
+- Health: #ffffff (white with red glow)
+- Soul: #3b82f6 (blue energy)
+- Shells: #fbbf24 (golden yellow)
+- Charms: #a78bfa (purple accent)
+- Purpose: Clear contrast from game world
+
+### Lighting & Atmosphere
+
+**Crossroads Lighting**
+- Dim, ambient lighting
+- Occasional flickering torches
+- Dark corners create mystery
+- Soft shadows add depth
+- Purpose: Eerie, abandoned feeling
+
+**Greenway Lighting**
+- Filtered sunlight through canopy
+- Bright, dappled lighting
+- Glowing particles (pollen/spores)
+- Warm, welcoming atmosphere
+- Purpose: Life, growth, hope
+
+**Medulla Lighting**
+- Harsh, stark lighting
+- Long, dramatic shadows
+- Faint red glow from magma
+- Cold, clinical feel
+- Purpose: Unsettling, dangerous
+
+**Lighting Transitions**
+- Smooth fade between biomes
+- Gradual color shift in background
+- Particle effects change density
+- Audio atmosphere shifts subtly
+
+### Visual Feedback Systems
+
+**Combat Feedback**
+- Hitstop: 50ms freeze on successful hits
+- Screen shake on heavy impacts
+- Flash effect on player damage
+- Particle burst on enemy death
+- Damage numbers (optional, for clarity)
+
+**Movement Feedback**
+- Dust particles on landing
+- Motion blur during dash
+- Trail effect during fast movement
+- Wall slide particles
+- Jump anticipation (squash/stretch)
+
+**Interaction Feedback**
+- Glow on interactable objects
+- Particle effect on collection
+- Visual cue on bench activation
+- Door opening animation
+- Platform feedback when stepped on
+
+**State Indicators**
+- Invulnerability: flashing sprite
+- Focus healing: aura/glow effect
+- Charm equipped: subtle visual change
+- Death marker: distinct color/shape
+
+### UI Design Principles
+
+**Minimalism**
+- Only essential information displayed
+- Clean, uncluttered interface
+- No overwhelming elements
+- Focused on gameplay
+
+**Readability**
+- High contrast text
+- Clear iconography
+- Consistent typography
+- Scalable for different resolutions
+
+**Consistency**
+- Same color usage throughout
+- Uniform button styles
+- Predictable menu layouts
+- Cohesive visual language
+
+**Feedback**
+- Button hover states
+- Click confirmation
+- Visual state changes
+- Audio cues for UI actions
+
+### Particle Effects System
+
+**Crossroads Particles**
+- Dust motes floating in air
+- Ash falling from ceiling
+- Occasional ember sparks
+- Subtle, unsettling movement
+
+**Greenway Particles**
+- Leaves falling gently
+- Pollen/spores drifting
+- Glow-in-the-dark particles
+- Vibrant, organic movement
+
+**Medulla Particles**
+- Bone fragments
+- Red ash/magma dust
+- Spectral wisps
+- Eerie, unnatural movement
+
+**Effect Usage**
+- Combat impact bursts
+- Death explosions
+- Healing auras
+- Dash trails
+- Jump clouds
+
+### Animation Principles
+
+**Player Animation**
+- Snappy, responsive (6-8 frames per action)
+- Anticipation for jumps (wind-up)
+- Follow-through for attacks
+- Smooth state transitions
+- Hitbox synced to animation frames
+
+**Enemy Animation**
+- Clear telegraphing for attacks
+- Distinct idle patterns
+- Death animations (varied)
+- Stagger animations on hit
+- Boss phase transition animations
+
+**Environmental Animation**
+- Subtle breathing of platforms
+- Water/lava flowing
+- Particle drift
+- Door opening/closing
+- Parallax background movement
+
+### Icon & Symbol Design
+
+**Health Icons**
+- Hollow circles for empty
+- Filled circles for HP
+- Glow effect on damage
+- Scale animation on heal
+
+**Soul Icon**
+- Orb shape
+- Blue glow effect
+- Pulsing when full
+- Drain animation on use
+
+**Charm Icons**
+- Distinct shapes for each charm
+- Color-coded by effect type
+- Glow when equipped
+- Size indicates slot cost
+
+**Door/Gate Icons**
+- Visual indication of type
+- Lock icon for locked doors
+- Boss gate with skull motif
+- Special gates with unique symbols
+
+### Typography
+
+**Font Style**
+- Clean, readable sans-serif
+- Consistent weight (medium/semibold)
+- Good contrast with backgrounds
+- Scalable for UI elements
+
+**Text Hierarchy**
+- Headers: Large, bold, prominent
+- Body text: Medium size, readable
+- Subtitles: Smaller, secondary info
+- Tooltips: Compact, detailed
+
+**Color Usage**
+- White text on dark backgrounds
+- Black text on light backgrounds
+- Accent colors for important info
+- Consistent color coding (red = danger, blue = info)
+
+---
+
+## Recent Changes & Updates
+
+### Medulla Biome Addition (2026)
+
+**New Biome Characteristics**
+- Bone-themed environment with skeletal structures
+- Darker, more oppressive atmosphere
+- 7 unique rooms with distinct challenges
+- Red magma/lava hazards as environmental danger
+- Skull-themed enemy family
+
+**New Enemy Types**
+
+**Skull Scuttler**
+- Fast-moving ground enemy
+- Patrol behavior with rapid movement
+- Burst movement when player detected
+- Low HP but high contact damage
+
+**Skull Ravager**
+- Larger, more aggressive skull enemy
+- Chase behavior when player spotted
+- Higher HP and damage
+- Found in later Medulla rooms
+
+**Adapted Skuller**
+- Elite variant with special attacks
+- Dual-state behavior (idle/aggro)
+- More complex AI patterns
+- Boss-like mechanics in regular enemy
+
+**Room Design**
+
+**Room 1: Rib Gate**
+- Introduction to Medulla aesthetic
+- Basic platforming with rib platforms
+- First encounter with Skull Scuttlers
+- Teaching room for new enemy type
+
+**Room 2: Skittering Shaft**
+- Vertical room with multiple platforms
+- Heavy use of Skull Scuttlers
+- Requires precise platforming
+- Introduction of magma hazards
+
+**Room 3: Marrow Tap**
+- Central hub room
+- Multiple paths and branches
+- Mix of enemy types
+- Checkpoint/respawn location
+
+**Room 4: Vertebrae Stepping Stones**
+- Precision platforming challenge
+- Floating vertebrae platforms
+- Magma hazards below
+- Timing-based gameplay
+
+**Room 5: Thermal Vent**
+- Vertical shaft with rising heat
+- Magma projectiles from vents
+- Environmental hazard focus
+- Dodging and positioning focus
+
+**Room 6: Shattered Femur**
+- Large arena room
+- Multiple enemy waves
+- Combat challenge room
+- Introduces Skull Ravagers
+
+**Room 7: Ossuary Gate**
+- Final Medulla room
+- Lead-up to boss arena
+- Combination of all mechanics
+- Preparation for boss fight
+
+**Technical Implementation**
+
+**Level Structure**
+- Room-based level system (vs. continuous levels)
+- Each room is separate JSON file
+- Transition triggers between rooms
+- Shared biome state (enemies defeated, doors opened)
+
+**Room Loading System**
+- Dynamic room loading based on position
+- Efficient memory management
+- Seamless transitions between rooms
+- Room-specific background effects
+
+**Medulla Parallax System**
+- Custom parallax background for bone aesthetic
+- Multiple depth layers
+- Atmospheric fog/mist effects
+- Red glow from magma sources
+
+**Boss Arena Integration**
+- Boss gate opens after defeating all enemies in final room
+- Seamless transition to boss fight
+- Boss state persisted across rooms
+- Victory sequence returns to game
+
+**Gameplay Changes**
+
+**Difficulty Adjustment**
+- Medulla is more challenging than previous biomes
+- Enemy patterns are more complex
+- Platforming requires more precision
+- Environmental hazards are more frequent
+
+**Progression Flow**
+- Accessible after completing Greenway
+- Requires mastery of basic mechanics
+- Prepares player for boss fights
+- Rewards with new abilities/charms
+
+**Audio Updates**
+- New sound effects for skull enemies
+- Ambient audio for Medulla atmosphere
+- Magma bubbling and vent sounds
+- Footstep sounds on bone surfaces
+
+**Visual Polish**
+- Bone texture details on platforms
+- Magma particle effects
+- Lighting changes based on room
+- Red glow effects on hazards
+
+---
+
 ## Document Version
 
 **Version**: 1.0  

@@ -1,0 +1,82 @@
+{
+  "id": "medullaRoom1",
+  "name": "The Rib-Gate",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#2a0808",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 750, "width": 1200, "height": 50, "type": "ground", "texture": "crackedBone" },
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 710, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 710, "type": "wall" }
+  ],
+  "magmaPools": [],
+  "enemies": [],
+  "pickups": [
+    {
+      "type": "journal",
+      "x": 600,
+      "y": 650,
+      "entry": "skullHierarchy",
+      "text": "Hunter's Journal: The Skull Hierarchy\n\nThe Medulla is ruled by a brutal caste system. At the bottom, mindless Scuttlers clean the bone-reefs. Above them, the Brutes enforce the Tyrant's will. At the apex, the Ravagers - living manifestations of ancient cruelty."
+    }
+  ],
+  "triggers": [
+    {
+      "id": "ribArch1",
+      "type": "decoration",
+      "x": 200,
+      "y": 200,
+      "width": 120,
+      "height": 500
+    },
+    {
+      "id": "ribArch2",
+      "type": "decoration",
+      "x": 500,
+      "y": 200,
+      "width": 120,
+      "height": 500
+    },
+    {
+      "id": "ribArch3",
+      "type": "decoration",
+      "x": 800,
+      "y": 200,
+      "width": 120,
+      "height": 500
+    },
+    {
+      "id": "entranceToMedulla",
+      "type": "transition",
+      "x": 1160,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "theMedulla",
+      "targetSpawn": "fromRibGate"
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom2",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 1160, "y": 700 },
+    "fromChain": { "x": 100, "y": 700 }
+  },
+  "special": {
+    "crackedBoneFloor": true,
+    "journalEntry": "skullHierarchy",
+    "backgroundType": "fossilizedRibs"
+  }
+}

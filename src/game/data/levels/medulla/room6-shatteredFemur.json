@@ -1,0 +1,114 @@
+{
+  "id": "medullaRoom6",
+  "name": "The Shattered Femur",
+  "biome": "medulla",
+  "width": 1400,
+  "height": 800,
+  "backgroundColor": "#2a0808",
+  "spawnPoint": { "x": 1300, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1400, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1360, "y": 40, "width": 40, "height": 760, "type": "wall" }
+  ],
+  "magmaPlatforms": [],
+  "lavaPools": [
+    { "x": 40, "y": 720, "width": 1320, "height": 80 }
+  ],
+  "enemies": [
+    { "type": "skullScuttler", "x": 400, "y": 550 },
+    { "type": "skullScuttler", "x": 700, "y": 550 },
+    { "type": "skullScuttler", "x": 1000, "y": 550 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "entranceFromRoom5",
+      "type": "transition",
+      "x": 1360,
+      "y": 450,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom5",
+      "targetSpawn": "default"
+    },
+    {
+      "id": "bridgeStart",
+      "type": "platform",
+      "x": 1200,
+      "y": 550,
+      "width": 160,
+      "height": 30
+    },
+    {
+      "id": "bridgeSection1",
+      "type": "platform",
+      "x": 1000,
+      "y": 550,
+      "width": 180,
+      "height": 30
+    },
+    {
+      "id": "bridgeSection2",
+      "type": "platform",
+      "x": 800,
+      "y": 550,
+      "width": 180,
+      "height": 30
+    },
+    {
+      "id": "bridgeSection3",
+      "type": "platform",
+      "x": 600,
+      "y": 550,
+      "width": 180,
+      "height": 30
+    },
+    {
+      "id": "bridgeSection4",
+      "type": "platform",
+      "x": 400,
+      "y": 550,
+      "width": 180,
+      "height": 30
+    },
+    {
+      "id": "bridgeEnd",
+      "type": "platform",
+      "x": 200,
+      "y": 550,
+      "width": 180,
+      "height": 30
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 450,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom7",
+      "targetSpawn": "default"
+    },
+    {
+      "id": "creakTrigger",
+      "type": "event",
+      "x": 700,
+      "y": 400,
+      "width": 200,
+      "height": 200,
+      "event": "bridgeCreak"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1300, "y": 700 },
+    "fromPrevious": { "x": 40, "y": 250 }
+  },
+  "special": {
+    "narrowBridge": true,
+    "magmaFloor": true,
+    "standingFireDamage": true,
+    "fireThreshold": 2000,
+    "projectileDodging": true
+  }
+}

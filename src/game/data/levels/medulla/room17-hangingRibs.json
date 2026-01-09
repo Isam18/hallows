@@ -1,0 +1,77 @@
+{
+  "id": "medullaRoom17",
+  "name": "The Hanging Ribs",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#4a1006",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1050, "y": 650, "width": 100, "height": 20, "type": "platform", "hangingRib": true },
+    { "x": 850, "y": 550, "width": 100, "height": 20, "type": "platform", "hangingRib": true },
+    { "x": 650, "y": 450, "width": 100, "height": 20, "type": "platform", "hangingRib": true },
+    { "x": 450, "y": 350, "width": 100, "height": 20, "type": "platform", "hangingRib": true },
+    { "x": 250, "y": 250, "width": 100, "height": 20, "type": "platform", "hangingRib": true }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 0, "y": 680, "width": 1200, "height": 120 }
+  ],
+  "enemies": [
+    { "type": "skullScuttler", "x": 1050, "y": 620 },
+    { "type": "skullScuttler", "x": 650, "y": 420 },
+    { "type": "skullScuttler", "x": 250, "y": 220 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "ribChain1",
+      "type": "decoration",
+      "x": 1080,
+      "y": 0,
+      "width": 40,
+      "height": 650
+    },
+    {
+      "id": "ribChain2",
+      "type": "decoration",
+      "x": 680,
+      "y": 0,
+      "width": 40,
+      "height": 450
+    },
+    {
+      "id": "ribChain3",
+      "type": "decoration",
+      "x": 280,
+      "y": 0,
+      "width": 40,
+      "height": 250
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 200,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom18",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 680 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "noFloor": true,
+    "hangingRibs": true,
+    "chainPlatforms": true,
+    "lavaSeaBelow": true,
+    "swingMechanic": true
+  }
+}

@@ -10,19 +10,27 @@
     { "x": 0, "y": 950, "width": 1200, "height": 50, "type": "ground" },
     { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
     { "x": 0, "y": 40, "width": 40, "height": 910, "type": "wall" },
-    { "x": 1160, "y": 40, "width": 40, "height": 910, "type": "wall" },
-    
-    { "x": 900, "y": 800, "width": 200, "height": 20, "type": "platform" },
-    { "x": 600, "y": 700, "width": 180, "height": 20, "type": "platform" },
-    { "x": 300, "y": 800, "width": 200, "height": 20, "type": "platform" },
-    { "x": 100, "y": 650, "width": 150, "height": 20, "type": "platform" },
-    { "x": 400, "y": 550, "width": 200, "height": 20, "type": "platform" },
-    { "x": 750, "y": 500, "width": 180, "height": 20, "type": "platform" },
-    { "x": 200, "y": 400, "width": 150, "height": 20, "type": "platform" },
-    { "x": 500, "y": 300, "width": 200, "height": 20, "type": "platform" },
-    { "x": 850, "y": 350, "width": 150, "height": 20, "type": "platform" }
+    { "x": 1160, "y": 40, "width": 40, "height": 910, "type": "wall" }
   ],
-  "enemies": [],
+  "magmaPlatforms": [
+    { "x": 900, "y": 800, "width": 200, "height": 20 },
+    { "x": 600, "y": 700, "width": 180, "height": 20 },
+    { "x": 300, "y": 800, "width": 200, "height": 20 },
+    { "x": 100, "y": 650, "width": 150, "height": 20 },
+    { "x": 400, "y": 550, "width": 200, "height": 20 },
+    { "x": 750, "y": 500, "width": 180, "height": 20 },
+    { "x": 200, "y": 400, "width": 150, "height": 20 },
+    { "x": 500, "y": 300, "width": 200, "height": 20 },
+    { "x": 850, "y": 350, "width": 150, "height": 20 }
+  ],
+  "lavaPools": [
+    { "x": 0, "y": 920, "width": 1200, "height": 80 }
+  ],
+  "enemies": [
+    { "type": "skullScuttler", "x": 200, "y": 610 },
+    { "type": "skullScuttler", "x": 950, "y": 610 },
+    { "type": "adaptedSkuller", "x": 500, "y": 510 }
+  ],
   "pickups": [],
   "triggers": [
     {
@@ -50,10 +58,21 @@
       "height": 100,
       "target": "mossTitanArena",
       "targetSpawn": "default"
+    },
+    {
+      "id": "entranceToRibGate",
+      "type": "transition",
+      "x": 40,
+      "y": 900,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom1",
+      "targetSpawn": "fromChain"
     }
   ],
   "spawns": {
     "default": { "x": 1100, "y": 900 },
-    "fromBoss": { "x": 1100, "y": 900 }
+    "fromBoss": { "x": 1100, "y": 900 },
+    "fromRibGate": { "x": 100, "y": 900 }
   }
 }

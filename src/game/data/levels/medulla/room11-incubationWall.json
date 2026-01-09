@@ -1,0 +1,82 @@
+{
+  "id": "medullaRoom11",
+  "name": "Incubation Wall",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#2a0806",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1050, "y": 600, "width": 100, "height": 30, "type": "platform" },
+    { "x": 850, "y": 500, "width": 100, "height": 30, "type": "platform" },
+    { "x": 650, "y": 400, "width": 100, "height": 30, "type": "platform" },
+    { "x": 450, "y": 300, "width": 100, "height": 30, "type": "platform" },
+    { "x": 250, "y": 200, "width": 100, "height": 30, "type": "platform" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 0, "y": 630, "width": 1200, "height": 170 }
+  ],
+  "enemies": [
+    { "type": "skullScuttler", "x": 1050, "y": 570 },
+    { "type": "skullScuttler", "x": 850, "y": 470 },
+    { "type": "skullScuttler", "x": 650, "y": 370 },
+    { "type": "skullScuttler", "x": 450, "y": 270 },
+    { "type": "skullScuttler", "x": 250, "y": 170 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "eggCluster1",
+      "type": "decoration",
+      "x": 50,
+      "y": 100,
+      "width": 20,
+      "height": 600,
+      "hatchable": true
+    },
+    {
+      "id": "eggCluster2",
+      "type": "decoration",
+      "x": 1130,
+      "y": 100,
+      "width": 20,
+      "height": 600,
+      "hatchable": true
+    },
+    {
+      "id": "entranceFromRoom10",
+      "type": "transition",
+      "x": 1160,
+      "y": 280,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom10",
+      "targetSpawn": "fromNext"
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 150,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom12",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "eggWall": true,
+    "wallHatching": true,
+    "airborneCombat": true,
+    "lavaFloorRiver": true
+  }
+}

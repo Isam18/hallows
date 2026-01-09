@@ -1,0 +1,118 @@
+{
+  "id": "medullaRoom7",
+  "name": "The Ossuary Gate",
+  "biome": "medulla",
+  "width": 1000,
+  "height": 800,
+  "backgroundColor": "#2a0808",
+  "spawnPoint": { "x": 900, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 750, "width": 1000, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1000, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 710, "type": "wall" },
+    { "x": 960, "y": 40, "width": 40, "height": 710, "type": "wall" }
+  ],
+  "magmaPlatforms": [],
+  "lavaPools": [
+    { "x": 0, "y": 720, "width": 1000, "height": 80 }
+  ],
+  "enemies": [],
+  "pickups": [
+    {
+      "type": "key",
+      "x": 500,
+      "y": 650,
+      "keyType": "skullKey",
+      "requiresWaves": true
+    }
+  ],
+  "triggers": [
+    {
+      "id": "arenaCenter",
+      "type": "event",
+      "x": 300,
+      "y": 400,
+      "width": 400,
+      "height": 300,
+      "event": "startArenaFight"
+    },
+    {
+      "id": "platformLeft",
+      "type": "platform",
+      "x": 200,
+      "y": 550,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platformRight",
+      "type": "platform",
+      "x": 600,
+      "y": 550,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "platformTop",
+      "type": "platform",
+      "x": 400,
+      "y": 350,
+      "width": 200,
+      "height": 30
+    },
+    {
+      "id": "entranceFromRoom6",
+      "type": "transition",
+      "x": 960,
+      "y": 250,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom6",
+      "targetSpawn": "default"
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 250,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom8",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 900, "y": 700 },
+    "fromPrevious": { "x": 40, "y": 450 }
+  },
+  "special": {
+    "lockedArena": true,
+    "waves": [
+      {
+        "wave": 1,
+        "enemies": [
+          { "type": "skullScuttler", "x": 300, "y": 500 },
+          { "type": "skullScuttler", "x": 500, "y": 500 },
+          { "type": "skullScuttler", "x": 700, "y": 500 },
+          { "type": "skullScuttler", "x": 400, "y": 300 }
+        ]
+      },
+      {
+        "wave": 2,
+        "enemies": [
+          { "type": "adaptedSkuller", "x": 300, "y": 500 },
+          { "type": "adaptedSkuller", "x": 700, "y": 500 }
+        ]
+      },
+      {
+        "wave": 3,
+        "enemies": [
+          { "type": "skullScuttler", "x": 250, "y": 500 },
+          { "type": "skullScuttler", "x": 750, "y": 500 },
+          { "type": "adaptedSkuller", "x": 500, "y": 500 }
+        ]
+      }
+    ],
+    "reward": "skullKey"
+  }
+}

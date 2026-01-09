@@ -1,0 +1,53 @@
+{
+  "id": "medullaRoom29",
+  "name": "The Lip of the Beast",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#1a0403",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 0, "y": 750, "width": 1200, "height": 50, "type": "ground", "texture": "lips" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "upperLip",
+      "type": "decoration",
+      "x": 0,
+      "y": 0,
+      "width": 1200,
+      "height": 150,
+      "lipTexture": true,
+      "upperLip": true
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom30",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 1160, "y": 700 },
+    "fromNext": { "x": 100, "y": 700 }
+  },
+  "special": {
+    "lipRoom": true,
+    "exitFromMouth": true,
+    "outsideWorld": true,
+    "lightTransition": true,
+    "exitMedulla": true
+  }
+}

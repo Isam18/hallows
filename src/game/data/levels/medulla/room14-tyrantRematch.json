@@ -1,0 +1,57 @@
+{
+  "id": "medullaRoom14",
+  "name": "The Tyrant's Rematch",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#3a1005",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 100, "y": 650, "width": 100, "height": 20, "type": "platform" },
+    { "x": 300, "y": 550, "width": 100, "height": 20, "type": "platform" },
+    { "x": 500, "y": 450, "width": 100, "height": 20, "type": "platform" },
+    { "x": 700, "y": 550, "width": 100, "height": 20, "type": "platform" },
+    { "x": 900, "y": 650, "width": 100, "height": 20, "type": "platform" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 0, "y": 680, "width": 1200, "height": 120 }
+  ],
+  "enemies": [
+    {
+      "type": "skullBrute",
+      "x": 600,
+      "y": 580,
+      "behavior": "lavaWaveAttack",
+      "elite": true
+    }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 150,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom15",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 680 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "miniBossRoom": true,
+    "lavaWaveAttack": true,
+    "airborneSurvivalRequired": true,
+    "survivalTime": 5000,
+    "wallShakeAttack": true
+  }
+}

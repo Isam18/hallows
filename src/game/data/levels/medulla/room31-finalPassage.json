@@ -1,0 +1,73 @@
+{
+  "id": "medullaRoom31",
+  "name": "The Final Passage",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#050101",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 0, "y": 750, "width": 1200, "height": 50, "type": "ground", "texture": "darkness" },
+    { "x": 300, "y": 650, "width": 200, "height": 20, "type": "platform", "texture": "glowing" },
+    { "x": 700, "y": 650, "width": 200, "height": 20, "type": "platform", "texture": "glowing" },
+    { "x": 500, "y": 500, "width": 200, "height": 20, "type": "platform", "texture": "glowing" },
+    { "x": 300, "y": 350, "width": 200, "height": 20, "type": "platform", "texture": "glowing" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [],
+  "enemies": [],
+  "pickups": [
+    { "type": "soul", "x": 400, "y": 700 },
+    { "type": "soul", "x": 800, "y": 700 },
+    { "type": "soul", "x": 600, "y": 550 },
+    { "type": "soul", "x": 400, "y": 400 }
+  ],
+  "triggers": [
+    {
+      "id": "lightParticles1",
+      "type": "decoration",
+      "x": 350,
+      "y": 300,
+      "width": 100,
+      "height": 100,
+      "lightParticles": true,
+      "floating": true
+    },
+    {
+      "id": "lightParticles2",
+      "type": "decoration",
+      "x": 550,
+      "y": 450,
+      "width": 100,
+      "height": 100,
+      "lightParticles": true,
+      "floating": true
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 150,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom32",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "finalPassage": true,
+    "darkRoom": true,
+    "glowingPlatforms": true,
+    "lightParticles": true,
+    "upwardClimb": true,
+    "mystical": true
+  }
+}

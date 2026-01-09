@@ -1,0 +1,75 @@
+{
+  "id": "medullaRoom25",
+  "name": "The Deep Stomach",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#5a0907",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 200, "y": 650, "width": 100, "height": 20, "type": "platform", "texture": "fleshy" },
+    { "x": 450, "y": 550, "width": 100, "height": 20, "type": "platform", "texture": "fleshy" },
+    { "x": 700, "y": 450, "width": 100, "height": 20, "type": "platform", "texture": "fleshy" },
+    { "x": 950, "y": 350, "width": 100, "height": 20, "type": "platform", "texture": "fleshy" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 0, "y": 680, "width": 1200, "height": 120 }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "acidDrip1",
+      "type": "decoration",
+      "x": 250,
+      "y": 0,
+      "width": 20,
+      "height": 650,
+      "acidDrip": true
+    },
+    {
+      "id": "acidDrip2",
+      "type": "decoration",
+      "x": 500,
+      "y": 0,
+      "width": 20,
+      "height": 550,
+      "acidDrip": true
+    },
+    {
+      "id": "acidDrip3",
+      "type": "decoration",
+      "x": 750,
+      "y": 0,
+      "width": 20,
+      "height": 450,
+      "acidDrip": true
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 150,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom26",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 680 },
+    "fromPrevious": { "x": 1160, "y": 280 },
+    "fromNext": { "x": 100, "y": 680 }
+  },
+  "special": {
+    "stomachAcid": true,
+    "acidDropsFromCeiling": true,
+    "platforming": true,
+    "risingAcid": true,
+    "timePressure": true
+  }
+}

@@ -1,0 +1,67 @@
+{
+  "id": "medullaRoom24",
+  "name": "The Inner Gullet",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 800,
+  "backgroundColor": "#4a0806",
+  "spawnPoint": { "x": 1100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 760, "type": "wall" },
+    { "x": 0, "y": 750, "width": 1200, "height": 50, "type": "ground", "texture": "fleshy" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [
+    { "x": 300, "y": 680, "width": 600, "height": 70 }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "fleshyWall1",
+      "type": "decoration",
+      "x": 50,
+      "y": 50,
+      "width": 30,
+      "height": 700,
+      "breathingWall": true,
+      "damageOnContact": true,
+      "contactDamageTime": 2000
+    },
+    {
+      "id": "fleshyWall2",
+      "type": "decoration",
+      "x": 1120,
+      "y": 50,
+      "width": 30,
+      "height": 700,
+      "breathingWall": true,
+      "damageOnContact": true,
+      "contactDamageTime": 2000
+    },
+    {
+      "id": "exit",
+      "type": "transition",
+      "x": 40,
+      "y": 650,
+      "width": 40,
+      "height": 100,
+      "target": "medullaRoom25",
+      "targetSpawn": "fromPrevious"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 1100, "y": 700 },
+    "fromPrevious": { "x": 1160, "y": 700 },
+    "fromNext": { "x": 100, "y": 700 }
+  },
+  "special": {
+    "fleshyWalls": true,
+    "breathingAnimation": true,
+    "wallContactDamage": true,
+    "dashThroughCenter": true,
+    "contactDamageTime": 2000
+  }
+}
