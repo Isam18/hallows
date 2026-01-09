@@ -17,7 +17,7 @@ import { MossWarrior } from '../entities/MossWarrior';
 import { Squit } from '../entities/Squit';
 import { SkullScuttler } from '../entities/SkullScuttler';
 import { AdaptedSkuller } from '../entities/AdaptedSkuller';
-import { SkullRavanger } from '../entities/SkullRavanger';
+import { SkullRavager } from '../entities/SkullRavager';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { Pickup } from '../entities/Pickup';
@@ -97,38 +97,38 @@ const LEVELS: Record<string, LevelConfig> = {
   mossTitanArena: mossTitanArenaData as LevelConfig,
   theMedulla: theMedullaData as LevelConfig,
   // Medulla rooms (1-32)
-  medullaRoom1: medullaRoom1Data as LevelConfig,
-  medullaRoom2: medullaRoom2Data as LevelConfig,
-  medullaRoom3: medullaRoom3Data as LevelConfig,
-  medullaRoom4: medullaRoom4Data as LevelConfig,
-  medullaRoom5: medullaRoom5Data as LevelConfig,
-  medullaRoom6: medullaRoom6Data as LevelConfig,
-  medullaRoom7: medullaRoom7Data as LevelConfig,
-  medullaRoom8: medullaRoom8Data as LevelConfig,
-  medullaRoom9: medullaRoom9Data as LevelConfig,
-  medullaRoom10: medullaRoom10Data as LevelConfig,
-  medullaRoom11: medullaRoom11Data as LevelConfig,
-  medullaRoom12: medullaRoom12Data as LevelConfig,
-  medullaRoom13: medullaRoom13Data as LevelConfig,
-  medullaRoom14: medullaRoom14Data as LevelConfig,
-  medullaRoom15: medullaRoom15Data as LevelConfig,
-  medullaRoom16: medullaRoom16Data as LevelConfig,
-  medullaRoom17: medullaRoom17Data as LevelConfig,
-  medullaRoom18: medullaRoom18Data as LevelConfig,
-  medullaRoom19: medullaRoom19Data as LevelConfig,
-  medullaRoom20: medullaRoom20Data as LevelConfig,
-  medullaRoom21: medullaRoom21Data as LevelConfig,
-  medullaRoom22: medullaRoom22Data as LevelConfig,
-  medullaRoom23: medullaRoom23Data as LevelConfig,
-  medullaRoom24: medullaRoom24Data as LevelConfig,
-  medullaRoom25: medullaRoom25Data as LevelConfig,
-  medullaRoom26: medullaRoom26Data as LevelConfig,
-  medullaRoom27: medullaRoom27Data as LevelConfig,
-  medullaRoom28: medullaRoom28Data as LevelConfig,
-  medullaRoom29: medullaRoom29Data as LevelConfig,
-  medullaRoom30: medullaRoom30Data as LevelConfig,
-  medullaRoom31: medullaRoom31Data as LevelConfig,
-  medullaRoom32: medullaRoom32Data as LevelConfig,
+  medullaRoom1: medullaRoom1Data as unknown as LevelConfig,
+  medullaRoom2: medullaRoom2Data as unknown as LevelConfig,
+  medullaRoom3: medullaRoom3Data as unknown as LevelConfig,
+  medullaRoom4: medullaRoom4Data as unknown as LevelConfig,
+  medullaRoom5: medullaRoom5Data as unknown as LevelConfig,
+  medullaRoom6: medullaRoom6Data as unknown as LevelConfig,
+  medullaRoom7: medullaRoom7Data as unknown as LevelConfig,
+  medullaRoom8: medullaRoom8Data as unknown as LevelConfig,
+  medullaRoom9: medullaRoom9Data as unknown as LevelConfig,
+  medullaRoom10: medullaRoom10Data as unknown as LevelConfig,
+  medullaRoom11: medullaRoom11Data as unknown as LevelConfig,
+  medullaRoom12: medullaRoom12Data as unknown as LevelConfig,
+  medullaRoom13: medullaRoom13Data as unknown as LevelConfig,
+  medullaRoom14: medullaRoom14Data as unknown as LevelConfig,
+  medullaRoom15: medullaRoom15Data as unknown as LevelConfig,
+  medullaRoom16: medullaRoom16Data as unknown as LevelConfig,
+  medullaRoom17: medullaRoom17Data as unknown as LevelConfig,
+  medullaRoom18: medullaRoom18Data as unknown as LevelConfig,
+  medullaRoom19: medullaRoom19Data as unknown as LevelConfig,
+  medullaRoom20: medullaRoom20Data as unknown as LevelConfig,
+  medullaRoom21: medullaRoom21Data as unknown as LevelConfig,
+  medullaRoom22: medullaRoom22Data as unknown as LevelConfig,
+  medullaRoom23: medullaRoom23Data as unknown as LevelConfig,
+  medullaRoom24: medullaRoom24Data as unknown as LevelConfig,
+  medullaRoom25: medullaRoom25Data as unknown as LevelConfig,
+  medullaRoom26: medullaRoom26Data as unknown as LevelConfig,
+  medullaRoom27: medullaRoom27Data as unknown as LevelConfig,
+  medullaRoom28: medullaRoom28Data as unknown as LevelConfig,
+  medullaRoom29: medullaRoom29Data as unknown as LevelConfig,
+  medullaRoom30: medullaRoom30Data as unknown as LevelConfig,
+  medullaRoom31: medullaRoom31Data as unknown as LevelConfig,
+  medullaRoom32: medullaRoom32Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -476,15 +476,10 @@ export class GameScene extends Phaser.Scene {
           // Adapted Skuller - rare aggressive variant with charge
           const adaptedSkuller = new AdaptedSkuller(this, e.x, e.y, config);
           this.enemies.add(adaptedSkuller);
-        } else if (e.type === 'skullRavanger') {
+        } else if (e.type === 'skullRavanger' || e.type === 'skullRavager') {
           // Skull Ravager - mini boss
-          const skullRavanger = new SkullRavanger(this, e.x, e.y);
-          this.boss = skullRavanger as any;
-          this.physics.add.collider(skullRavanger, this.platforms);
-          this.physics.add.collider(skullRavanger, this.walls);
-          this.physics.add.overlap(this.player, skullRavanger,
-            () => this.handlePlayerBossContact()
-          );
+          const skullRavager = new SkullRavager(this, e.x, e.y, config);
+          this.enemies.add(skullRavager);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
