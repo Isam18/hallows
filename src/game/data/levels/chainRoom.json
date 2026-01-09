@@ -40,6 +40,16 @@
       "y": 750,
       "width": 50,
       "height": 100
+    },
+    {
+      "id": "enterTheMedulla",
+      "type": "transition",
+      "x": 30,
+      "y": 770,
+      "width": 50,
+      "height": 80,
+      "target": "medullaRoom1",
+      "targetSpawn": "default"
     }
   ],
   "spawns": {
