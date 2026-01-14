@@ -23,58 +23,6 @@ export class SkullRavager extends Enemy {
     skullMain.setStrokeStyle(4, 0x1a1a1a);
     skullMain.setDepth(this.depth + 2);
     this.visualElements.push(skullMain);
-    
-    // Jagged crown with multiple horns (5 prominent spikes like reference)
-    // Far left horn
-    const hornFL = this.scene.add.polygon(0, 0, [
-      -26, -4,
-      -36, -32,
-      -22, -8
-    ], 0x7a7474);
-    hornFL.setStrokeStyle(3, 0x1a1a1a);
-    hornFL.setDepth(this.depth + 2);
-    this.visualElements.push(hornFL);
-    
-    // Left horn
-    const hornL = this.scene.add.polygon(0, 0, [
-      -16, -8,
-      -24, -44,
-      -10, -12
-    ], 0x7a7474);
-    hornL.setStrokeStyle(3, 0x1a1a1a);
-    hornL.setDepth(this.depth + 2);
-    this.visualElements.push(hornL);
-    
-    // Center horn (tallest)
-    const hornC = this.scene.add.polygon(0, 0, [
-      -6, -12,
-      0, -52,
-      6, -12
-    ], 0x7a7474);
-    hornC.setStrokeStyle(3, 0x1a1a1a);
-    hornC.setDepth(this.depth + 2);
-    this.visualElements.push(hornC);
-    
-    // Right horn
-    const hornR = this.scene.add.polygon(0, 0, [
-      10, -12,
-      24, -44,
-      16, -8
-    ], 0x7a7474);
-    hornR.setStrokeStyle(3, 0x1a1a1a);
-    hornR.setDepth(this.depth + 2);
-    this.visualElements.push(hornR);
-    
-    // Far right horn
-    const hornFR = this.scene.add.polygon(0, 0, [
-      22, -8,
-      36, -32,
-      26, -4
-    ], 0x7a7474);
-    hornFR.setStrokeStyle(3, 0x1a1a1a);
-    hornFR.setDepth(this.depth + 2);
-    this.visualElements.push(hornFR);
-    
     // Left eye socket - large hollow void
     const leftEyeSocket = this.scene.add.ellipse(-14, -4, 16, 20, 0x1a1a1a);
     leftEyeSocket.setDepth(this.depth + 3);
@@ -85,10 +33,6 @@ export class SkullRavager extends Enemy {
     rightEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(rightEyeSocket);
     
-    // Nose hole
-    const nose = this.scene.add.ellipse(0, 8, 8, 10, 0x1a1a1a);
-    nose.setDepth(this.depth + 3);
-    this.visualElements.push(nose);
     
     // Wide jaw with teeth
     const jaw = this.scene.add.ellipse(0, 20, 40, 14, 0x5a5454);
@@ -251,19 +195,13 @@ export class SkullRavager extends Enemy {
     
     const positions = [
       { x: 0, y: -6 },      // skull main
-      { x: -28, y: -18 },   // horn FL
-      { x: -16, y: -26 },   // horn L
-      { x: 0, y: -30 },     // horn C
-      { x: 16, y: -26 },    // horn R
-      { x: 28, y: -18 },    // horn FR
       { x: -14, y: -10 },   // left eye
       { x: 14, y: -10 },    // right eye
-      { x: 0, y: 2 },       // nose
-      { x: 0, y: 14 },      // jaw
+      { x: 0, y: 8 },       // jaw
     ];
     
     // Update main elements
-    for (let i = 0; i < 10 && i < this.visualElements.length; i++) {
+    for (let i = 0; i < 4 && i < this.visualElements.length; i++) {
       const el = this.visualElements[i] as any;
       if (positions[i]) {
         el.setPosition(
@@ -273,26 +211,26 @@ export class SkullRavager extends Enemy {
       }
     }
     
-    // Update teeth (elements 10-16)
+    // Update teeth (elements 4-10)
     for (let i = 0; i < 7; i++) {
-      const tooth = this.visualElements[10 + i] as any;
+      const tooth = this.visualElements[4 + i] as any;
       if (tooth) {
         tooth.setPosition(
           this.x + (-12 + i * 4) * flipMult,
-          this.y + 10
+          this.y + 4
         );
       }
     }
     
-    // Update wing-claws (elements 17-18)
-    const leftWing = this.visualElements[17] as any;
-    const rightWing = this.visualElements[18] as any;
+    // Update wing-claws (elements 11-12)
+    const leftWing = this.visualElements[11] as any;
+    const rightWing = this.visualElements[12] as any;
     if (leftWing) leftWing.setPosition(this.x + -38 * flipMult, this.y + 6);
     if (rightWing) rightWing.setPosition(this.x + 38 * flipMult, this.y + 6);
     
-    // Update feet (elements 19-20)
-    const leftFoot = this.visualElements[19] as any;
-    const rightFoot = this.visualElements[20] as any;
+    // Update feet (elements 13-14)
+    const leftFoot = this.visualElements[13] as any;
+    const rightFoot = this.visualElements[14] as any;
     if (leftFoot) leftFoot.setPosition(this.x + -18 * flipMult, this.y + 22);
     if (rightFoot) rightFoot.setPosition(this.x + 18 * flipMult, this.y + 22);
   }
