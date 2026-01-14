@@ -4,7 +4,7 @@ import { EnemyCombatConfig } from '../core/CombatConfig';
 
 /**
  * AdaptedSkuller - Medium skull based on reference image 2
- * Larger skull with 3 tall horn spikes forming crown, visible cracks, thicker legs
+ * Hollow Knight style: gray skull with 3 horns (two side, one center), crack mark, crab-like legs
  */
 export class AdaptedSkuller extends Enemy {
   private visualElements: Phaser.GameObjects.GameObject[] = [];
@@ -18,102 +18,80 @@ export class AdaptedSkuller extends Enemy {
   }
   
   private createVisuals(): void {
-    // Main skull body - wider, more robust (grayish bone)
-    const skullMain = this.scene.add.ellipse(0, 0, 44, 48, 0xc0b8b0);
-    skullMain.setStrokeStyle(2, 0x2a2828);
+    // Main skull body - larger, grayish like reference
+    const skullMain = this.scene.add.ellipse(0, 0, 40, 44, 0x8a8484);
+    skullMain.setStrokeStyle(3, 0x1a1a1a);
     skullMain.setDepth(this.depth + 2);
     this.visualElements.push(skullMain);
     
-    // THREE tall horn spikes forming crown (like reference image 2)
-    // Left horn
+    // Left horn (sweeping outward)
     const leftHorn = this.scene.add.polygon(0, 0, [
-      -18, -10,   // Base left
-      -22, -42,   // Tip
-      -10, -15    // Base right
-    ], 0xb8b0a8);
-    leftHorn.setStrokeStyle(2, 0x2a2828);
+      -14, -8,    // Base inner
+      -28, -36,   // Tip
+      -20, -6     // Base outer
+    ], 0x9a9494);
+    leftHorn.setStrokeStyle(3, 0x1a1a1a);
     leftHorn.setDepth(this.depth + 2);
     this.visualElements.push(leftHorn);
     
-    // Center horn (tallest)
+    // Center horn (pointed up, tallest)
     const centerHorn = this.scene.add.polygon(0, 0, [
-      -6, -12,    // Base left
-      0, -50,     // Tip
-      6, -12      // Base right
-    ], 0xc8c0b8);
-    centerHorn.setStrokeStyle(2, 0x2a2828);
+      -5, -10,    // Base left
+      0, -44,     // Tip
+      5, -10      // Base right
+    ], 0x9a9494);
+    centerHorn.setStrokeStyle(3, 0x1a1a1a);
     centerHorn.setDepth(this.depth + 2);
     this.visualElements.push(centerHorn);
     
-    // Right horn
+    // Right horn (sweeping outward)
     const rightHorn = this.scene.add.polygon(0, 0, [
-      10, -15,    // Base left
-      22, -42,    // Tip
-      18, -10     // Base right
-    ], 0xb8b0a8);
-    rightHorn.setStrokeStyle(2, 0x2a2828);
+      14, -8,     // Base inner
+      28, -36,    // Tip
+      20, -6      // Base outer
+    ], 0x9a9494);
+    rightHorn.setStrokeStyle(3, 0x1a1a1a);
     rightHorn.setDepth(this.depth + 2);
     this.visualElements.push(rightHorn);
     
-    // Crack lines on skull (battle damage)
-    const crack1 = this.scene.add.line(0, 0, -8, -10, -4, 8, 0x3a3430);
-    crack1.setStrokeStyle(2, 0x3a3430);
-    crack1.setDepth(this.depth + 3);
-    this.visualElements.push(crack1);
+    // Crack line on skull (distinctive battle damage from ref)
+    const crack = this.scene.add.line(0, 0, -6, -12, 2, 8, 0x1a1a1a);
+    crack.setLineWidth(2);
+    crack.setDepth(this.depth + 3);
+    this.visualElements.push(crack);
     
-    const crack2 = this.scene.add.line(0, 0, 10, -8, 14, 6, 0x3a3430);
-    crack2.setStrokeStyle(2, 0x3a3430);
-    crack2.setDepth(this.depth + 3);
-    this.visualElements.push(crack2);
-    
-    // Large hollow eye sockets
-    const leftEyeSocket = this.scene.add.ellipse(-12, -4, 14, 18, 0x0a0808);
+    // Left eye socket - hollow dark void
+    const leftEyeSocket = this.scene.add.ellipse(-10, -2, 12, 16, 0x1a1a1a);
     leftEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(leftEyeSocket);
     
-    const rightEyeSocket = this.scene.add.ellipse(12, -4, 14, 18, 0x0a0808);
+    // Right eye socket
+    const rightEyeSocket = this.scene.add.ellipse(10, -2, 12, 16, 0x1a1a1a);
     rightEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(rightEyeSocket);
     
-    // Small dark pupils
-    const leftPupil = this.scene.add.circle(-12, -2, 3, 0x2a2828);
-    leftPupil.setDepth(this.depth + 4);
-    this.visualElements.push(leftPupil);
-    
-    const rightPupil = this.scene.add.circle(12, -2, 3, 0x2a2828);
-    rightPupil.setDepth(this.depth + 4);
-    this.visualElements.push(rightPupil);
-    
-    // Jaw/mouth area
-    const mouth = this.scene.add.ellipse(0, 16, 20, 10, 0x1a1818);
+    // Small dark dot for nose/mouth
+    const mouth = this.scene.add.circle(0, 12, 4, 0x1a1a1a);
     mouth.setDepth(this.depth + 3);
     this.visualElements.push(mouth);
     
-    // Teeth
-    for (let i = 0; i < 5; i++) {
-      const toothX = -8 + i * 4;
-      const tooth = this.scene.add.triangle(0, 0, -1.5, 0, 1.5, 0, 0, 5, 0xf0ece8);
-      tooth.setPosition(toothX, 14);
-      tooth.setDepth(this.depth + 4);
-      this.visualElements.push(tooth);
-    }
+    // 4 thick crab-like legs (2 per side like reference)
+    // Front legs
+    const legFL = this.createCrabLeg(-16, 10, -30, 24);
+    const legFR = this.createCrabLeg(16, 10, 30, 24);
     
-    // Thicker spider legs - 6 total
-    const legFL = this.createLeg(-16, 14, 20, -45);
-    const legFR = this.createLeg(16, 14, 20, 45);
-    const legML = this.createLeg(-18, 18, 18, -25);
-    const legMR = this.createLeg(18, 18, 18, 25);
-    const legBL = this.createLeg(-14, 22, 16, -8);
-    const legBR = this.createLeg(14, 22, 16, 8);
+    // Back legs
+    const legBL = this.createCrabLeg(-14, 18, -26, 32);
+    const legBR = this.createCrabLeg(14, 18, 26, 32);
     
-    this.visualElements.push(legFL, legFR, legML, legMR, legBL, legBR);
+    this.visualElements.push(legFL, legFR, legBL, legBR);
     
     this.setAlpha(0);
   }
   
-  private createLeg(x: number, y: number, length: number, angle: number): Phaser.GameObjects.Rectangle {
-    const leg = this.scene.add.rectangle(x, y, 3, length, 0x1a1818);
-    leg.setAngle(angle);
+  private createCrabLeg(startX: number, startY: number, endX: number, endY: number): Phaser.GameObjects.Line {
+    const leg = this.scene.add.line(0, 0, startX, startY, endX, endY, 0x1a1a1a);
+    leg.setLineWidth(4);
     leg.setDepth(this.depth + 1);
     return leg;
   }
@@ -156,41 +134,53 @@ export class AdaptedSkuller extends Enemy {
   }
   
   private updateVisualPositions(): void {
-    const offsets = [
-      { x: 0, y: -6 },     // skull main
-      { x: -14, y: -24 },  // left horn
-      { x: 0, y: -28 },    // center horn
-      { x: 14, y: -24 },   // right horn
-      { x: -6, y: -4 },    // crack1
-      { x: 12, y: -2 },    // crack2
-      { x: -12, y: -8 },   // left eye
-      { x: 12, y: -8 },    // right eye
-      { x: -12, y: -6 },   // left pupil
-      { x: 12, y: -6 },    // right pupil
-      { x: 0, y: 10 },     // mouth
+    const flipMult = this.flipX ? -1 : 1;
+    
+    const positions = [
+      { x: 0, y: -4 },      // skull main
+      { x: -16, y: -20 },   // left horn
+      { x: 0, y: -24 },     // center horn
+      { x: 16, y: -20 },    // right horn
+      { x: -2, y: -4 },     // crack
+      { x: -10, y: -6 },    // left eye
+      { x: 10, y: -6 },     // right eye
+      { x: 0, y: 8 },       // mouth
     ];
     
-    // Teeth offsets
-    for (let i = 0; i < 5; i++) {
-      offsets.push({ x: -8 + i * 4, y: 12 });
-    }
-    
-    // Leg offsets
-    offsets.push(
-      { x: -16, y: 16 }, { x: 16, y: 16 },
-      { x: -18, y: 20 }, { x: 18, y: 20 },
-      { x: -14, y: 24 }, { x: 14, y: 24 }
-    );
-    
-    this.visualElements.forEach((el, i) => {
-      if (offsets[i]) {
-        const flipMult = this.flipX ? -1 : 1;
-        (el as any).setPosition(
-          this.x + offsets[i].x * flipMult,
-          this.y + offsets[i].y
+    // Update main elements
+    for (let i = 0; i < 8 && i < this.visualElements.length; i++) {
+      const el = this.visualElements[i] as any;
+      if (positions[i]) {
+        el.setPosition(
+          this.x + positions[i].x * flipMult,
+          this.y + positions[i].y
         );
       }
-    });
+    }
+    
+    // Update crack line specially
+    const crack = this.visualElements[4] as Phaser.GameObjects.Line;
+    if (crack) {
+      crack.setTo(-6 * flipMult, -12, 2 * flipMult, 8);
+      crack.setPosition(this.x, this.y - 4);
+    }
+    
+    // Update legs
+    const legData = [
+      { sx: -16, sy: 10, ex: -30, ey: 24 },
+      { sx: 16, sy: 10, ex: 30, ey: 24 },
+      { sx: -14, sy: 18, ex: -26, ey: 32 },
+      { sx: 14, sy: 18, ex: 26, ey: 32 },
+    ];
+    
+    for (let i = 0; i < 4; i++) {
+      const leg = this.visualElements[8 + i] as Phaser.GameObjects.Line;
+      if (leg) {
+        const ld = legData[i];
+        leg.setTo(ld.sx * flipMult, ld.sy, ld.ex * flipMult, ld.ey);
+        leg.setPosition(this.x, this.y);
+      }
+    }
   }
   
   destroy(fromScene?: boolean): void {

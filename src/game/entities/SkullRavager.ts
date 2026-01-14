@@ -4,15 +4,13 @@ import { EnemyCombatConfig } from '../core/CombatConfig';
 
 /**
  * SkullRavager - Large menacing skull based on reference image 3
- * Massive cream skull, bright glowing orange-red eyes, tall multi-pronged crown
+ * Hollow Knight style: dark gray skull, jagged crown with 5+ horns, hollow eyes, wide jaw with teeth, wing-like claws
  */
 export class SkullRavager extends Enemy {
   private visualElements: Phaser.GameObjects.GameObject[] = [];
   private attackState: 'idle' | 'windup' | 'charging' | 'jumping' | 'cooldown' = 'idle';
   private attackTimer = 0;
   private jumpCount = 0;
-  private leftGlow: Phaser.GameObjects.Arc | null = null;
-  private rightGlow: Phaser.GameObjects.Arc | null = null;
   
   constructor(scene: Phaser.Scene, x: number, y: number, config: EnemyCombatConfig) {
     super(scene, x, y, config);
@@ -20,123 +18,137 @@ export class SkullRavager extends Enemy {
   }
   
   private createVisuals(): void {
-    // Massive skull body - cream/bone white like reference
-    const skullMain = this.scene.add.ellipse(0, 0, 70, 60, 0xf0e8e0);
-    skullMain.setStrokeStyle(3, 0x2a2828);
+    // Main skull body - large, dark gray like reference
+    const skullMain = this.scene.add.ellipse(0, 0, 60, 52, 0x6a6464);
+    skullMain.setStrokeStyle(4, 0x1a1a1a);
     skullMain.setDepth(this.depth + 2);
     this.visualElements.push(skullMain);
     
-    // Tall multi-pronged crown (5 spikes like reference image 3)
-    // Outer left horn
-    const hornOL = this.scene.add.polygon(0, 0, [
-      -28, -8, -34, -50, -20, -15
-    ], 0xe8e0d8);
-    hornOL.setStrokeStyle(2, 0x2a2828);
-    hornOL.setDepth(this.depth + 2);
-    this.visualElements.push(hornOL);
+    // Jagged crown with multiple horns (5 prominent spikes like reference)
+    // Far left horn
+    const hornFL = this.scene.add.polygon(0, 0, [
+      -26, -4,
+      -36, -32,
+      -22, -8
+    ], 0x7a7474);
+    hornFL.setStrokeStyle(3, 0x1a1a1a);
+    hornFL.setDepth(this.depth + 2);
+    this.visualElements.push(hornFL);
     
-    // Inner left horn
-    const hornIL = this.scene.add.polygon(0, 0, [
-      -14, -12, -18, -55, -8, -18
-    ], 0xf0e8e0);
-    hornIL.setStrokeStyle(2, 0x2a2828);
-    hornIL.setDepth(this.depth + 2);
-    this.visualElements.push(hornIL);
+    // Left horn
+    const hornL = this.scene.add.polygon(0, 0, [
+      -16, -8,
+      -24, -44,
+      -10, -12
+    ], 0x7a7474);
+    hornL.setStrokeStyle(3, 0x1a1a1a);
+    hornL.setDepth(this.depth + 2);
+    this.visualElements.push(hornL);
     
     // Center horn (tallest)
     const hornC = this.scene.add.polygon(0, 0, [
-      -6, -15, 0, -65, 6, -15
-    ], 0xf8f0e8);
-    hornC.setStrokeStyle(2, 0x2a2828);
+      -6, -12,
+      0, -52,
+      6, -12
+    ], 0x7a7474);
+    hornC.setStrokeStyle(3, 0x1a1a1a);
     hornC.setDepth(this.depth + 2);
     this.visualElements.push(hornC);
     
-    // Inner right horn
-    const hornIR = this.scene.add.polygon(0, 0, [
-      8, -18, 18, -55, 14, -12
-    ], 0xf0e8e0);
-    hornIR.setStrokeStyle(2, 0x2a2828);
-    hornIR.setDepth(this.depth + 2);
-    this.visualElements.push(hornIR);
+    // Right horn
+    const hornR = this.scene.add.polygon(0, 0, [
+      10, -12,
+      24, -44,
+      16, -8
+    ], 0x7a7474);
+    hornR.setStrokeStyle(3, 0x1a1a1a);
+    hornR.setDepth(this.depth + 2);
+    this.visualElements.push(hornR);
     
-    // Outer right horn
-    const hornOR = this.scene.add.polygon(0, 0, [
-      20, -15, 34, -50, 28, -8
-    ], 0xe8e0d8);
-    hornOR.setStrokeStyle(2, 0x2a2828);
-    hornOR.setDepth(this.depth + 2);
-    this.visualElements.push(hornOR);
+    // Far right horn
+    const hornFR = this.scene.add.polygon(0, 0, [
+      22, -8,
+      36, -32,
+      26, -4
+    ], 0x7a7474);
+    hornFR.setStrokeStyle(3, 0x1a1a1a);
+    hornFR.setDepth(this.depth + 2);
+    this.visualElements.push(hornFR);
     
-    // Large menacing eye sockets - deep black
-    const leftEyeSocket = this.scene.add.ellipse(-18, -5, 22, 26, 0x0a0505);
+    // Left eye socket - large hollow void
+    const leftEyeSocket = this.scene.add.ellipse(-14, -4, 16, 20, 0x1a1a1a);
     leftEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(leftEyeSocket);
     
-    const rightEyeSocket = this.scene.add.ellipse(18, -5, 22, 26, 0x0a0505);
+    // Right eye socket
+    const rightEyeSocket = this.scene.add.ellipse(14, -4, 16, 20, 0x1a1a1a);
     rightEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(rightEyeSocket);
     
-    // BRIGHT GLOWING ORANGE-RED PUPILS (key feature from reference)
-    const leftPupil = this.scene.add.circle(-18, -3, 7, 0xff4400);
-    leftPupil.setDepth(this.depth + 5);
-    this.visualElements.push(leftPupil);
+    // Nose hole
+    const nose = this.scene.add.ellipse(0, 8, 8, 10, 0x1a1a1a);
+    nose.setDepth(this.depth + 3);
+    this.visualElements.push(nose);
     
-    const rightPupil = this.scene.add.circle(18, -3, 7, 0xff4400);
-    rightPupil.setDepth(this.depth + 5);
-    this.visualElements.push(rightPupil);
-    
-    // Intense glow effect around pupils
-    this.leftGlow = this.scene.add.circle(-18, -3, 12, 0xff2200);
-    this.leftGlow.setAlpha(0.6);
-    this.leftGlow.setDepth(this.depth + 4);
-    this.visualElements.push(this.leftGlow);
-    
-    this.rightGlow = this.scene.add.circle(18, -3, 12, 0xff2200);
-    this.rightGlow.setAlpha(0.6);
-    this.rightGlow.setDepth(this.depth + 4);
-    this.visualElements.push(this.rightGlow);
-    
-    // Heavy jaw
-    const jaw = this.scene.add.ellipse(0, 22, 45, 22, 0xe8e0d8);
-    jaw.setStrokeStyle(2, 0x2a2828);
+    // Wide jaw with teeth
+    const jaw = this.scene.add.ellipse(0, 20, 40, 14, 0x5a5454);
+    jaw.setStrokeStyle(3, 0x1a1a1a);
     jaw.setDepth(this.depth + 2);
     this.visualElements.push(jaw);
     
-    // Many sharp teeth
-    for (let i = 0; i < 9; i++) {
-      const toothX = -16 + i * 4;
-      const toothH = (i === 0 || i === 8) ? 5 : (i === 4 ? 9 : 7);
-      const tooth = this.scene.add.triangle(0, 0, -2, 0, 2, 0, 0, toothH, 0xffffff);
-      tooth.setPosition(toothX, 18);
+    // Row of sharp teeth
+    for (let i = 0; i < 7; i++) {
+      const toothX = -12 + i * 4;
+      const tooth = this.scene.add.triangle(0, 0, -2, 0, 0, 6, 2, 0, 0xd0c8c8);
+      tooth.setStrokeStyle(1, 0x1a1a1a);
+      tooth.setPosition(toothX, 16);
       tooth.setDepth(this.depth + 4);
       this.visualElements.push(tooth);
     }
     
-    // Powerful thick legs - 4 pairs
-    const legFL = this.createLeg(-24, 28, 28, -40);
-    const legFR = this.createLeg(24, 28, 28, 40);
-    const legML = this.createLeg(-28, 34, 24, -20);
-    const legMR = this.createLeg(28, 34, 24, 20);
-    const legBL = this.createLeg(-22, 38, 20, -5);
-    const legBR = this.createLeg(22, 38, 20, 5);
+    // Wing-like claw appendages (distinctive feature from ref)
+    // Left wing-claw
+    const leftWing = this.scene.add.polygon(0, 0, [
+      -26, 4,      // Inner top
+      -48, -6,     // Outer top
+      -52, 8,      // Outer mid
+      -44, 22,     // Outer bottom
+      -28, 18      // Inner bottom
+    ], 0x4a4444);
+    leftWing.setStrokeStyle(3, 0x1a1a1a);
+    leftWing.setDepth(this.depth + 1);
+    this.visualElements.push(leftWing);
     
-    this.visualElements.push(legFL, legFR, legML, legMR, legBL, legBR);
+    // Right wing-claw
+    const rightWing = this.scene.add.polygon(0, 0, [
+      26, 4,
+      48, -6,
+      52, 8,
+      44, 22,
+      28, 18
+    ], 0x4a4444);
+    rightWing.setStrokeStyle(3, 0x1a1a1a);
+    rightWing.setDepth(this.depth + 1);
+    this.visualElements.push(rightWing);
+    
+    // Small feet/legs underneath
+    const leftFoot = this.scene.add.ellipse(-18, 28, 14, 8, 0x3a3434);
+    leftFoot.setStrokeStyle(2, 0x1a1a1a);
+    leftFoot.setDepth(this.depth + 1);
+    this.visualElements.push(leftFoot);
+    
+    const rightFoot = this.scene.add.ellipse(18, 28, 14, 8, 0x3a3434);
+    rightFoot.setStrokeStyle(2, 0x1a1a1a);
+    rightFoot.setDepth(this.depth + 1);
+    this.visualElements.push(rightFoot);
     
     this.setAlpha(0);
-  }
-  
-  private createLeg(x: number, y: number, length: number, angle: number): Phaser.GameObjects.Rectangle {
-    const leg = this.scene.add.rectangle(x, y, 5, length, 0x1a1818);
-    leg.setAngle(angle);
-    leg.setDepth(this.depth + 1);
-    return leg;
   }
   
   update(time: number, delta: number, player: any): void {
     super.update(time, delta, player);
     this.updateAttackBehavior(delta, player);
     this.updateVisualPositions();
-    this.animateEyes(time);
   }
   
   private updateAttackBehavior(delta: number, player: any): void {
@@ -222,7 +234,7 @@ export class SkullRavager extends Enemy {
   
   private createGroundPound(): void {
     this.scene.cameras.main.shake(150, 0.02);
-    const shockwave = this.scene.add.ellipse(this.x, this.y + 40, 20, 10, 0xff6600, 0.8);
+    const shockwave = this.scene.add.ellipse(this.x, this.y + 40, 20, 10, 0x4a4444, 0.8);
     shockwave.setDepth(this.depth - 1);
     this.scene.tweens.add({
       targets: shockwave,
@@ -234,58 +246,60 @@ export class SkullRavager extends Enemy {
     });
   }
   
-  private animateEyes(time: number): void {
-    // Pulsing glow effect
-    const glowAlpha = 0.5 + Math.sin(time * 0.008) * 0.3;
-    if (this.leftGlow) this.leftGlow.setAlpha(glowAlpha);
-    if (this.rightGlow) this.rightGlow.setAlpha(glowAlpha);
-  }
-  
   private updateVisualPositions(): void {
-    const offsets = [
-      { x: 0, y: -8 },      // skull main
-      { x: -26, y: -28 },   // horn OL
-      { x: -12, y: -32 },   // horn IL
-      { x: 0, y: -36 },     // horn C
-      { x: 12, y: -32 },    // horn IR
-      { x: 26, y: -28 },    // horn OR
-      { x: -18, y: -12 },   // left eye socket
-      { x: 18, y: -12 },    // right eye socket
-      { x: -18, y: -10 },   // left pupil
-      { x: 18, y: -10 },    // right pupil
-      { x: -18, y: -10 },   // left glow
-      { x: 18, y: -10 },    // right glow
+    const flipMult = this.flipX ? -1 : 1;
+    
+    const positions = [
+      { x: 0, y: -6 },      // skull main
+      { x: -28, y: -18 },   // horn FL
+      { x: -16, y: -26 },   // horn L
+      { x: 0, y: -30 },     // horn C
+      { x: 16, y: -26 },    // horn R
+      { x: 28, y: -18 },    // horn FR
+      { x: -14, y: -10 },   // left eye
+      { x: 14, y: -10 },    // right eye
+      { x: 0, y: 2 },       // nose
       { x: 0, y: 14 },      // jaw
     ];
     
-    // Teeth
-    for (let i = 0; i < 9; i++) {
-      offsets.push({ x: -16 + i * 4, y: 12 });
-    }
-    
-    // Legs
-    offsets.push(
-      { x: -24, y: 24 }, { x: 24, y: 24 },
-      { x: -28, y: 30 }, { x: 28, y: 30 },
-      { x: -22, y: 34 }, { x: 22, y: 34 }
-    );
-    
-    this.visualElements.forEach((el, i) => {
-      if (offsets[i]) {
-        const flipMult = this.flipX ? -1 : 1;
-        (el as any).setPosition(
-          this.x + offsets[i].x * flipMult,
-          this.y + offsets[i].y
+    // Update main elements
+    for (let i = 0; i < 10 && i < this.visualElements.length; i++) {
+      const el = this.visualElements[i] as any;
+      if (positions[i]) {
+        el.setPosition(
+          this.x + positions[i].x * flipMult,
+          this.y + positions[i].y
         );
       }
-    });
+    }
+    
+    // Update teeth (elements 10-16)
+    for (let i = 0; i < 7; i++) {
+      const tooth = this.visualElements[10 + i] as any;
+      if (tooth) {
+        tooth.setPosition(
+          this.x + (-12 + i * 4) * flipMult,
+          this.y + 10
+        );
+      }
+    }
+    
+    // Update wing-claws (elements 17-18)
+    const leftWing = this.visualElements[17] as any;
+    const rightWing = this.visualElements[18] as any;
+    if (leftWing) leftWing.setPosition(this.x + -38 * flipMult, this.y + 6);
+    if (rightWing) rightWing.setPosition(this.x + 38 * flipMult, this.y + 6);
+    
+    // Update feet (elements 19-20)
+    const leftFoot = this.visualElements[19] as any;
+    const rightFoot = this.visualElements[20] as any;
+    if (leftFoot) leftFoot.setPosition(this.x + -18 * flipMult, this.y + 22);
+    if (rightFoot) rightFoot.setPosition(this.x + 18 * flipMult, this.y + 22);
   }
   
   destroy(fromScene?: boolean): void {
     this.visualElements.forEach(el => el.destroy());
     this.visualElements = [];
-    this.leftGlow = null;
-    this.rightGlow = null;
     super.destroy(fromScene);
   }
 }
