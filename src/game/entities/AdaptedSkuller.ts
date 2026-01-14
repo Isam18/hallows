@@ -24,36 +24,6 @@ export class AdaptedSkuller extends Enemy {
     skullMain.setDepth(this.depth + 2);
     this.visualElements.push(skullMain);
     
-    // Left horn (sweeping outward)
-    const leftHorn = this.scene.add.polygon(0, 0, [
-      -14, -8,    // Base inner
-      -28, -36,   // Tip
-      -20, -6     // Base outer
-    ], 0x9a9494);
-    leftHorn.setStrokeStyle(3, 0x1a1a1a);
-    leftHorn.setDepth(this.depth + 2);
-    this.visualElements.push(leftHorn);
-    
-    // Center horn (pointed up, tallest)
-    const centerHorn = this.scene.add.polygon(0, 0, [
-      -5, -10,    // Base left
-      0, -44,     // Tip
-      5, -10      // Base right
-    ], 0x9a9494);
-    centerHorn.setStrokeStyle(3, 0x1a1a1a);
-    centerHorn.setDepth(this.depth + 2);
-    this.visualElements.push(centerHorn);
-    
-    // Right horn (sweeping outward)
-    const rightHorn = this.scene.add.polygon(0, 0, [
-      14, -8,     // Base inner
-      28, -36,    // Tip
-      20, -6      // Base outer
-    ], 0x9a9494);
-    rightHorn.setStrokeStyle(3, 0x1a1a1a);
-    rightHorn.setDepth(this.depth + 2);
-    this.visualElements.push(rightHorn);
-    
     // Crack line on skull (distinctive battle damage from ref)
     const crack = this.scene.add.line(0, 0, -6, -12, 2, 8, 0x1a1a1a);
     crack.setLineWidth(2);
@@ -69,11 +39,6 @@ export class AdaptedSkuller extends Enemy {
     const rightEyeSocket = this.scene.add.ellipse(10, -2, 12, 16, 0x1a1a1a);
     rightEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(rightEyeSocket);
-    
-    // Small dark dot for nose/mouth
-    const mouth = this.scene.add.circle(0, 12, 4, 0x1a1a1a);
-    mouth.setDepth(this.depth + 3);
-    this.visualElements.push(mouth);
     
     // 4 thick crab-like legs (2 per side like reference)
     // Front legs
@@ -138,17 +103,13 @@ export class AdaptedSkuller extends Enemy {
     
     const positions = [
       { x: 0, y: -4 },      // skull main
-      { x: -16, y: -20 },   // left horn
-      { x: 0, y: -24 },     // center horn
-      { x: 16, y: -20 },    // right horn
       { x: -2, y: -4 },     // crack
       { x: -10, y: -6 },    // left eye
       { x: 10, y: -6 },     // right eye
-      { x: 0, y: 8 },       // mouth
     ];
     
     // Update main elements
-    for (let i = 0; i < 8 && i < this.visualElements.length; i++) {
+    for (let i = 0; i < 4 && i < this.visualElements.length; i++) {
       const el = this.visualElements[i] as any;
       if (positions[i]) {
         el.setPosition(
@@ -174,7 +135,7 @@ export class AdaptedSkuller extends Enemy {
     ];
     
     for (let i = 0; i < 4; i++) {
-      const leg = this.visualElements[8 + i] as Phaser.GameObjects.Line;
+      const leg = this.visualElements[4 + i] as Phaser.GameObjects.Line;
       if (leg) {
         const ld = legData[i];
         leg.setTo(ld.sx * flipMult, ld.sy, ld.ex * flipMult, ld.ey);

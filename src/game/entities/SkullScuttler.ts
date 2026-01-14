@@ -21,17 +21,6 @@ export class SkullScuttler extends Enemy {
     skullMain.setDepth(this.depth + 2);
     this.visualElements.push(skullMain);
     
-    // Single pointed flame crest on top (distinctive feature from ref)
-    const crest = this.scene.add.polygon(0, 0, [
-      0, -28,     // Sharp tip
-      -8, -6,     // Left base
-      0, -10,     // Center notch
-      8, -6       // Right base
-    ], 0xb0a8a8);
-    crest.setStrokeStyle(3, 0x1a1a1a);
-    crest.setDepth(this.depth + 2);
-    this.visualElements.push(crest);
-    
     // Left eye socket - large hollow dark void (Hollow Knight style)
     const leftEyeSocket = this.scene.add.ellipse(-6, -4, 10, 14, 0x1a1a1a);
     leftEyeSocket.setDepth(this.depth + 3);
@@ -41,11 +30,6 @@ export class SkullScuttler extends Enemy {
     const rightEyeSocket = this.scene.add.ellipse(6, -4, 10, 14, 0x1a1a1a);
     rightEyeSocket.setDepth(this.depth + 3);
     this.visualElements.push(rightEyeSocket);
-    
-    // Small mouth/nose area
-    const mouth = this.scene.add.ellipse(0, 8, 8, 6, 0x1a1a1a);
-    mouth.setDepth(this.depth + 3);
-    this.visualElements.push(mouth);
     
     // Two small fangs
     const leftFang = this.scene.add.triangle(0, 0, -2, 0, 0, 6, 2, 0, 0xc8c0c0);
@@ -91,16 +75,14 @@ export class SkullScuttler extends Enemy {
     // Position all elements relative to sprite
     const positions = [
       { x: 0, y: -2 },      // skull main
-      { x: 0, y: -16 },     // crest
       { x: -6, y: -6 },     // left eye
       { x: 6, y: -6 },      // right eye
-      { x: 0, y: 6 },       // mouth
-      { x: -3, y: 12 },     // left fang
-      { x: 3, y: 12 },      // right fang
+      { x: -3, y: 8 },      // left fang
+      { x: 3, y: 8 },       // right fang
     ];
     
     // Update main elements
-    for (let i = 0; i < 7 && i < this.visualElements.length; i++) {
+    for (let i = 0; i < 5 && i < this.visualElements.length; i++) {
       const el = this.visualElements[i] as any;
       if (positions[i]) {
         el.setPosition(
@@ -119,7 +101,7 @@ export class SkullScuttler extends Enemy {
     ];
     
     for (let i = 0; i < 4; i++) {
-      const leg = this.visualElements[7 + i] as Phaser.GameObjects.Line;
+      const leg = this.visualElements[5 + i] as Phaser.GameObjects.Line;
       if (leg) {
         const ld = legData[i];
         leg.setTo(ld.sx * flipMult, ld.sy, ld.ex * flipMult, ld.ey);
