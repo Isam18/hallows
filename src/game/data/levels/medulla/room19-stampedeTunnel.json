@@ -18,7 +18,7 @@
   "magmaPools": [],
   "lavaPools": [],
   "enemies": [
-    { "type": "skullBrute", "x": 600, "y": 400, "behavior": "stampede", "backgroundCharge": true }
+    { "type": "adaptedSkuller", "x": 600, "y": 400, "behavior": "stampede", "backgroundCharge": true }
   ],
   "pickups": [],
   "triggers": [
@@ -41,7 +41,7 @@
   "special": {
     "flatCorridor": true,
     "stampedeEvent": true,
-    "threeBruteCharge": true,
+    "threeAdaptedSkullersCharge": true,
     "iFrameDashRequired": true,
     "alcoveShelters": true,
     "instantKill": 2

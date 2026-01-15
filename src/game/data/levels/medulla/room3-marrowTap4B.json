@@ -27,7 +27,7 @@
   ],
   "enemies": [
     {
-      "type": "skullBrute",
+      "type": "adaptedSkuller",
       "x": 550,
       "y": 600,
       "behavior": "chargePlayer",
@@ -84,6 +84,6 @@
     "slimePools": true,
     "femurPipes": true,
     "slimeSlowMultiplier": 0.4,
-    "bruteChargeIntoSlime": true
+    "adaptedSkullerChargeIntoSlime": true
   }
 }

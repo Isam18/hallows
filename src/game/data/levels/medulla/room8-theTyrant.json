@@ -19,7 +19,7 @@
     { "x": 900, "y": 680, "width": 300, "height": 70 }
   ],
   "enemies": [
-    { "type": "skullBrute", "x": 600, "y": 600, "behavior": "chargePlayer" }
+    { "type": "adaptedSkuller", "x": 600, "y": 600, "behavior": "chargePlayer" }
   ],
   "pickups": [],
   "triggers": [
