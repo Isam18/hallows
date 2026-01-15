@@ -25,7 +25,11 @@
     { "x": 750, "y": 500, "width": 60, "height": 50 },
     { "x": 1000, "y": 400, "width": 60, "height": 50 }
   ],
-  "enemies": [],
+  "enemies": [
+    { "type": "skullScuttler", "x": 250, "y": 570 },
+    { "type": "skullScuttler", "x": 500, "y": 470 },
+    { "type": "skullScuttler", "x": 750, "y": 370 }
+  ],
   "pickups": [],
   "triggers": [
     {

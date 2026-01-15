@@ -15,7 +15,11 @@
   ],
   "magmaPools": [],
   "lavaPools": [],
-  "enemies": [],
+  "enemies": [
+    { "type": "skullScuttler", "x": 500, "y": 700 },
+    { "type": "skullScuttler", "x": 700, "y": 700 },
+    { "type": "skullScuttler", "x": 600, "y": 620 }
+  ],
   "pickups": [],
   "triggers": [
     {
