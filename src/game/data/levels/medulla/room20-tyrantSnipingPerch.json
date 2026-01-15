@@ -20,7 +20,11 @@
   "lavaPools": [
     { "x": 0, "y": 680, "width": 1200, "height": 120 }
   ],
-  "enemies": [],
+  "enemies": [
+    { "type": "skullScuttler", "x": 1000, "y": 620 },
+    { "type": "skullScuttler", "x": 600, "y": 420 },
+    { "type": "skullScuttler", "x": 200, "y": 220 }
+  ],
   "pickups": [],
   "triggers": [
     {

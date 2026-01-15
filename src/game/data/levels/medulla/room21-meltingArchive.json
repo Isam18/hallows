@@ -19,7 +19,11 @@
   "lavaPools": [
     { "x": 0, "y": 680, "width": 1200, "height": 120 }
   ],
-  "enemies": [],
+  "enemies": [
+    { "type": "skullScuttler", "x": 300, "y": 620 },
+    { "type": "skullScuttler", "x": 500, "y": 470 },
+    { "type": "skullScuttler", "x": 700, "y": 320 }
+  ],
   "pickups": [
     { "type": "charm", "x": 900, "y": 170, "charmId": "secretMedullaCharm" }
   ],
