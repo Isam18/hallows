@@ -18,7 +18,7 @@
   ],
   "enemies": [
     {
-      "type": "skullBrute",
+      "type": "adaptedSkuller",
       "x": 600,
       "y": 400,
       "behavior": "chargePlayer",
@@ -55,7 +55,7 @@
   "special": {
     "lowCeiling": true,
     "crawlingRequired": true,
-    "trappedBrute": true,
+    "trappedAdaptedSkuller": true,
     "ceilingLavaDrips": true
   }
 }

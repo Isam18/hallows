@@ -22,21 +22,21 @@
   ],
   "enemies": [
     {
-      "type": "skullBrute",
+      "type": "adaptedSkuller",
       "x": 150,
       "y": 580,
       "behavior": "patrol",
       "elite": true
     },
     {
-      "type": "skullBrute",
+      "type": "adaptedSkuller",
       "x": 1050,
       "y": 580,
       "behavior": "patrol",
       "elite": true
     },
     {
-      "type": "skullBrute",
+      "type": "adaptedSkuller",
       "x": 600,
       "y": 430,
       "behavior": "lavaWaveAttack",
@@ -65,7 +65,7 @@
     "miniBossRoom": true,
     "tripleEliteFight": true,
     "centerTyrant": true,
-    "twoBrutesPatrol": true,
+    "twoAdaptedSkullersPatrol": true,
     "checkerboardFloor": true,
     "brutalArena": true
   }

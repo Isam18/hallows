@@ -22,7 +22,7 @@
   ],
   "enemies": [
     {
-      "type": "skullBrute",
+      "type": "adaptedSkuller",
       "x": 600,
       "y": 580,
       "behavior": "lavaWaveAttack",
