@@ -65,8 +65,8 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
     if (!gameRef) return;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const scene = gameRef.scene.getScene('GameScene') as any;
-    if (scene && scene.loadRoom) {
-      scene.loadRoom(roomId);
+    if (scene && scene.teleportToLevel) {
+      scene.teleportToLevel(roomId);
     }
   };
 
