@@ -196,7 +196,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
             onClick={() => handleTeleport('medullaRoom8')}
             className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
           >
-            Room 8: Skull Ravager
+            Room 8: Skull Tyrant
           </button>
           <button
             onClick={() => handleTeleport('medullaRoom32')}
