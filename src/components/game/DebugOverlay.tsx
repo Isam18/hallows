@@ -35,7 +35,9 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
     return () => clearInterval(interval);
   }, [visible, gameRef]);
 
-  if (!visible || !debugState) return null;
+  // Show the overlay as soon as it's toggled on.
+  // (Teleport should still be usable even if the player/debugState isn't ready yet.)
+  if (!visible) return null;
 
   const getStateColor = (state: string) => {
     switch (state) {
@@ -63,63 +65,86 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
 
   const handleTeleport = (roomId: string) => {
     if (!gameRef) return;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const scene = gameRef.scene.getScene('GameScene') as any;
-    if (scene && scene.teleportToLevel) {
-      scene.teleportToLevel(roomId);
+
+    const sceneManager = gameRef.scene;
+    const isGameSceneActive = sceneManager.isActive('GameScene');
+
+    // If GameScene isn't running yet (e.g. user is still on MenuScene), start it directly
+    // at the requested level so the button always does something.
+    if (!isGameSceneActive) {
+      console.log('[DebugOverlay] Starting GameScene at', roomId);
+      sceneManager.start('GameScene', { levelId: roomId, spawnId: 'default', debugMode: true });
+      return;
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const scene = sceneManager.getScene('GameScene') as any;
+    console.log('[DebugOverlay] Teleporting to', roomId);
+    scene?.teleportToLevel?.(roomId);
   };
 
   return (
     <div className="fixed top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-4 font-mono text-sm z-50 min-w-[280px] shadow-lg">
       <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
         <span className="text-muted-foreground text-xs">Movement Debug [F1]</span>
-        <span className={`font-bold uppercase ${getStateColor(debugState.state)}`}>
-          {debugState.state}
-        </span>
-      </div>
-
-      {/* Flags */}
-      <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-3 text-xs">
-        <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${debugState.isGrounded ? 'bg-green-500' : 'bg-muted'}`} />
-          <span className="text-muted-foreground">Grounded</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${debugState.isTouchingWall ? 'bg-yellow-500' : 'bg-muted'}`} />
-          <span className="text-muted-foreground">Wall ({debugState.wallDirection > 0 ? 'R' : debugState.wallDirection < 0 ? 'L' : '-'})</span>
-        </div>
-      </div>
-
-      {/* Velocity */}
-      <div className="mb-3 p-2 bg-background/30 rounded text-xs">
-        <div className="flex justify-between">
-          <span className="text-muted-foreground">Velocity</span>
-          <span>
-            X: <span className="text-foreground">{debugState.velocityX}</span>
-            {' '}
-            Y: <span className="text-foreground">{debugState.velocityY}</span>
+        {debugState ? (
+          <span className={`font-bold uppercase ${getStateColor(debugState.state)}`}>
+            {debugState.state}
           </span>
-        </div>
-        <div className="flex justify-between mt-1">
-          <span className="text-muted-foreground">Facing</span>
-          <span className="text-foreground">{debugState.facing > 0 ? 'Right →' : '← Left'}</span>
-        </div>
-        <div className="flex justify-between mt-1">
-          <span className="text-muted-foreground">Air Dashes</span>
-          <span className="text-foreground">{debugState.airDashesUsed}</span>
-        </div>
+        ) : (
+          <span className="text-muted-foreground text-xs">waiting…</span>
+        )}
       </div>
 
-      {/* Timers */}
-      <div className="space-y-1.5">
-        <TimerBar label="Coyote" value={debugState.coyoteTimer} max={100} color="bg-green-500" />
-        <TimerBar label="Jump Buf" value={debugState.jumpBufferTimer} max={120} color="bg-blue-500" />
-        <TimerBar label="Dash CD" value={debugState.dashCooldown} max={450} color="bg-purple-500" />
-        <TimerBar label="Dash Buf" value={debugState.dashBufferTimer} max={100} color="bg-purple-400" />
-        <TimerBar label="Wall Stick" value={debugState.wallStickTimer} max={80} color="bg-yellow-500" />
-        <TimerBar label="WJ Lock" value={debugState.wallJumpLockout} max={150} color="bg-orange-500" />
-      </div>
+      {debugState ? (
+        <>
+          {/* Flags */}
+          <div className="grid grid-cols-2 gap-x-4 gap-y-1 mb-3 text-xs">
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${debugState.isGrounded ? 'bg-green-500' : 'bg-muted'}`} />
+              <span className="text-muted-foreground">Grounded</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`w-2 h-2 rounded-full ${debugState.isTouchingWall ? 'bg-yellow-500' : 'bg-muted'}`} />
+              <span className="text-muted-foreground">Wall ({debugState.wallDirection > 0 ? 'R' : debugState.wallDirection < 0 ? 'L' : '-'})</span>
+            </div>
+          </div>
+
+          {/* Velocity */}
+          <div className="mb-3 p-2 bg-background/30 rounded text-xs">
+            <div className="flex justify-between">
+              <span className="text-muted-foreground">Velocity</span>
+              <span>
+                X: <span className="text-foreground">{debugState.velocityX}</span>
+                {' '}
+                Y: <span className="text-foreground">{debugState.velocityY}</span>
+              </span>
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-muted-foreground">Facing</span>
+              <span className="text-foreground">{debugState.facing > 0 ? 'Right →' : '← Left'}</span>
+            </div>
+            <div className="flex justify-between mt-1">
+              <span className="text-muted-foreground">Air Dashes</span>
+              <span className="text-foreground">{debugState.airDashesUsed}</span>
+            </div>
+          </div>
+
+          {/* Timers */}
+          <div className="space-y-1.5">
+            <TimerBar label="Coyote" value={debugState.coyoteTimer} max={100} color="bg-green-500" />
+            <TimerBar label="Jump Buf" value={debugState.jumpBufferTimer} max={120} color="bg-blue-500" />
+            <TimerBar label="Dash CD" value={debugState.dashCooldown} max={450} color="bg-purple-500" />
+            <TimerBar label="Dash Buf" value={debugState.dashBufferTimer} max={100} color="bg-purple-400" />
+            <TimerBar label="Wall Stick" value={debugState.wallStickTimer} max={80} color="bg-yellow-500" />
+            <TimerBar label="WJ Lock" value={debugState.wallJumpLockout} max={150} color="bg-orange-500" />
+          </div>
+        </>
+      ) : (
+        <div className="mb-3 p-2 bg-background/30 rounded text-xs text-muted-foreground">
+          Start/enter gameplay so the player debug stats can populate.
+        </div>
+      )}
 
       {/* Teleport Section */}
       <div className="mt-3 pt-2 border-t border-border">
@@ -172,6 +197,18 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
             className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
           >
             Room 8: Skull Ravager
+          </button>
+          <button
+            onClick={() => handleTeleport('medullaRoom32')}
+            className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
+          >
+            Room 32: Final Boss
+          </button>
+          <button
+            onClick={() => handleTeleport('mossTitanArena')}
+            className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
+          >
+            Moss Titan Arena
           </button>
         </div>
       </div>
