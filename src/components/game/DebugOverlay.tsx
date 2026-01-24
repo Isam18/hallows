@@ -205,6 +205,12 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
             Room 32: Final Boss
           </button>
           <button
+            onClick={() => handleTeleport('skullRavagerArena')}
+            className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold"
+          >
+            ⚔️ Skull Ravager Boss
+          </button>
+          <button
             onClick={() => handleTeleport('mossTitanArena')}
             className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
           >

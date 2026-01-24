@@ -82,6 +82,7 @@ import medullaRoom29Data from '../data/levels/medulla/room29-lipOfTheBeast.json'
 import medullaRoom30Data from '../data/levels/medulla/room30-palateArchway.json';
 import medullaRoom31Data from '../data/levels/medulla/room31-finalPassage.json';
 import medullaRoom32Data from '../data/levels/medulla/room32-bossArena.json';
+import skullRavagerArenaData from '../data/levels/medulla/skullRavagerArena.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -129,6 +130,7 @@ const LEVELS: Record<string, LevelConfig> = {
   medullaRoom30: medullaRoom30Data as unknown as LevelConfig,
   medullaRoom31: medullaRoom31Data as unknown as LevelConfig,
   medullaRoom32: medullaRoom32Data as unknown as LevelConfig,
+  skullRavagerArena: skullRavagerArenaData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {

@@ -1,0 +1,44 @@
+{
+  "id": "skullRavagerArena",
+  "name": "Skull Ravager Arena",
+  "biome": "medulla",
+  "width": 1200,
+  "height": 700,
+  "backgroundColor": "#1a0505",
+  "spawnPoint": { "x": 1100, "y": 550 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1200, "height": 40, "type": "wall" },
+    { "x": 0, "y": 40, "width": 40, "height": 660, "type": "wall" },
+    { "x": 1160, "y": 40, "width": 40, "height": 660, "type": "wall" },
+    { "x": 0, "y": 650, "width": 1200, "height": 50, "type": "ground", "texture": "boneFloor" },
+    { "x": 200, "y": 500, "width": 200, "height": 20, "type": "platform" },
+    { "x": 800, "y": 500, "width": 200, "height": 20, "type": "platform" },
+    { "x": 500, "y": 400, "width": 200, "height": 20, "type": "platform" }
+  ],
+  "magmaPools": [],
+  "lavaPools": [],
+  "enemies": [
+    {
+      "type": "skullRavager",
+      "x": 600,
+      "y": 550,
+      "behavior": "boss",
+      "elite": true
+    }
+  ],
+  "pickups": [
+    { "type": "soul", "x": 300, "y": 600 },
+    { "type": "soul", "x": 900, "y": 600 }
+  ],
+  "triggers": [],
+  "spawns": {
+    "default": { "x": 1100, "y": 550 },
+    "fromPrevious": { "x": 1100, "y": 550 }
+  },
+  "special": {
+    "bossRoom": true,
+    "bossName": "Skull Ravager",
+    "cinematicIntro": false,
+    "bossArena": true
+  }
+}
