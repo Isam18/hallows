@@ -19,9 +19,9 @@
   "lavaPools": [],
   "enemies": [
     {
-      "type": "skullRavager",
+      "type": "megaSkullRavager",
       "x": 600,
-      "y": 550,
+      "y": 500,
       "behavior": "boss",
       "elite": true
     }

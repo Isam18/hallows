@@ -309,5 +309,26 @@
     "height": 55,
     "isMedulla": true,
     "isElite": true
+  },
+  "megaSkullRavager": {
+    "id": "megaSkullRavager",
+    "displayName": "Mega Skull Ravager",
+    "hp": 80,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 400,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": { "x": 20, "y": 10 },
+    "hitstunMs": 80,
+    "invulnOnHitMs": 200,
+    "dropShells": { "min": 120, "max": 180 },
+    "hurtFlashMs": 100,
+    "spriteKey": "megaSkullRavager",
+    "width": 110,
+    "height": 90,
+    "isMedulla": true,
+    "isElite": true,
+    "isBoss": true
   }
 }
