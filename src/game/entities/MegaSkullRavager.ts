@@ -235,6 +235,7 @@ export class MegaSkullRavager extends Enemy {
   }
 
   private showDefeatText(): void {
+    if (!this.scene) return;
     const cam = this.scene.cameras.main;
     const cx = cam.width / 2;
     const cy = cam.height / 2;
@@ -549,14 +550,20 @@ export class MegaSkullRavager extends Enemy {
     const wasDead = this.isDying();
     const result = super.takeDamage(amount, fromX, swingId);
     if (!wasDead && this.isDying()) {
-      this.showDefeatText();
-      // Open the exit door after a short delay
-      this.scene.time.delayedCall(2000, () => {
-        const gameScene = this.scene as any;
-        if (gameScene.openBossExitDoor) {
-          gameScene.openBossExitDoor();
-        }
-      });
+      // Store scene ref before entity might get destroyed
+      const sceneRef = this.scene;
+      if (sceneRef) {
+        this.showDefeatText();
+        // Open the exit door after a short delay
+        sceneRef.time.delayedCall(2000, () => {
+          if (sceneRef && sceneRef.scene && sceneRef.scene.isActive()) {
+            const gameScene = sceneRef as any;
+            if (gameScene.openBossExitDoor) {
+              gameScene.openBossExitDoor();
+            }
+          }
+        });
+      }
     }
     return result;
   }
