@@ -557,16 +557,15 @@ export class MegaSkullRavager extends Enemy {
     const wasDead = this.isDying();
     const result = super.takeDamage(amount, fromX, swingId);
     if (!wasDead && this.isDying()) {
-      // Store scene ref before entity might get destroyed
       const sceneRef = this.scene;
       if (sceneRef) {
         this.showDefeatText();
-        // Open the exit door after a short delay
-        sceneRef.time.delayedCall(2000, () => {
+        // Teleport to verdant chamber after defeat text
+        sceneRef.time.delayedCall(3000, () => {
           if (sceneRef && sceneRef.scene && sceneRef.scene.isActive()) {
             const gameScene = sceneRef as any;
-            if (gameScene.openBossExitDoor) {
-              gameScene.openBossExitDoor();
+            if (gameScene.transitionToLevel) {
+              gameScene.transitionToLevel('verdantChamber', 'default');
             }
           }
         });
