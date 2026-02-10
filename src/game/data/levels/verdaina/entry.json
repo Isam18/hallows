@@ -19,8 +19,8 @@
   "pickups": [],
   "triggers": [
     {
-      "id": "verdainaDoor",
-      "type": "verdainaDoor",
+      "id": "verdantDoorSealed",
+      "type": "verdantDoor",
       "x": 880,
       "y": 550,
       "width": 50,

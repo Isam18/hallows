@@ -424,8 +424,13 @@ export class GameScene extends Phaser.Scene {
         // Hidden exit that appears after boss is defeated
         this.createBossExitDoor(t.x, t.y, t.width, t.height, t.target, t.targetSpawn);
       } else if (t.type === 'verdainaDoor') {
-        // Sealed door in verdaina (does nothing yet)
-        this.createVerdainaDoor(t.x, t.y, t.width, t.height);
+        if (t.target) {
+          // Functional mossy door that transitions
+          this.createVerdainaDoorTransition(t.x, t.y, t.width, t.height, t.target, t.targetSpawn || 'default');
+        } else {
+          // Sealed mossy door (does nothing yet)
+          this.createVerdainaDoor(t.x, t.y, t.width, t.height);
+        }
       }
     });
     
@@ -1407,6 +1412,15 @@ export class GameScene extends Phaser.Scene {
       (this as any)._verdainaDoorText.setVisible(inRange);
     }
 
+    // Check verdaina transition door proximity
+    if ((this as any)._verdainaDoorTransZone && (this as any)._verdainaDoorTransPrompt) {
+      const inRange = this.physics.overlap(this.player, (this as any)._verdainaDoorTransZone);
+      (this as any)._verdainaDoorTransPrompt.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.transitionToLevel((this as any)._verdainaDoorTransTarget, (this as any)._verdainaDoorTransSpawn);
+      }
+    }
+
     // Check boss exit door interaction
     if (this.bossExitZone && this.bossExitPrompt) {
       const inRange = this.physics.overlap(this.player, this.bossExitZone);
@@ -2225,5 +2239,45 @@ export class GameScene extends Phaser.Scene {
 
     (this as any)._verdainaDoorZone = zone;
     (this as any)._verdainaDoorText = sealedText;
+  }
+
+  private createVerdainaDoorTransition(x: number, y: number, width: number, height: number, target: string, targetSpawn: string): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Same mossy door visuals
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x2a3a2a);
+    doorFrame.setStrokeStyle(3, 0x1a2a1a);
+    doorFrame.setDepth(5);
+
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x3a4a3a);
+    doorSurface.setStrokeStyle(2, 0x2a3a2a);
+    doorSurface.setDepth(6);
+
+    for (let i = 0; i < 8; i++) {
+      const vx = doorX + Phaser.Math.Between(-18, 18);
+      const vy = doorY + Phaser.Math.Between(-40, 40);
+      const vine = this.add.ellipse(vx, vy, 6 + Math.random() * 8, 10 + Math.random() * 12, 0x44aa44, 0.6);
+      vine.setDepth(7);
+    }
+
+    // Interact prompt
+    const prompt = this.add.text(doorX, doorY - 60, 'Press UP to enter', {
+      fontSize: '12px',
+      color: '#44cc44',
+      fontFamily: 'Georgia, serif',
+      fontStyle: 'italic',
+    });
+    prompt.setOrigin(0.5);
+    prompt.setDepth(100);
+    prompt.setVisible(false);
+
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    (this as any)._verdainaDoorTransZone = zone;
+    (this as any)._verdainaDoorTransPrompt = prompt;
+    (this as any)._verdainaDoorTransTarget = target;
+    (this as any)._verdainaDoorTransSpawn = targetSpawn;
   }
 }
