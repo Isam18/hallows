@@ -4,7 +4,7 @@
   "biome": "verdaina",
   "width": 1000,
   "height": 700,
-  "backgroundColor": "#0a1a0a",
+  "backgroundColor": "#1a0a0a",
   "spawnPoint": { "x": 100, "y": 600 },
   "platforms": [
     { "x": 0, "y": 650, "width": 1000, "height": 50, "type": "ground" },
