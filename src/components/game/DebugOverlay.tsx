@@ -199,6 +199,12 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
             Room 8: Skull Tyrant
           </button>
           <button
+            onClick={() => handleTeleport('medullaRoom31')}
+            className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
+          >
+            Room 31: Final Passage
+          </button>
+          <button
             onClick={() => handleTeleport('medullaRoom32')}
             className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors"
           >
