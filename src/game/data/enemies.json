@@ -313,7 +313,7 @@
   "megaSkullRavager": {
     "id": "megaSkullRavager",
     "displayName": "Mega Skull Ravager",
-    "hp": 80,
+    "hp": 68,
     "contactDamage": 2,
     "moveSpeedPatrol": 0,
     "moveSpeedAggro": 0,
