@@ -68,6 +68,7 @@ import medullaRoom31Data from '../data/levels/medulla/room31-finalPassage.json';
 import medullaRoom32Data from '../data/levels/medulla/room32-bossArena.json';
 import skullRavagerArenaData from '../data/levels/medulla/skullRavagerArena.json';
 import verdantChamberData from '../data/levels/medulla/verdantChamber.json';
+import verdainaEntryData from '../data/levels/verdaina/entry.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -100,6 +101,7 @@ const LEVELS: Record<string, LevelConfig> = {
   medullaRoom32: medullaRoom32Data as unknown as LevelConfig,
   skullRavagerArena: skullRavagerArenaData as unknown as LevelConfig,
   verdantChamber: verdantChamberData as unknown as LevelConfig,
+  verdainaEntry: verdainaEntryData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -216,6 +218,8 @@ export class GameScene extends Phaser.Scene {
     } else if (biome === 'medulla' || this.levelId === 'theMedulla' || isMedullaRoom) {
       this.medullaParallax = new MedullaParallax(this);
       this.createMedullaEnvironment();
+    } else if (biome === 'verdaina') {
+      this.createVerdainaEnvironment();
     }
     
     // Build level
@@ -419,6 +423,9 @@ export class GameScene extends Phaser.Scene {
       } else if (t.type === 'bossExitTransition') {
         // Hidden exit that appears after boss is defeated
         this.createBossExitDoor(t.x, t.y, t.width, t.height, t.target, t.targetSpawn);
+      } else if (t.type === 'verdainaDoor') {
+        // Sealed door in verdaina (does nothing yet)
+        this.createVerdainaDoor(t.x, t.y, t.width, t.height);
       }
     });
     
@@ -1394,6 +1401,12 @@ export class GameScene extends Phaser.Scene {
       (this as any)._verdantDoorText.setVisible(inRange);
     }
 
+    // Check verdaina door proximity
+    if ((this as any)._verdainaDoorZone && (this as any)._verdainaDoorText) {
+      const inRange = this.physics.overlap(this.player, (this as any)._verdainaDoorZone);
+      (this as any)._verdainaDoorText.setVisible(inRange);
+    }
+
     // Check boss exit door interaction
     if (this.bossExitZone && this.bossExitPrompt) {
       const inRange = this.physics.overlap(this.player, this.bossExitZone);
@@ -2066,5 +2079,151 @@ export class GameScene extends Phaser.Scene {
         this.enterBossArena();
       });
     }
+  }
+
+  private createVerdainaEnvironment(): void {
+    const w = this.currentLevel.width;
+    const h = this.currentLevel.height;
+
+    // Dark mossy green background
+    const bg = this.add.rectangle(w / 2, h / 2, w, h, 0x0a1a0a);
+    bg.setDepth(-10);
+
+    // Moss patches on ground
+    for (let i = 0; i < 30; i++) {
+      const mx = Phaser.Math.Between(40, w - 40);
+      const my = Phaser.Math.Between(h - 80, h - 20);
+      const moss = this.add.ellipse(mx, my, Phaser.Math.Between(20, 50), Phaser.Math.Between(8, 16), 
+        Phaser.Math.RND.pick([0x2d5a1e, 0x3a7a2a, 0x4a8a3a, 0x1e4a12]), 0.7);
+      moss.setDepth(0);
+    }
+
+    // Moss on walls
+    for (let wy = 50; wy < h - 50; wy += 30) {
+      // Left wall moss
+      const lm = this.add.ellipse(35 + Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x2d6a1e, 0.5);
+      lm.setDepth(0);
+      // Right wall moss
+      const rm = this.add.ellipse(w - 35 - Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x2d6a1e, 0.5);
+      rm.setDepth(0);
+    }
+
+    // Ceiling moss/vines hanging down
+    for (let i = 0; i < 15; i++) {
+      const vx = Phaser.Math.Between(50, w - 50);
+      const vineLen = Phaser.Math.Between(30, 80);
+      const vine = this.add.rectangle(vx, 30 + vineLen / 2, 3, vineLen, 0x3a8a2a, 0.6);
+      vine.setDepth(0);
+      // Leaf at tip
+      const leaf = this.add.ellipse(vx, 30 + vineLen, 8, 5, 0x5aaa4a, 0.7);
+      leaf.setDepth(0);
+    }
+
+    // Scattered moss clumps on platforms
+    for (let i = 0; i < 12; i++) {
+      const cx = Phaser.Math.Between(50, w - 50);
+      const cy = Phaser.Math.Between(100, h - 120);
+      const clump = this.add.ellipse(cx, cy, Phaser.Math.Between(12, 30), Phaser.Math.Between(6, 14), 0x3a7a2a, 0.4);
+      clump.setDepth(0);
+    }
+
+    // Zone title - "THE VERDAINA" in big green letters
+    const cam = this.cameras.main;
+    const title = this.add.text(cam.width / 2, cam.height / 2 - 20, 'THE VERDAINA', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '52px',
+      color: '#44cc44',
+      fontStyle: 'bold',
+      stroke: '#115511',
+      strokeThickness: 8,
+      shadow: {
+        offsetX: 3,
+        offsetY: 3,
+        color: '#004400',
+        blur: 15,
+        fill: true
+      }
+    });
+    title.setOrigin(0.5);
+    title.setScrollFactor(0);
+    title.setDepth(1001);
+    title.setAlpha(0);
+
+    const subtitle = this.add.text(cam.width / 2, cam.height / 2 + 30, '~ The living gardens ~', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '18px',
+      color: '#66dd66',
+      fontStyle: 'italic',
+      stroke: '#000000',
+      strokeThickness: 4,
+    });
+    subtitle.setOrigin(0.5);
+    subtitle.setScrollFactor(0);
+    subtitle.setDepth(1001);
+    subtitle.setAlpha(0);
+
+    // Fade in title
+    this.tweens.add({
+      targets: [title, subtitle],
+      alpha: 1,
+      duration: 600,
+      ease: 'Power2'
+    });
+
+    // Fade out after 2.5 seconds
+    this.time.delayedCall(2500, () => {
+      if (this.scene.isActive()) {
+        this.tweens.add({
+          targets: [title, subtitle],
+          alpha: 0,
+          duration: 600,
+          ease: 'Power2',
+          onComplete: () => {
+            title.destroy();
+            subtitle.destroy();
+          }
+        });
+      }
+    });
+  }
+
+  private createVerdainaDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Stone door frame
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x2a3a2a);
+    doorFrame.setStrokeStyle(3, 0x1a2a1a);
+    doorFrame.setDepth(5);
+
+    // Door surface
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x3a4a3a);
+    doorSurface.setStrokeStyle(2, 0x2a3a2a);
+    doorSurface.setDepth(6);
+
+    // Moss/vine decorations on door
+    for (let i = 0; i < 8; i++) {
+      const vx = doorX + Phaser.Math.Between(-18, 18);
+      const vy = doorY + Phaser.Math.Between(-40, 40);
+      const vine = this.add.ellipse(vx, vy, 6 + Math.random() * 8, 10 + Math.random() * 12, 0x44aa44, 0.6);
+      vine.setDepth(7);
+    }
+
+    // "Sealed" text
+    const sealedText = this.add.text(doorX, doorY - 60, 'The path ahead is not yet clear...', {
+      fontSize: '12px',
+      color: '#44cc44',
+      fontFamily: 'Georgia, serif',
+      fontStyle: 'italic',
+    });
+    sealedText.setOrigin(0.5);
+    sealedText.setDepth(100);
+    sealedText.setVisible(false);
+
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    (this as any)._verdainaDoorZone = zone;
+    (this as any)._verdainaDoorText = sealedText;
   }
 }
