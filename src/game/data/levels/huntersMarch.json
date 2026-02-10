@@ -1,7 +1,7 @@
 {
-  "id": "verdainaEntry",
-  "name": "The Verdaina",
-  "biome": "verdaina",
+  "id": "huntersMarch",
+  "name": "Hunter's March",
+  "biome": "huntersMarch",
   "width": 1000,
   "height": 700,
   "backgroundColor": "#1a0a0a",
@@ -19,7 +19,7 @@
   "pickups": [],
   "triggers": [
     {
-      "id": "verdantDoorSealed",
+      "id": "sealedDoor",
       "type": "verdantDoor",
       "x": 880,
       "y": 550,
@@ -29,6 +29,6 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 600 },
-    "fromHuntersMarch": { "x": 100, "y": 600 }
+    "fromChamber": { "x": 100, "y": 600 }
   }
 }
