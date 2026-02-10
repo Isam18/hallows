@@ -349,5 +349,25 @@
     "width": 36,
     "height": 40,
     "isHuntersMarch": true
+  },
+  "frontierWarrior": {
+    "id": "frontierWarrior",
+    "displayName": "Frontier Warrior",
+    "hp": 6,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 25,
+    "moveSpeedAggro": 55,
+    "aggroRangePx": 180,
+    "deaggroRangePx": 280,
+    "knockbackOnHit": { "x": 40, "y": 20 },
+    "hitstunMs": 100,
+    "invulnOnHitMs": 120,
+    "dropShells": { "min": 20, "max": 35 },
+    "hurtFlashMs": 120,
+    "spriteKey": "frontierWarrior",
+    "width": 44,
+    "height": 48,
+    "isHuntersMarch": true,
+    "isElite": false
   }
 }

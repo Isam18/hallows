@@ -20,6 +20,7 @@ import { AdaptedSkuller } from '../entities/AdaptedSkuller';
 import { SkullRavager } from '../entities/SkullRavager';
 import { MegaSkullRavager } from '../entities/MegaSkullRavager';
 import { FrontierScout } from '../entities/FrontierScout';
+import { FrontierWarrior } from '../entities/FrontierWarrior';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { Pickup } from '../entities/Pickup';
@@ -482,6 +483,9 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'frontierScout') {
           const scout = new FrontierScout(this, e.x, e.y, config);
           this.enemies.add(scout);
+        } else if (e.type === 'frontierWarrior') {
+          const warrior = new FrontierWarrior(this, e.x, e.y, config);
+          this.enemies.add(warrior);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {

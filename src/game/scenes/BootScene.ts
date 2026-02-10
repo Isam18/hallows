@@ -1431,6 +1431,10 @@ export class BootScene extends Phaser.Scene {
   private createHuntersMarchEnemySprites(): void {
     this.createFrontierScoutSprite();
     this.createFrontierScoutHurtSprite();
+    this.createFrontierWarriorSprite();
+    this.createFrontierWarriorHurtSprite();
+    this.createFrontierWarriorUnmaskedSprite();
+    this.createFrontierWarriorUnmaskedHurtSprite();
   }
 
   private createFrontierScoutSprite(): void {
@@ -1589,6 +1593,217 @@ export class BootScene extends Phaser.Scene {
     g.strokePath();
 
     g.generateTexture('frontierScout_hurt', 48, 52);
+    g.destroy();
+  }
+
+  private createFrontierWarriorSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 28;
+    const cy = 30;
+
+    // Heavy dark-grey fur mantle (behind body)
+    g.fillStyle(0x3a3a3a);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 10);
+    g.lineTo(cx - 24, cy + 8);
+    g.lineTo(cx - 16, cy + 14);
+    g.lineTo(cx - 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 10);
+    g.lineTo(cx + 24, cy + 8);
+    g.lineTo(cx + 16, cy + 14);
+    g.lineTo(cx + 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    // Fur texture lines
+    g.lineStyle(1, 0x2a2a2a, 0.6);
+    g.lineBetween(cx - 20, cy - 4, cx - 18, cy + 10);
+    g.lineBetween(cx + 20, cy - 4, cx + 18, cy + 10);
+    g.lineBetween(cx - 16, cy - 2, cx - 14, cy + 12);
+
+    // Main body - robust deep crimson segmented
+    g.fillStyle(0x7a1818);
+    g.fillEllipse(cx, cy + 2, 30, 32);
+    // Segment lines
+    g.lineStyle(1, 0x5a1010, 0.7);
+    g.lineBetween(cx - 10, cy - 2, cx + 10, cy - 2);
+    g.lineBetween(cx - 12, cy + 4, cx + 12, cy + 4);
+    g.lineBetween(cx - 10, cy + 10, cx + 10, cy + 10);
+    // Crimson highlight
+    g.fillStyle(0x992222, 0.6);
+    g.fillEllipse(cx - 3, cy - 2, 16, 18);
+
+    // Bone-white mask with asymmetric eye-holes
+    g.fillStyle(0xe8dcc8);
+    g.fillEllipse(cx, cy - 16, 24, 20);
+    // Mask contour
+    g.lineStyle(1.5, 0xc8b8a0);
+    g.strokeEllipse(cx, cy - 16, 24, 20);
+
+    // Jagged crests at back of mask
+    g.fillStyle(0xd4c8b0);
+    g.fillTriangle(cx - 10, cy - 26, cx - 14, cy - 32, cx - 6, cy - 28);
+    g.fillTriangle(cx - 2, cy - 26, cx - 4, cy - 35, cx + 2, cy - 28);
+    g.fillTriangle(cx + 8, cy - 25, cx + 6, cy - 33, cx + 12, cy - 27);
+    // Crest outlines
+    g.lineStyle(1, 0xb8a890);
+    g.lineBetween(cx - 10, cy - 26, cx - 14, cy - 32);
+    g.lineBetween(cx - 14, cy - 32, cx - 6, cy - 28);
+    g.lineBetween(cx - 2, cy - 26, cx - 4, cy - 35);
+    g.lineBetween(cx + 8, cy - 25, cx + 6, cy - 33);
+
+    // Asymmetric eye-holes - dark voids
+    g.fillStyle(0x0a0a0a);
+    // Left eye - larger, angular
+    g.beginPath();
+    g.moveTo(cx - 9, cy - 20);
+    g.lineTo(cx - 4, cy - 17);
+    g.lineTo(cx - 3, cy - 13);
+    g.lineTo(cx - 10, cy - 15);
+    g.closePath();
+    g.fillPath();
+    // Right eye - smaller, rounder
+    g.fillCircle(cx + 5, cy - 16, 3.5);
+    // Third small eye-hole
+    g.fillCircle(cx + 10, cy - 19, 2);
+
+    // Eye gleam
+    g.fillStyle(0xff6666, 0.5);
+    g.fillCircle(cx - 7, cy - 17, 1.5);
+    g.fillCircle(cx + 5, cy - 17, 1);
+
+    // Sturdy limbs
+    g.lineStyle(3, 0x1a1a1a);
+    g.lineBetween(cx - 10, cy + 12, cx - 16, cy + 30);
+    g.lineBetween(cx - 16, cy + 30, cx - 18, cy + 34);
+    g.lineBetween(cx + 10, cy + 12, cx + 16, cy + 30);
+    g.lineBetween(cx + 16, cy + 30, cx + 18, cy + 34);
+    // Joints
+    g.fillStyle(0x1a1a1a);
+    g.fillCircle(cx - 16, cy + 30, 2.5);
+    g.fillCircle(cx + 16, cy + 30, 2.5);
+    g.fillCircle(cx - 18, cy + 34, 2);
+    g.fillCircle(cx + 18, cy + 34, 2);
+
+    // Body outline
+    g.lineStyle(1.5, 0x4a0808);
+    g.strokeEllipse(cx, cy + 2, 30, 32);
+
+    g.generateTexture('frontierWarrior', 56, 56);
+    g.destroy();
+  }
+
+  private createFrontierWarriorHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 28;
+    const cy = 30;
+    g.fillStyle(0xffffff);
+    g.fillEllipse(cx, cy + 2, 30, 32);
+    g.fillEllipse(cx, cy - 16, 24, 20);
+    // Crests
+    g.fillTriangle(cx - 10, cy - 26, cx - 14, cy - 32, cx - 6, cy - 28);
+    g.fillTriangle(cx - 2, cy - 26, cx - 4, cy - 35, cx + 2, cy - 28);
+    g.fillTriangle(cx + 8, cy - 25, cx + 6, cy - 33, cx + 12, cy - 27);
+    // Mantle
+    g.fillStyle(0xdddddd);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 10);
+    g.lineTo(cx - 24, cy + 8);
+    g.lineTo(cx - 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 10);
+    g.lineTo(cx + 24, cy + 8);
+    g.lineTo(cx + 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    // Legs
+    g.lineStyle(3, 0xcccccc);
+    g.lineBetween(cx - 10, cy + 12, cx - 18, cy + 34);
+    g.lineBetween(cx + 10, cy + 12, cx + 18, cy + 34);
+    g.generateTexture('frontierWarrior_hurt', 56, 56);
+    g.destroy();
+  }
+
+  private createFrontierWarriorUnmaskedSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 28;
+    const cy = 30;
+
+    // Same mantle
+    g.fillStyle(0x3a3a3a);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 10);
+    g.lineTo(cx - 24, cy + 8);
+    g.lineTo(cx - 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 10);
+    g.lineTo(cx + 24, cy + 8);
+    g.lineTo(cx + 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+
+    // Body
+    g.fillStyle(0x7a1818);
+    g.fillEllipse(cx, cy + 2, 30, 32);
+    g.fillStyle(0x992222, 0.6);
+    g.fillEllipse(cx - 3, cy - 2, 16, 18);
+
+    // Exposed head - no mask, raw crimson with dark eyes
+    g.fillStyle(0x6a1212);
+    g.fillEllipse(cx, cy - 16, 20, 16);
+    // Angry exposed eyes
+    g.fillStyle(0x0a0a0a);
+    g.fillCircle(cx - 5, cy - 17, 3);
+    g.fillCircle(cx + 5, cy - 17, 3);
+    g.fillStyle(0xff4444, 0.8);
+    g.fillCircle(cx - 5, cy - 17, 1.5);
+    g.fillCircle(cx + 5, cy - 17, 1.5);
+
+    // Legs
+    g.lineStyle(3, 0x1a1a1a);
+    g.lineBetween(cx - 10, cy + 12, cx - 18, cy + 34);
+    g.lineBetween(cx + 10, cy + 12, cx + 18, cy + 34);
+    g.fillStyle(0x1a1a1a);
+    g.fillCircle(cx - 16, cy + 30, 2.5);
+    g.fillCircle(cx + 16, cy + 30, 2.5);
+
+    g.lineStyle(1.5, 0x4a0808);
+    g.strokeEllipse(cx, cy + 2, 30, 32);
+
+    g.generateTexture('frontierWarrior_unmasked', 56, 56);
+    g.destroy();
+  }
+
+  private createFrontierWarriorUnmaskedHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 28;
+    const cy = 30;
+    g.fillStyle(0xffffff);
+    g.fillEllipse(cx, cy + 2, 30, 32);
+    g.fillEllipse(cx, cy - 16, 20, 16);
+    g.fillStyle(0xdddddd);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 10);
+    g.lineTo(cx - 24, cy + 8);
+    g.lineTo(cx - 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 18, cy - 10);
+    g.lineTo(cx + 24, cy + 8);
+    g.lineTo(cx + 8, cy + 6);
+    g.closePath();
+    g.fillPath();
+    g.lineStyle(3, 0xcccccc);
+    g.lineBetween(cx - 10, cy + 12, cx - 18, cy + 34);
+    g.lineBetween(cx + 10, cy + 12, cx + 18, cy + 34);
+    g.generateTexture('frontierWarrior_unmasked_hurt', 56, 56);
     g.destroy();
   }
 

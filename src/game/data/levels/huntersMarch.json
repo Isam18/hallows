@@ -16,7 +16,8 @@
     { "x": 420, "y": 400, "width": 160, "height": 18, "type": "platform" }
   ],
   "enemies": [
-    { "type": "frontierScout", "x": 500, "y": 600 }
+    { "type": "frontierScout", "x": 500, "y": 600 },
+    { "type": "frontierWarrior", "x": 300, "y": 600 }
   ],
   "pickups": [],
   "triggers": [
