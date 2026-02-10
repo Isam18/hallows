@@ -67,7 +67,7 @@ import medullaRoom29Data from '../data/levels/medulla/room29-lipOfTheBeast.json'
 import medullaRoom31Data from '../data/levels/medulla/room31-finalPassage.json';
 import medullaRoom32Data from '../data/levels/medulla/room32-bossArena.json';
 import skullRavagerArenaData from '../data/levels/medulla/skullRavagerArena.json';
-import verdantChamberData from '../data/levels/medulla/verdantChamber.json';
+import huntersMarchData from '../data/levels/medulla/huntersMarch.json';
 import verdainaEntryData from '../data/levels/verdaina/entry.json';
 
 // Generate procedural levels
@@ -100,7 +100,7 @@ const LEVELS: Record<string, LevelConfig> = {
   medullaRoom31: medullaRoom31Data as unknown as LevelConfig,
   medullaRoom32: medullaRoom32Data as unknown as LevelConfig,
   skullRavagerArena: skullRavagerArenaData as unknown as LevelConfig,
-  verdantChamber: verdantChamberData as unknown as LevelConfig,
+  huntersMarch: huntersMarchData as unknown as LevelConfig,
   verdainaEntry: verdainaEntryData as unknown as LevelConfig,
 };
 
@@ -218,6 +218,8 @@ export class GameScene extends Phaser.Scene {
     } else if (biome === 'medulla' || this.levelId === 'theMedulla' || isMedullaRoom) {
       this.medullaParallax = new MedullaParallax(this);
       this.createMedullaEnvironment();
+    } else if (biome === 'huntersMarch') {
+      this.createHuntersMarchEnvironment();
     } else if (biome === 'verdaina') {
       this.createVerdainaEnvironment();
     }
@@ -1788,7 +1790,7 @@ export class GameScene extends Phaser.Scene {
   private bossExitPrompt: Phaser.GameObjects.Text | null = null;
 
   private createBossExitDoor(x: number, y: number, width: number, height: number, target: string, targetSpawn: string): void {
-    this.bossExitTarget = target || 'verdantChamber';
+    this.bossExitTarget = target || 'huntersMarch';
     this.bossExitTargetSpawn = targetSpawn || 'default';
 
     // Initially hidden - will be revealed when boss dies
@@ -2096,6 +2098,109 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private createHuntersMarchEnvironment(): void {
+    const w = this.currentLevel.width;
+    const h = this.currentLevel.height;
+
+    // Dark red background
+    const bg = this.add.rectangle(w / 2, h / 2, w, h, 0x1a0808);
+    bg.setDepth(-10);
+
+    // Blood-red stains on ground
+    for (let i = 0; i < 30; i++) {
+      const mx = Phaser.Math.Between(40, w - 40);
+      const my = Phaser.Math.Between(h - 80, h - 20);
+      const stain = this.add.ellipse(mx, my, Phaser.Math.Between(20, 50), Phaser.Math.Between(8, 16), 
+        Phaser.Math.RND.pick([0x5a1e1e, 0x7a2a2a, 0x8a3a3a, 0x4a1212]), 0.7);
+      stain.setDepth(0);
+    }
+
+    // Red streaks on walls
+    for (let wy = 50; wy < h - 50; wy += 30) {
+      const lm = this.add.ellipse(35 + Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x6a1e1e, 0.5);
+      lm.setDepth(0);
+      const rm = this.add.ellipse(w - 35 - Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x6a1e1e, 0.5);
+      rm.setDepth(0);
+    }
+
+    // Crimson stalactites hanging from ceiling
+    for (let i = 0; i < 15; i++) {
+      const vx = Phaser.Math.Between(50, w - 50);
+      const vineLen = Phaser.Math.Between(30, 80);
+      const spike = this.add.rectangle(vx, 30 + vineLen / 2, 3, vineLen, 0x8a2a2a, 0.6);
+      spike.setDepth(0);
+      const tip = this.add.triangle(vx, 30 + vineLen, 0, 0, 8, 0, 4, 8, 0xaa4444, 0.7);
+      tip.setDepth(0);
+    }
+
+    // Scattered dark red patches
+    for (let i = 0; i < 12; i++) {
+      const cx = Phaser.Math.Between(50, w - 50);
+      const cy = Phaser.Math.Between(100, h - 120);
+      const clump = this.add.ellipse(cx, cy, Phaser.Math.Between(12, 30), Phaser.Math.Between(6, 14), 0x7a2a2a, 0.4);
+      clump.setDepth(0);
+    }
+
+    // Zone title - "HUNTER'S MARCH" in big red letters
+    const cam = this.cameras.main;
+    const title = this.add.text(cam.width / 2, cam.height / 2 - 20, "HUNTER'S MARCH", {
+      fontFamily: 'Georgia, serif',
+      fontSize: '52px',
+      color: '#cc4444',
+      fontStyle: 'bold',
+      stroke: '#551111',
+      strokeThickness: 8,
+      shadow: {
+        offsetX: 3,
+        offsetY: 3,
+        color: '#440000',
+        blur: 15,
+        fill: true
+      }
+    });
+    title.setOrigin(0.5);
+    title.setScrollFactor(0);
+    title.setDepth(1001);
+    title.setAlpha(0);
+
+    const subtitle = this.add.text(cam.width / 2, cam.height / 2 + 30, '~ The path of crimson ~', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '18px',
+      color: '#dd6666',
+      fontStyle: 'italic',
+      stroke: '#000000',
+      strokeThickness: 4,
+    });
+    subtitle.setOrigin(0.5);
+    subtitle.setScrollFactor(0);
+    subtitle.setDepth(1001);
+    subtitle.setAlpha(0);
+
+    // Fade in title
+    this.tweens.add({
+      targets: [title, subtitle],
+      alpha: 1,
+      duration: 600,
+      ease: 'Power2'
+    });
+
+    // Fade out after 2.5 seconds
+    this.time.delayedCall(2500, () => {
+      if (this.scene.isActive()) {
+        this.tweens.add({
+          targets: [title, subtitle],
+          alpha: 0,
+          duration: 600,
+          ease: 'Power2',
+          onComplete: () => {
+            title.destroy();
+            subtitle.destroy();
+          }
+        });
+      }
+    });
+  }
+
   private createVerdainaEnvironment(): void {
     const w = this.currentLevel.width;
     const h = this.currentLevel.height;
@@ -2115,10 +2220,8 @@ export class GameScene extends Phaser.Scene {
 
     // Moss on walls
     for (let wy = 50; wy < h - 50; wy += 30) {
-      // Left wall moss
       const lm = this.add.ellipse(35 + Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x2d6a1e, 0.5);
       lm.setDepth(0);
-      // Right wall moss
       const rm = this.add.ellipse(w - 35 - Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x2d6a1e, 0.5);
       rm.setDepth(0);
     }
@@ -2129,7 +2232,6 @@ export class GameScene extends Phaser.Scene {
       const vineLen = Phaser.Math.Between(30, 80);
       const vine = this.add.rectangle(vx, 30 + vineLen / 2, 3, vineLen, 0x3a8a2a, 0.6);
       vine.setDepth(0);
-      // Leaf at tip
       const leaf = this.add.ellipse(vx, 30 + vineLen, 8, 5, 0x5aaa4a, 0.7);
       leaf.setDepth(0);
     }
@@ -2246,26 +2348,26 @@ export class GameScene extends Phaser.Scene {
     const doorX = x + width / 2;
     const doorY = y + height / 2;
 
-    // Same mossy door visuals
-    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x2a3a2a);
-    doorFrame.setStrokeStyle(3, 0x1a2a1a);
+    // Red-themed door visuals for Hunter's March
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x3a1a1a);
+    doorFrame.setStrokeStyle(3, 0x2a0a0a);
     doorFrame.setDepth(5);
 
-    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x3a4a3a);
-    doorSurface.setStrokeStyle(2, 0x2a3a2a);
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x4a2a2a);
+    doorSurface.setStrokeStyle(2, 0x3a1a1a);
     doorSurface.setDepth(6);
 
     for (let i = 0; i < 8; i++) {
       const vx = doorX + Phaser.Math.Between(-18, 18);
       const vy = doorY + Phaser.Math.Between(-40, 40);
-      const vine = this.add.ellipse(vx, vy, 6 + Math.random() * 8, 10 + Math.random() * 12, 0x44aa44, 0.6);
+      const vine = this.add.ellipse(vx, vy, 6 + Math.random() * 8, 10 + Math.random() * 12, 0xaa4444, 0.6);
       vine.setDepth(7);
     }
 
     // Interact prompt
     const prompt = this.add.text(doorX, doorY - 60, 'Press UP to enter', {
       fontSize: '12px',
-      color: '#44cc44',
+      color: '#cc4444',
       fontFamily: 'Georgia, serif',
       fontStyle: 'italic',
     });

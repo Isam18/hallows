@@ -184,6 +184,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           <button onClick={() => handleTeleport('medullaRoom31')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Room 31: Final</button>
           <button onClick={() => handleTeleport('medullaRoom32')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Room 32: Boss</button>
           <button onClick={() => handleTeleport('skullRavagerArena')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold">⚔️ Burning Mauler</button>
+          <button onClick={() => handleTeleport('huntersMarch')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold">⚔️ Hunter's March</button>
           <button onClick={() => handleTeleport('verdainaEntry')} className="px-2 py-1 text-xs bg-green-600/20 hover:bg-green-600/40 border border-green-600/30 rounded transition-colors font-bold">🌿 Verdaina</button>
           <button onClick={() => handleTeleport('mossTitanArena')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Moss Titan Arena</button>
         </div>

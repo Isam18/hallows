@@ -29,6 +29,6 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 600 },
-    "fromVerdantChamber": { "x": 100, "y": 600 }
+    "fromHuntersMarch": { "x": 100, "y": 600 }
   }
 }
