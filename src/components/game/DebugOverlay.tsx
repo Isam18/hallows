@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { MovementDebugState } from '@/game/core/MovementConfig';
 
 interface DebugOverlayProps {
@@ -9,19 +9,23 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   const [manualToggle, setManualToggle] = useState<boolean | null>(null);
   const [debugMode, setDebugMode] = useState(false);
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
+  const prevDebugMode = useRef(false);
 
   // F1 manual override
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'F1') {
         e.preventDefault();
-        setManualToggle(prev => prev === null ? !debugMode : !prev);
+        setManualToggle(prev => {
+          const currentlyVisible = prev !== null ? prev : prevDebugMode.current;
+          return !currentlyVisible;
+        });
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [debugMode]);
+  }, []);
 
   // Poll debugMode from registry and player debug state
   useEffect(() => {
@@ -29,12 +33,13 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
 
     const interval = setInterval(() => {
       const registryDebug = gameRef.registry?.get('debugMode') ?? false;
-      setDebugMode(registryDebug);
-
+      
       // When debug mode changes, reset manual override
-      if (registryDebug !== debugMode) {
+      if (registryDebug !== prevDebugMode.current) {
+        prevDebugMode.current = registryDebug;
         setManualToggle(null);
       }
+      setDebugMode(registryDebug);
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const scene = gameRef.scene.getScene('GameScene') as any;
@@ -44,7 +49,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
     }, 50);
 
     return () => clearInterval(interval);
-  }, [gameRef, debugMode]);
+  }, [gameRef]);
 
   const visible = manualToggle !== null ? manualToggle : debugMode;
 
