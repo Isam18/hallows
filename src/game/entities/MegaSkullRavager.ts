@@ -560,10 +560,10 @@ export class MegaSkullRavager extends Enemy {
       const sceneRef = this.scene;
       if (sceneRef) {
         this.showDefeatText();
-        // Immediately transition to verdant chamber
+        // Immediately transition to Hunter's March
         const gameScene = sceneRef as any;
         if (gameScene.transitionToLevel) {
-          gameScene.transitionToLevel('verdantChamber', 'default');
+          gameScene.transitionToLevel('huntersMarch', 'default');
         }
       }
     }

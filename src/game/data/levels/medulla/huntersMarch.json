@@ -1,10 +1,10 @@
 {
-  "id": "verdantChamber",
-  "name": "The Verdant Chamber",
-  "biome": "medulla",
+  "id": "huntersMarch",
+  "name": "Hunter's March",
+  "biome": "huntersMarch",
   "width": 800,
   "height": 900,
-  "backgroundColor": "#0a0810",
+  "backgroundColor": "#1a0808",
   "spawnPoint": { "x": 100, "y": 800 },
   "platforms": [
     { "x": 0, "y": 850, "width": 800, "height": 50, "type": "ground" },
@@ -19,7 +19,7 @@
   "pickups": [],
   "triggers": [
     {
-      "id": "verdainaDoorTransition",
+      "id": "huntersDoorTransition",
       "type": "verdainaDoor",
       "x": 720,
       "y": 750,
