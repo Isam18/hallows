@@ -13,7 +13,8 @@ export class MegaSkullRavager extends Enemy {
   private attackTimer = 0;
   private jumpCount = 0;
   private projectiles: Phaser.GameObjects.Group;
-  private attackCycle = 0; // tracks which attack pattern to use next
+  private attackCycle = 0;
+  private hasShownIntro = false;
 
   // Key visual refs for tinting during projectile windup
   private skullMain!: Phaser.GameObjects.Ellipse;
@@ -149,6 +150,15 @@ export class MegaSkullRavager extends Enemy {
   }
 
   update(time: number, delta: number, player: any): void {
+    // Show boss intro when player gets close
+    if (!this.hasShownIntro) {
+      const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
+      if (dist < 400) {
+        this.hasShownIntro = true;
+        this.showBossTitle();
+      }
+    }
+
     // Only call super.update for non-attack states so parent doesn't override velocity
     if (this.attackState === 'idle' || this.attackState === 'cooldown') {
       super.update(time, delta, player);
@@ -156,6 +166,114 @@ export class MegaSkullRavager extends Enemy {
     this.updateAttackBehavior(delta, player);
     this.updateVisualPositions();
     this.updateProjectiles(player);
+  }
+
+  private showBossTitle(): void {
+    const cam = this.scene.cameras.main;
+    const cx = cam.width / 2;
+    const cy = cam.height / 2;
+
+    // Fiery title
+    const title = this.scene.add.text(cx, cy - 20, 'THE BURNING MAULER', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '56px',
+      color: '#ff6600',
+      fontStyle: 'bold',
+      stroke: '#ff2200',
+      strokeThickness: 8,
+      shadow: {
+        offsetX: 3,
+        offsetY: 3,
+        color: '#cc0000',
+        blur: 15,
+        fill: true
+      }
+    });
+    title.setOrigin(0.5);
+    title.setScrollFactor(0);
+    title.setDepth(1001);
+    title.setAlpha(0);
+
+    // Subtitle
+    const subtitle = this.scene.add.text(cx, cy + 30, '~ Fury of the Medulla ~', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '20px',
+      color: '#ff8844',
+      fontStyle: 'italic',
+      stroke: '#000000',
+      strokeThickness: 4,
+    });
+    subtitle.setOrigin(0.5);
+    subtitle.setScrollFactor(0);
+    subtitle.setDepth(1001);
+    subtitle.setAlpha(0);
+
+    // Fade in
+    this.scene.tweens.add({
+      targets: [title, subtitle],
+      alpha: 1,
+      duration: 400,
+      ease: 'Power2'
+    });
+
+    // Screen shake
+    cam.shake(300, 0.02);
+
+    // Hold then fade out after 2 seconds
+    this.scene.time.delayedCall(2000, () => {
+      this.scene.tweens.add({
+        targets: [title, subtitle],
+        alpha: 0,
+        duration: 500,
+        ease: 'Power2',
+        onComplete: () => {
+          title.destroy();
+          subtitle.destroy();
+        }
+      });
+    });
+  }
+
+  private showDefeatText(): void {
+    const cam = this.scene.cameras.main;
+    const cx = cam.width / 2;
+    const cy = cam.height / 2;
+
+    const text = this.scene.add.text(cx, cy, 'BURNING MAULER DEFEATED', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '42px',
+      color: '#ff8800',
+      fontStyle: 'bold italic',
+      stroke: '#000000',
+      strokeThickness: 6,
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: '#cc4400',
+        blur: 10,
+        fill: true
+      }
+    });
+    text.setOrigin(0.5);
+    text.setScrollFactor(0);
+    text.setDepth(1001);
+    text.setAlpha(0);
+
+    this.scene.tweens.add({
+      targets: text,
+      alpha: 1,
+      duration: 500,
+      ease: 'Power2'
+    });
+
+    this.scene.time.delayedCall(3000, () => {
+      this.scene.tweens.add({
+        targets: text,
+        alpha: 0,
+        duration: 800,
+        onComplete: () => text.destroy()
+      });
+    });
   }
 
   private updateAttackBehavior(delta: number, player: Player): void {
@@ -425,6 +543,15 @@ export class MegaSkullRavager extends Enemy {
     const rf = this.visualElements[22] as any;
     if (lf) lf.setPosition(this.x + -28 * flipMult, this.y + 36);
     if (rf) rf.setPosition(this.x + 28 * flipMult, this.y + 36);
+  }
+
+  takeDamage(amount: number, fromX: number, swingId: number = -1): boolean {
+    const wasDead = this.isDying();
+    const result = super.takeDamage(amount, fromX, swingId);
+    if (!wasDead && this.isDying()) {
+      this.showDefeatText();
+    }
+    return result;
   }
 
   destroy(fromScene?: boolean): void {
