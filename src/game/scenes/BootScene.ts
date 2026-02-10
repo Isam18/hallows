@@ -34,6 +34,7 @@ export class BootScene extends Phaser.Scene {
     this.createPlayerSprites();
     this.createEnemySprites();
     this.createGreenwayEnemySprites();
+    this.createHuntersMarchEnemySprites();
     this.createBossSprites();
     this.createPickupSprites();
     this.createEnvironmentSprites();
@@ -1425,6 +1426,170 @@ export class BootScene extends Phaser.Scene {
     hg.fillPath();
     hg.generateTexture('basicHuskB_hurt', 40, 56);
     hg.destroy();
+  }
+
+  private createHuntersMarchEnemySprites(): void {
+    this.createFrontierScoutSprite();
+    this.createFrontierScoutHurtSprite();
+  }
+
+  private createFrontierScoutSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 24;
+    const cy = 26;
+
+    // Tattered black scholar-cloak/shawl (behind body)
+    g.fillStyle(0x1a1a1a);
+    g.beginPath();
+    g.moveTo(cx - 14, cy - 8);
+    g.lineTo(cx - 18, cy + 16);
+    g.lineTo(cx - 10, cy + 20);
+    g.lineTo(cx - 6, cy + 14);
+    g.closePath();
+    g.fillPath();
+
+    g.beginPath();
+    g.moveTo(cx + 14, cy - 8);
+    g.lineTo(cx + 18, cy + 16);
+    g.lineTo(cx + 10, cy + 20);
+    g.lineTo(cx + 6, cy + 14);
+    g.closePath();
+    g.fillPath();
+
+    // Tattered edges
+    g.fillStyle(0x222222);
+    g.fillTriangle(cx - 16, cy + 16, cx - 20, cy + 22, cx - 12, cy + 18);
+    g.fillTriangle(cx + 16, cy + 16, cx + 20, cy + 22, cx + 12, cy + 18);
+    g.fillTriangle(cx - 12, cy + 18, cx - 14, cy + 24, cx - 8, cy + 20);
+
+    // Throwing rings on back - ivory curves
+    g.lineStyle(2.5, 0xe8dcc8);
+    g.beginPath();
+    g.arc(cx - 6, cy - 12, 8, -Math.PI * 0.8, Math.PI * 0.2, false);
+    g.strokePath();
+    g.beginPath();
+    g.arc(cx + 6, cy - 14, 7, -Math.PI * 0.7, Math.PI * 0.3, false);
+    g.strokePath();
+
+    // Ring highlights
+    g.lineStyle(1, 0xfff8ee, 0.5);
+    g.beginPath();
+    g.arc(cx - 6, cy - 12, 7, -Math.PI * 0.6, -Math.PI * 0.2, false);
+    g.strokePath();
+
+    // Main body - crimson red armored carapace
+    g.fillStyle(0x8a2222);
+    g.fillEllipse(cx, cy, 24, 28);
+
+    // Carapace highlight - polished metallic sheen
+    g.fillStyle(0xaa3333, 0.7);
+    g.fillEllipse(cx - 3, cy - 4, 14, 16);
+
+    // Bright metallic highlight
+    g.fillStyle(0xcc5544, 0.5);
+    g.fillEllipse(cx - 4, cy - 6, 8, 10);
+
+    // Head - polished crimson armored
+    g.fillStyle(0x7a1a1a);
+    g.fillEllipse(cx, cy - 14, 18, 14);
+
+    // Head highlight
+    g.fillStyle(0x992222, 0.8);
+    g.fillEllipse(cx - 2, cy - 16, 10, 8);
+
+    // Slanted angry eyes - dark voids
+    g.fillStyle(0x0a0a0a);
+    g.beginPath();
+    g.moveTo(cx - 7, cy - 16);
+    g.lineTo(cx - 3, cy - 14);
+    g.lineTo(cx - 3, cy - 11);
+    g.lineTo(cx - 8, cy - 13);
+    g.closePath();
+    g.fillPath();
+
+    g.beginPath();
+    g.moveTo(cx + 7, cy - 16);
+    g.lineTo(cx + 3, cy - 14);
+    g.lineTo(cx + 3, cy - 11);
+    g.lineTo(cx + 8, cy - 13);
+    g.closePath();
+    g.fillPath();
+
+    // Eye gleam
+    g.fillStyle(0xffcccc, 0.6);
+    g.fillCircle(cx - 5, cy - 15, 1.5);
+    g.fillCircle(cx + 5, cy - 15, 1.5);
+
+    // Thin needle-like black limbs
+    g.lineStyle(2, 0x0a0a0a);
+    // Front legs
+    g.lineBetween(cx - 8, cy + 8, cx - 14, cy + 24);
+    g.lineBetween(cx - 14, cy + 24, cx - 16, cy + 28);
+    g.lineBetween(cx + 8, cy + 8, cx + 14, cy + 24);
+    g.lineBetween(cx + 14, cy + 24, cx + 16, cy + 28);
+
+    // Leg joints
+    g.fillStyle(0x0a0a0a);
+    g.fillCircle(cx - 14, cy + 24, 2);
+    g.fillCircle(cx + 14, cy + 24, 2);
+
+    // Feet tips
+    g.fillCircle(cx - 16, cy + 28, 1.5);
+    g.fillCircle(cx + 16, cy + 28, 1.5);
+
+    // Body outline
+    g.lineStyle(1.5, 0x4a0a0a);
+    g.strokeEllipse(cx, cy, 24, 28);
+    g.strokeEllipse(cx, cy - 14, 18, 14);
+
+    // Segmentation lines
+    g.lineStyle(1, 0x5a1a1a, 0.6);
+    g.lineBetween(cx - 8, cy + 4, cx + 8, cy + 4);
+    g.lineBetween(cx - 6, cy + 8, cx + 6, cy + 8);
+
+    g.generateTexture('frontierScout', 48, 52);
+    g.destroy();
+  }
+
+  private createFrontierScoutHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 24;
+    const cy = 26;
+
+    // White flash version
+    g.fillStyle(0xffffff);
+    g.fillEllipse(cx, cy, 24, 28);
+    g.fillEllipse(cx, cy - 14, 18, 14);
+
+    // Cloak
+    g.fillStyle(0xdddddd);
+    g.beginPath();
+    g.moveTo(cx - 14, cy - 8);
+    g.lineTo(cx - 18, cy + 16);
+    g.lineTo(cx - 6, cy + 14);
+    g.closePath();
+    g.fillPath();
+
+    g.beginPath();
+    g.moveTo(cx + 14, cy - 8);
+    g.lineTo(cx + 18, cy + 16);
+    g.lineTo(cx + 6, cy + 14);
+    g.closePath();
+    g.fillPath();
+
+    // Legs
+    g.lineStyle(2, 0xcccccc);
+    g.lineBetween(cx - 8, cy + 8, cx - 16, cy + 28);
+    g.lineBetween(cx + 8, cy + 8, cx + 16, cy + 28);
+
+    // Rings
+    g.lineStyle(2.5, 0xffffff);
+    g.beginPath();
+    g.arc(cx - 6, cy - 12, 8, -Math.PI * 0.8, Math.PI * 0.2, false);
+    g.strokePath();
+
+    g.generateTexture('frontierScout_hurt', 48, 52);
+    g.destroy();
   }
 
   private createBossSprites(): void {

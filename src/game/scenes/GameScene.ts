@@ -19,6 +19,7 @@ import { SkullScuttler } from '../entities/SkullScuttler';
 import { AdaptedSkuller } from '../entities/AdaptedSkuller';
 import { SkullRavager } from '../entities/SkullRavager';
 import { MegaSkullRavager } from '../entities/MegaSkullRavager';
+import { FrontierScout } from '../entities/FrontierScout';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { Pickup } from '../entities/Pickup';
@@ -478,6 +479,9 @@ export class GameScene extends Phaser.Scene {
           // Mega Skull Ravager - huge boss with horns and projectiles
           const megaRavager = new MegaSkullRavager(this, e.x, e.y, config);
           this.enemies.add(megaRavager);
+        } else if (e.type === 'frontierScout') {
+          const scout = new FrontierScout(this, e.x, e.y, config);
+          this.enemies.add(scout);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
