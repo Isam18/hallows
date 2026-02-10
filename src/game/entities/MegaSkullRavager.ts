@@ -560,15 +560,11 @@ export class MegaSkullRavager extends Enemy {
       const sceneRef = this.scene;
       if (sceneRef) {
         this.showDefeatText();
-        // Teleport to verdant chamber after defeat text
-        sceneRef.time.delayedCall(3000, () => {
-          if (sceneRef && sceneRef.scene && sceneRef.scene.isActive()) {
-            const gameScene = sceneRef as any;
-            if (gameScene.transitionToLevel) {
-              gameScene.transitionToLevel('verdantChamber', 'default');
-            }
-          }
-        });
+        // Immediately transition to verdant chamber
+        const gameScene = sceneRef as any;
+        if (gameScene.transitionToLevel) {
+          gameScene.transitionToLevel('verdantChamber', 'default');
+        }
       }
     }
     return result;
