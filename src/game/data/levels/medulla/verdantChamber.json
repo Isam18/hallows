@@ -19,12 +19,14 @@
   "pickups": [],
   "triggers": [
     {
-      "id": "verdantDoor",
-      "type": "verdantDoor",
+      "id": "verdantDoorToVerdaina",
+      "type": "transition",
       "x": 720,
       "y": 750,
       "width": 50,
-      "height": 100
+      "height": 100,
+      "target": "verdainaEntry",
+      "targetSpawn": "default"
     }
   ],
   "spawns": {
