@@ -330,5 +330,24 @@
     "isMedulla": true,
     "isElite": true,
     "isBoss": true
+  },
+  "frontierScout": {
+    "id": "frontierScout",
+    "displayName": "Frontier Scout",
+    "hp": 8,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 35,
+    "moveSpeedAggro": 200,
+    "aggroRangePx": 200,
+    "deaggroRangePx": 320,
+    "knockbackOnHit": { "x": 80, "y": 40 },
+    "hitstunMs": 140,
+    "invulnOnHitMs": 120,
+    "dropShells": { "min": 15, "max": 25 },
+    "hurtFlashMs": 120,
+    "spriteKey": "frontierScout",
+    "width": 36,
+    "height": 40,
+    "isHuntersMarch": true
   }
 }
