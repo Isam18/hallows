@@ -165,13 +165,15 @@ export class MegaSkullRavager extends Enemy {
     switch (this.attackState) {
       case 'idle':
         if (dist < 400 && this.attackTimer <= 0) {
-          // Cycle through: jump → projectile → charge → projectile → repeat
-          const pattern = this.attackCycle % 4;
+          // Cycle: jump → projectile → charge → projectile → repeat
+          const pattern = this.attackCycle % 5;
           this.attackCycle++;
-          if (pattern === 0 || pattern === 2) {
+          if (pattern === 0 || pattern === 3) {
             this.startJumpAttack(player);
-          } else if (pattern === 1 || pattern === 3) {
+          } else if (pattern === 1 || pattern === 4) {
             this.startProjectileAttack(player);
+          } else {
+            this.startCharge(player);
           }
         }
         break;
@@ -241,6 +243,12 @@ export class MegaSkullRavager extends Enemy {
         }
         break;
     }
+  }
+
+  private startCharge(player: Player): void {
+    this.attackState = 'windup';
+    this.attackTimer = 400;
+    this.flipX = player.x < this.x;
   }
 
   private startJumpAttack(player: Player): void {
