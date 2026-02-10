@@ -2251,7 +2251,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Interact prompt
-    const prompt = this.add.text(doorX, doorY - 60, 'Press UP to enter', {
+    const prompt = this.add.text(doorX, doorY - 60, 'Press E to enter', {
       fontSize: '12px',
       color: '#cc4444',
       fontFamily: 'Georgia, serif',
