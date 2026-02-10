@@ -67,6 +67,7 @@ import medullaRoom29Data from '../data/levels/medulla/room29-lipOfTheBeast.json'
 import medullaRoom31Data from '../data/levels/medulla/room31-finalPassage.json';
 import medullaRoom32Data from '../data/levels/medulla/room32-bossArena.json';
 import skullRavagerArenaData from '../data/levels/medulla/skullRavagerArena.json';
+import verdantChamberData from '../data/levels/medulla/verdantChamber.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -98,6 +99,7 @@ const LEVELS: Record<string, LevelConfig> = {
   medullaRoom31: medullaRoom31Data as unknown as LevelConfig,
   medullaRoom32: medullaRoom32Data as unknown as LevelConfig,
   skullRavagerArena: skullRavagerArenaData as unknown as LevelConfig,
+  verdantChamber: verdantChamberData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -411,6 +413,12 @@ export class GameScene extends Phaser.Scene {
       } else if (t.type === 'lavaDoor') {
         // Lava door to The Medulla
         this.createLavaDoor(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'verdantDoor') {
+        // Light green plant door (unopenable for now)
+        this.createVerdantDoor(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'bossExitTransition') {
+        // Hidden exit that appears after boss is defeated
+        this.createBossExitDoor(t.x, t.y, t.width, t.height, t.target, t.targetSpawn);
       }
     });
     
@@ -1379,6 +1387,22 @@ export class GameScene extends Phaser.Scene {
         this.emitUIEvent('showTheMedullaDialog', null);
       }
     }
+
+    // Check verdant door proximity
+    if ((this as any)._verdantDoorZone && (this as any)._verdantDoorText) {
+      const inRange = this.physics.overlap(this.player, (this as any)._verdantDoorZone);
+      (this as any)._verdantDoorText.setVisible(inRange);
+    }
+
+    // Check boss exit door interaction
+    if (this.bossExitZone && this.bossExitPrompt) {
+      const inRange = this.physics.overlap(this.player, this.bossExitZone);
+      const doorVisible = this.bossExitDoorVisuals.length > 0 && (this.bossExitDoorVisuals[0] as any).alpha > 0.5;
+      this.bossExitPrompt.setVisible(inRange && doorVisible);
+      if (inRange && doorVisible && inputManager.justPressed('interact')) {
+        this.transitionToLevel(this.bossExitTarget, this.bossExitTargetSpawn);
+      }
+    }
   }
   
   private createChainVisual(x: number, y: number, width: number, height: number): void {
@@ -1676,7 +1700,116 @@ export class GameScene extends Phaser.Scene {
     this.lavaDoorZone = this.add.zone(doorX, doorY, width + 40, height + 40);
     this.physics.add.existing(this.lavaDoorZone, true);
   }
-  
+
+  private createVerdantDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Dark stone door frame
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x2a2a2a);
+    doorFrame.setStrokeStyle(3, 0x1a1a1a);
+    doorFrame.setDepth(5);
+
+    // Door surface - stone
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x3a3a3a);
+    doorSurface.setStrokeStyle(2, 0x2a2a2a);
+    doorSurface.setDepth(6);
+
+    // Light green plant vines growing on the door
+    const vineColor = 0x88dd88; // Light green, lighter than greenway
+    for (let i = 0; i < 6; i++) {
+      const vx = doorX + Phaser.Math.Between(-15, 15);
+      const vy = doorY + Phaser.Math.Between(-40, 40);
+      const vine = this.add.ellipse(vx, vy, 8 + Math.random() * 6, 12 + Math.random() * 10, vineColor, 0.7);
+      vine.setDepth(7);
+    }
+
+    // Small leaf clusters
+    for (let i = 0; i < 4; i++) {
+      const lx = doorX + Phaser.Math.Between(-20, 20);
+      const ly = doorY + Phaser.Math.Between(-35, 35);
+      const leaf = this.add.ellipse(lx, ly, 5, 8, 0xaaeebb, 0.6);
+      leaf.setRotation(Math.random() * Math.PI);
+      leaf.setDepth(7);
+    }
+
+    // "Sealed" text when player approaches
+    const sealedText = this.add.text(doorX, doorY - 60, 'The way is sealed...', {
+      fontSize: '12px',
+      color: '#88dd88',
+      fontFamily: 'Georgia, serif',
+      fontStyle: 'italic',
+    });
+    sealedText.setOrigin(0.5);
+    sealedText.setDepth(100);
+    sealedText.setVisible(false);
+
+    // Interaction zone to show text
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    // Poll for proximity in update - store refs
+    (this as any)._verdantDoorZone = zone;
+    (this as any)._verdantDoorText = sealedText;
+  }
+
+  private bossExitDoorVisuals: Phaser.GameObjects.GameObject[] = [];
+  private bossExitZone: Phaser.GameObjects.Zone | null = null;
+  private bossExitTarget: string = '';
+  private bossExitTargetSpawn: string = '';
+  private bossExitPrompt: Phaser.GameObjects.Text | null = null;
+
+  private createBossExitDoor(x: number, y: number, width: number, height: number, target: string, targetSpawn: string): void {
+    this.bossExitTarget = target || 'verdantChamber';
+    this.bossExitTargetSpawn = targetSpawn || 'default';
+
+    // Initially hidden - will be revealed when boss dies
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x3a3a3a);
+    doorFrame.setStrokeStyle(3, 0x1a1a1a);
+    doorFrame.setDepth(5);
+    doorFrame.setAlpha(0);
+
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x555555);
+    doorSurface.setStrokeStyle(2, 0x444444);
+    doorSurface.setDepth(6);
+    doorSurface.setAlpha(0);
+
+    const prompt = this.add.text(doorX, doorY - 60, '[E] ENTER', {
+      fontSize: '14px',
+      color: '#aaddaa',
+      backgroundColor: '#00000088',
+      padding: { x: 8, y: 4 }
+    });
+    prompt.setOrigin(0.5);
+    prompt.setDepth(100);
+    prompt.setVisible(false);
+    this.bossExitPrompt = prompt;
+
+    this.bossExitDoorVisuals = [doorFrame, doorSurface];
+
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+    this.bossExitZone = zone;
+  }
+
+  openBossExitDoor(): void {
+    // Reveal the exit door with a tween
+    this.bossExitDoorVisuals.forEach(v => {
+      this.tweens.add({
+        targets: v,
+        alpha: 1,
+        duration: 1000,
+        ease: 'Power2'
+      });
+    });
+
+    // Screen shake
+    this.cameras.main.shake(300, 0.02);
+  }
+
   // Greenway environment visuals
   private createGreenwayEnvironment(): void {
     const width = this.currentLevel.width;

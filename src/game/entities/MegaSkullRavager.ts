@@ -550,6 +550,13 @@ export class MegaSkullRavager extends Enemy {
     const result = super.takeDamage(amount, fromX, swingId);
     if (!wasDead && this.isDying()) {
       this.showDefeatText();
+      // Open the exit door after a short delay
+      this.scene.time.delayedCall(2000, () => {
+        const gameScene = this.scene as any;
+        if (gameScene.openBossExitDoor) {
+          gameScene.openBossExitDoor();
+        }
+      });
     }
     return result;
   }

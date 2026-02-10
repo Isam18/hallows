@@ -30,7 +30,19 @@
     { "type": "soul", "x": 300, "y": 600 },
     { "type": "soul", "x": 900, "y": 600 }
   ],
-  "triggers": [],
+  "triggers": [
+    {
+      "id": "bossExitDoor",
+      "type": "bossExitTransition",
+      "x": 580,
+      "y": 550,
+      "width": 40,
+      "height": 100,
+      "target": "verdantChamber",
+      "targetSpawn": "default",
+      "hiddenUntilBossDefeated": true
+    }
+  ],
   "spawns": {
     "default": { "x": 1100, "y": 550 },
     "fromPrevious": { "x": 1100, "y": 550 }
