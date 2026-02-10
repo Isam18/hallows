@@ -1,6 +1,6 @@
 {
-  "id": "huntersMarch",
-  "name": "Hunter's March",
+  "id": "chamberOfTheHunter",
+  "name": "Chamber of the Hunter",
   "biome": "huntersMarch",
   "width": 800,
   "height": 900,
@@ -25,7 +25,7 @@
       "y": 750,
       "width": 50,
       "height": 100,
-      "target": "verdainaEntry",
+      "target": "huntersMarch",
       "targetSpawn": "default"
     }
   ],

@@ -67,8 +67,8 @@ import medullaRoom29Data from '../data/levels/medulla/room29-lipOfTheBeast.json'
 import medullaRoom31Data from '../data/levels/medulla/room31-finalPassage.json';
 import medullaRoom32Data from '../data/levels/medulla/room32-bossArena.json';
 import skullRavagerArenaData from '../data/levels/medulla/skullRavagerArena.json';
-import huntersMarchData from '../data/levels/medulla/huntersMarch.json';
-import verdainaEntryData from '../data/levels/verdaina/entry.json';
+import chamberOfTheHunterData from '../data/levels/medulla/chamberOfTheHunter.json';
+import huntersMarchData from '../data/levels/huntersMarch.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -100,8 +100,8 @@ const LEVELS: Record<string, LevelConfig> = {
   medullaRoom31: medullaRoom31Data as unknown as LevelConfig,
   medullaRoom32: medullaRoom32Data as unknown as LevelConfig,
   skullRavagerArena: skullRavagerArenaData as unknown as LevelConfig,
+  chamberOfTheHunter: chamberOfTheHunterData as unknown as LevelConfig,
   huntersMarch: huntersMarchData as unknown as LevelConfig,
-  verdainaEntry: verdainaEntryData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -223,8 +223,6 @@ export class GameScene extends Phaser.Scene {
       this.createMedullaEnvironment();
     } else if (biome === 'huntersMarch') {
       this.createHuntersMarchEnvironment(biome !== GameScene.lastEnteredBiome);
-    } else if (biome === 'verdaina') {
-      this.createVerdainaEnvironment(biome !== GameScene.lastEnteredBiome);
     }
     GameScene.lastEnteredBiome = biome;
     
@@ -1794,7 +1792,7 @@ export class GameScene extends Phaser.Scene {
   private bossExitPrompt: Phaser.GameObjects.Text | null = null;
 
   private createBossExitDoor(x: number, y: number, width: number, height: number, target: string, targetSpawn: string): void {
-    this.bossExitTarget = target || 'huntersMarch';
+    this.bossExitTarget = target || 'chamberOfTheHunter';
     this.bossExitTargetSpawn = targetSpawn || 'default';
 
     // Initially hidden - will be revealed when boss dies
@@ -2150,53 +2148,6 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private createVerdainaEnvironment(showTitle: boolean): void {
-    const w = this.currentLevel.width;
-    const h = this.currentLevel.height;
-
-    // Dark red background (matching Hunter's March theme)
-    const bg = this.add.rectangle(w / 2, h / 2, w, h, 0x1a0a0a);
-    bg.setDepth(-10);
-
-    // Dark crimson patches on ground
-    for (let i = 0; i < 30; i++) {
-      const mx = Phaser.Math.Between(40, w - 40);
-      const my = Phaser.Math.Between(h - 80, h - 20);
-      const stain = this.add.ellipse(mx, my, Phaser.Math.Between(20, 50), Phaser.Math.Between(8, 16), 
-        Phaser.Math.RND.pick([0x5a1e1e, 0x7a2a2a, 0x8a3a3a, 0x4a1212]), 0.7);
-      stain.setDepth(0);
-    }
-
-    // Red streaks on walls
-    for (let wy = 50; wy < h - 50; wy += 30) {
-      const lm = this.add.ellipse(35 + Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x6a1e1e, 0.5);
-      lm.setDepth(0);
-      const rm = this.add.ellipse(w - 35 - Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x6a1e1e, 0.5);
-      rm.setDepth(0);
-    }
-
-    // Crimson stalactites
-    for (let i = 0; i < 15; i++) {
-      const vx = Phaser.Math.Between(50, w - 50);
-      const vineLen = Phaser.Math.Between(30, 80);
-      const spike = this.add.rectangle(vx, 30 + vineLen / 2, 3, vineLen, 0x8a2a2a, 0.6);
-      spike.setDepth(0);
-      const tip = this.add.triangle(vx, 30 + vineLen, 0, 0, 8, 0, 4, 8, 0xaa4444, 0.7);
-      tip.setDepth(0);
-    }
-
-    // Scattered dark red patches
-    for (let i = 0; i < 12; i++) {
-      const cx = Phaser.Math.Between(50, w - 50);
-      const cy = Phaser.Math.Between(100, h - 120);
-      const clump = this.add.ellipse(cx, cy, Phaser.Math.Between(12, 30), Phaser.Math.Between(6, 14), 0x7a2a2a, 0.4);
-      clump.setDepth(0);
-    }
-
-    if (showTitle) {
-      this.showAreaTitle('THE VERDAINA', '~ The living gardens ~', '#cc4444', '#dd6666', '#551111', '#440000');
-    }
-  }
 
   private showAreaTitle(title: string, subtitle: string, titleColor: string, subtitleColor: string, strokeColor: string, shadowColor: string): void {
     const cam = this.cameras.main;
