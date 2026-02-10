@@ -225,11 +225,12 @@ export class GameScene extends Phaser.Scene {
     // Build level
     this.buildLevel();
     
-    // Create player at spawn
+    // Create player at spawn, snapped to nearest ground below
     const spawn = this.currentLevel.spawns[this.spawnId] || this.currentLevel.spawnPoint;
-    this.player = new Player(this, spawn.x, spawn.y);
+    const snappedY = this.findGroundBelow(spawn.x, spawn.y);
+    this.player = new Player(this, spawn.x, snappedY);
     this.lastSafeX = spawn.x;
-    this.lastSafeY = spawn.y;
+    this.lastSafeY = snappedY;
     
     // Set up collisions
     this.setupCollisions();
@@ -2279,5 +2280,26 @@ export class GameScene extends Phaser.Scene {
     (this as any)._verdainaDoorTransPrompt = prompt;
     (this as any)._verdainaDoorTransTarget = target;
     (this as any)._verdainaDoorTransSpawn = targetSpawn;
+  }
+
+  private findGroundBelow(x: number, startY: number): number {
+    if (!this.currentLevel) return startY;
+    const playerHeight = 40;
+    let bestY = startY;
+    for (const p of this.currentLevel.platforms) {
+      const platformTop = p.y;
+      // Check if x is within platform horizontal bounds
+      if (x >= p.x && x <= p.x + p.width) {
+        // Platform must be at or below spawn
+        if (platformTop >= startY - playerHeight && platformTop > bestY - 200) {
+          // Snap player so feet rest on top of platform
+          const landY = platformTop - playerHeight / 2;
+          if (landY < bestY || bestY === startY) {
+            bestY = landY;
+          }
+        }
+      }
+    }
+    return bestY;
   }
 }
