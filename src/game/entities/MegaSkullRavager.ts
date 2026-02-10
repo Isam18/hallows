@@ -149,7 +149,10 @@ export class MegaSkullRavager extends Enemy {
   }
 
   update(time: number, delta: number, player: any): void {
-    super.update(time, delta, player);
+    // Only call super.update for non-attack states so parent doesn't override velocity
+    if (this.attackState === 'idle' || this.attackState === 'cooldown') {
+      super.update(time, delta, player);
+    }
     this.updateAttackBehavior(delta, player);
     this.updateVisualPositions();
     this.updateProjectiles(player);
