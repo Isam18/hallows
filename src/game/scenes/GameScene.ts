@@ -158,6 +158,9 @@ export class GameScene extends Phaser.Scene {
   
   // Debug mode
   private debugModeEnabled = false;
+  
+  // Track last biome for title display
+  private static lastEnteredBiome: string | null = null;
   private debugGraphics: Phaser.GameObjects.Graphics | null = null;
   
   // Boss summon tracking
@@ -219,10 +222,11 @@ export class GameScene extends Phaser.Scene {
       this.medullaParallax = new MedullaParallax(this);
       this.createMedullaEnvironment();
     } else if (biome === 'huntersMarch') {
-      this.createHuntersMarchEnvironment();
+      this.createHuntersMarchEnvironment(biome !== GameScene.lastEnteredBiome);
     } else if (biome === 'verdaina') {
-      this.createVerdainaEnvironment();
+      this.createVerdainaEnvironment(biome !== GameScene.lastEnteredBiome);
     }
+    GameScene.lastEnteredBiome = biome;
     
     // Build level
     this.buildLevel();
@@ -2098,7 +2102,7 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private createHuntersMarchEnvironment(): void {
+  private createHuntersMarchEnvironment(showTitle: boolean): void {
     const w = this.currentLevel.width;
     const h = this.currentLevel.height;
 
@@ -2141,165 +2145,92 @@ export class GameScene extends Phaser.Scene {
       clump.setDepth(0);
     }
 
-    // Zone title - "HUNTER'S MARCH" in big red letters
-    const cam = this.cameras.main;
-    const title = this.add.text(cam.width / 2, cam.height / 2 - 20, "HUNTER'S MARCH", {
-      fontFamily: 'Georgia, serif',
-      fontSize: '52px',
-      color: '#cc4444',
-      fontStyle: 'bold',
-      stroke: '#551111',
-      strokeThickness: 8,
-      shadow: {
-        offsetX: 3,
-        offsetY: 3,
-        color: '#440000',
-        blur: 15,
-        fill: true
-      }
-    });
-    title.setOrigin(0.5);
-    title.setScrollFactor(0);
-    title.setDepth(1001);
-    title.setAlpha(0);
-
-    const subtitle = this.add.text(cam.width / 2, cam.height / 2 + 30, '~ The path of crimson ~', {
-      fontFamily: 'Georgia, serif',
-      fontSize: '18px',
-      color: '#dd6666',
-      fontStyle: 'italic',
-      stroke: '#000000',
-      strokeThickness: 4,
-    });
-    subtitle.setOrigin(0.5);
-    subtitle.setScrollFactor(0);
-    subtitle.setDepth(1001);
-    subtitle.setAlpha(0);
-
-    // Fade in title
-    this.tweens.add({
-      targets: [title, subtitle],
-      alpha: 1,
-      duration: 600,
-      ease: 'Power2'
-    });
-
-    // Fade out after 2.5 seconds
-    this.time.delayedCall(2500, () => {
-      if (this.scene.isActive()) {
-        this.tweens.add({
-          targets: [title, subtitle],
-          alpha: 0,
-          duration: 600,
-          ease: 'Power2',
-          onComplete: () => {
-            title.destroy();
-            subtitle.destroy();
-          }
-        });
-      }
-    });
+    if (showTitle) {
+      this.showAreaTitle("HUNTER'S MARCH", '~ The path of crimson ~', '#cc4444', '#dd6666', '#551111', '#440000');
+    }
   }
 
-  private createVerdainaEnvironment(): void {
+  private createVerdainaEnvironment(showTitle: boolean): void {
     const w = this.currentLevel.width;
     const h = this.currentLevel.height;
 
-    // Dark mossy green background
-    const bg = this.add.rectangle(w / 2, h / 2, w, h, 0x0a1a0a);
+    // Dark red background (matching Hunter's March theme)
+    const bg = this.add.rectangle(w / 2, h / 2, w, h, 0x1a0a0a);
     bg.setDepth(-10);
 
-    // Moss patches on ground
+    // Dark crimson patches on ground
     for (let i = 0; i < 30; i++) {
       const mx = Phaser.Math.Between(40, w - 40);
       const my = Phaser.Math.Between(h - 80, h - 20);
-      const moss = this.add.ellipse(mx, my, Phaser.Math.Between(20, 50), Phaser.Math.Between(8, 16), 
-        Phaser.Math.RND.pick([0x2d5a1e, 0x3a7a2a, 0x4a8a3a, 0x1e4a12]), 0.7);
-      moss.setDepth(0);
+      const stain = this.add.ellipse(mx, my, Phaser.Math.Between(20, 50), Phaser.Math.Between(8, 16), 
+        Phaser.Math.RND.pick([0x5a1e1e, 0x7a2a2a, 0x8a3a3a, 0x4a1212]), 0.7);
+      stain.setDepth(0);
     }
 
-    // Moss on walls
+    // Red streaks on walls
     for (let wy = 50; wy < h - 50; wy += 30) {
-      const lm = this.add.ellipse(35 + Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x2d6a1e, 0.5);
+      const lm = this.add.ellipse(35 + Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x6a1e1e, 0.5);
       lm.setDepth(0);
-      const rm = this.add.ellipse(w - 35 - Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x2d6a1e, 0.5);
+      const rm = this.add.ellipse(w - 35 - Math.random() * 15, wy, Phaser.Math.Between(10, 25), Phaser.Math.Between(8, 18), 0x6a1e1e, 0.5);
       rm.setDepth(0);
     }
 
-    // Ceiling moss/vines hanging down
+    // Crimson stalactites
     for (let i = 0; i < 15; i++) {
       const vx = Phaser.Math.Between(50, w - 50);
       const vineLen = Phaser.Math.Between(30, 80);
-      const vine = this.add.rectangle(vx, 30 + vineLen / 2, 3, vineLen, 0x3a8a2a, 0.6);
-      vine.setDepth(0);
-      const leaf = this.add.ellipse(vx, 30 + vineLen, 8, 5, 0x5aaa4a, 0.7);
-      leaf.setDepth(0);
+      const spike = this.add.rectangle(vx, 30 + vineLen / 2, 3, vineLen, 0x8a2a2a, 0.6);
+      spike.setDepth(0);
+      const tip = this.add.triangle(vx, 30 + vineLen, 0, 0, 8, 0, 4, 8, 0xaa4444, 0.7);
+      tip.setDepth(0);
     }
 
-    // Scattered moss clumps on platforms
+    // Scattered dark red patches
     for (let i = 0; i < 12; i++) {
       const cx = Phaser.Math.Between(50, w - 50);
       const cy = Phaser.Math.Between(100, h - 120);
-      const clump = this.add.ellipse(cx, cy, Phaser.Math.Between(12, 30), Phaser.Math.Between(6, 14), 0x3a7a2a, 0.4);
+      const clump = this.add.ellipse(cx, cy, Phaser.Math.Between(12, 30), Phaser.Math.Between(6, 14), 0x7a2a2a, 0.4);
       clump.setDepth(0);
     }
 
-    // Zone title - "THE VERDAINA" in big green letters
+    if (showTitle) {
+      this.showAreaTitle('THE VERDAINA', '~ The living gardens ~', '#cc4444', '#dd6666', '#551111', '#440000');
+    }
+  }
+
+  private showAreaTitle(title: string, subtitle: string, titleColor: string, subtitleColor: string, strokeColor: string, shadowColor: string): void {
     const cam = this.cameras.main;
-    const title = this.add.text(cam.width / 2, cam.height / 2 - 20, 'THE VERDAINA', {
+    const titleText = this.add.text(cam.width / 2, cam.height / 2 - 20, title, {
       fontFamily: 'Georgia, serif',
       fontSize: '52px',
-      color: '#44cc44',
+      color: titleColor,
       fontStyle: 'bold',
-      stroke: '#115511',
+      stroke: strokeColor,
       strokeThickness: 8,
-      shadow: {
-        offsetX: 3,
-        offsetY: 3,
-        color: '#004400',
-        blur: 15,
-        fill: true
-      }
+      shadow: { offsetX: 3, offsetY: 3, color: shadowColor, blur: 15, fill: true }
     });
-    title.setOrigin(0.5);
-    title.setScrollFactor(0);
-    title.setDepth(1001);
-    title.setAlpha(0);
+    titleText.setOrigin(0.5);
+    titleText.setScrollFactor(0);
+    titleText.setDepth(1001);
+    titleText.setAlpha(0);
 
-    const subtitle = this.add.text(cam.width / 2, cam.height / 2 + 30, '~ The living gardens ~', {
+    const subText = this.add.text(cam.width / 2, cam.height / 2 + 30, subtitle, {
       fontFamily: 'Georgia, serif',
       fontSize: '18px',
-      color: '#66dd66',
+      color: subtitleColor,
       fontStyle: 'italic',
       stroke: '#000000',
       strokeThickness: 4,
     });
-    subtitle.setOrigin(0.5);
-    subtitle.setScrollFactor(0);
-    subtitle.setDepth(1001);
-    subtitle.setAlpha(0);
+    subText.setOrigin(0.5);
+    subText.setScrollFactor(0);
+    subText.setDepth(1001);
+    subText.setAlpha(0);
 
-    // Fade in title
-    this.tweens.add({
-      targets: [title, subtitle],
-      alpha: 1,
-      duration: 600,
-      ease: 'Power2'
-    });
-
-    // Fade out after 2.5 seconds
+    this.tweens.add({ targets: [titleText, subText], alpha: 1, duration: 600, ease: 'Power2' });
     this.time.delayedCall(2500, () => {
       if (this.scene.isActive()) {
-        this.tweens.add({
-          targets: [title, subtitle],
-          alpha: 0,
-          duration: 600,
-          ease: 'Power2',
-          onComplete: () => {
-            title.destroy();
-            subtitle.destroy();
-          }
-        });
+        this.tweens.add({ targets: [titleText, subText], alpha: 0, duration: 600, ease: 'Power2', onComplete: () => { titleText.destroy(); subText.destroy(); } });
       }
     });
   }
