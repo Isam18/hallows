@@ -23,7 +23,7 @@ export class FrontierWarrior extends Phaser.Physics.Arcade.Sprite {
   private patrolDir: 1 | -1 = 1;
   private patrolTimer = 0;
   private patrolSwitchTime = 2000;
-  private marchSpeed = 55;
+  private marchSpeed = 80;
 
   // Combat timers
   private hitstunTimer = 0;
@@ -36,7 +36,7 @@ export class FrontierWarrior extends Phaser.Physics.Arcade.Sprite {
 
   // Attack
   private telegraphTimer = 0;
-  private telegraphDuration = 500;
+  private telegraphDuration = 800;
   private swingTimer = 0;
   private swingDuration = 300;
   private swingCooldown = 0;
