@@ -1435,6 +1435,10 @@ export class BootScene extends Phaser.Scene {
     this.createFrontierWarriorHurtSprite();
     this.createFrontierWarriorUnmaskedSprite();
     this.createFrontierWarriorUnmaskedHurtSprite();
+    this.createWingedWarriorSprite();
+    this.createWingedWarriorHurtSprite();
+    this.createWingedWarriorUnmaskedSprite();
+    this.createWingedWarriorUnmaskedHurtSprite();
   }
 
   private createFrontierScoutSprite(): void {
@@ -1806,6 +1810,184 @@ export class BootScene extends Phaser.Scene {
     g.generateTexture('frontierWarrior_unmasked_hurt', 56, 56);
     g.destroy();
   }
+
+  private createWingedWarriorSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 26;
+    const cy = 28;
+
+    // Ivory wings behind body
+    g.fillStyle(0xe8dcc8, 0.9);
+    // Left wing
+    g.beginPath();
+    g.moveTo(cx - 8, cy - 8);
+    g.lineTo(cx - 26, cy - 20);
+    g.lineTo(cx - 22, cy - 6);
+    g.lineTo(cx - 14, cy);
+    g.closePath();
+    g.fillPath();
+    // Right wing
+    g.beginPath();
+    g.moveTo(cx + 8, cy - 8);
+    g.lineTo(cx + 26, cy - 20);
+    g.lineTo(cx + 22, cy - 6);
+    g.lineTo(cx + 14, cy);
+    g.closePath();
+    g.fillPath();
+    // Wing hooks
+    g.lineStyle(2, 0xc8b8a0);
+    g.lineBetween(cx - 26, cy - 20, cx - 28, cy - 16);
+    g.lineBetween(cx + 26, cy - 20, cx + 28, cy - 16);
+    // Wing veins
+    g.lineStyle(1, 0xd4c8b0, 0.5);
+    g.lineBetween(cx - 10, cy - 7, cx - 22, cy - 14);
+    g.lineBetween(cx + 10, cy - 7, cx + 22, cy - 14);
+
+    // Fur mantle
+    g.fillStyle(0x2a2a2a);
+    g.beginPath();
+    g.moveTo(cx - 14, cy - 6);
+    g.lineTo(cx - 18, cy + 6);
+    g.lineTo(cx - 10, cy + 10);
+    g.lineTo(cx - 6, cy + 4);
+    g.closePath();
+    g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 14, cy - 6);
+    g.lineTo(cx + 18, cy + 6);
+    g.lineTo(cx + 10, cy + 10);
+    g.lineTo(cx + 6, cy + 4);
+    g.closePath();
+    g.fillPath();
+
+    // Body - deep crimson
+    g.fillStyle(0x7a1818);
+    g.fillEllipse(cx, cy + 4, 26, 26);
+    g.fillStyle(0x992222, 0.5);
+    g.fillEllipse(cx - 2, cy + 2, 14, 14);
+
+    // Bone mask
+    g.fillStyle(0xe8dcc8);
+    g.fillEllipse(cx, cy - 10, 22, 18);
+    g.lineStyle(1.5, 0xc8b8a0);
+    g.strokeEllipse(cx, cy - 10, 22, 18);
+
+    // Crests/horns
+    g.fillStyle(0xd4c8b0);
+    g.fillTriangle(cx - 8, cy - 20, cx - 12, cy - 28, cx - 4, cy - 22);
+    g.fillTriangle(cx + 8, cy - 20, cx + 12, cy - 28, cx + 4, cy - 22);
+    g.lineStyle(1, 0xb8a890);
+    g.lineBetween(cx - 8, cy - 20, cx - 12, cy - 28);
+    g.lineBetween(cx + 8, cy - 20, cx + 12, cy - 28);
+
+    // Eyes
+    g.fillStyle(0x0a0a0a);
+    g.beginPath();
+    g.moveTo(cx - 7, cy - 14);
+    g.lineTo(cx - 3, cy - 11);
+    g.lineTo(cx - 3, cy - 8);
+    g.lineTo(cx - 8, cy - 10);
+    g.closePath();
+    g.fillPath();
+    g.fillCircle(cx + 5, cy - 11, 3);
+    g.fillCircle(cx + 9, cy - 13, 1.5);
+    g.fillStyle(0xff6666, 0.5);
+    g.fillCircle(cx - 6, cy - 11, 1.2);
+    g.fillCircle(cx + 5, cy - 12, 1);
+
+    // Legs (shorter, dangling)
+    g.lineStyle(2.5, 0x1a1a1a);
+    g.lineBetween(cx - 8, cy + 14, cx - 12, cy + 26);
+    g.lineBetween(cx + 8, cy + 14, cx + 12, cy + 26);
+    g.fillStyle(0x1a1a1a);
+    g.fillCircle(cx - 12, cy + 26, 2);
+    g.fillCircle(cx + 12, cy + 26, 2);
+
+    g.lineStyle(1.5, 0x4a0808);
+    g.strokeEllipse(cx, cy + 4, 26, 26);
+
+    g.generateTexture('wingedWarrior', 52, 52);
+    g.destroy();
+  }
+
+  private createWingedWarriorHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 26;
+    const cy = 28;
+    g.fillStyle(0xffffff);
+    g.fillEllipse(cx, cy + 4, 26, 26);
+    g.fillEllipse(cx, cy - 10, 22, 18);
+    g.fillTriangle(cx - 8, cy - 20, cx - 12, cy - 28, cx - 4, cy - 22);
+    g.fillTriangle(cx + 8, cy - 20, cx + 12, cy - 28, cx + 4, cy - 22);
+    g.fillStyle(0xdddddd);
+    // Wings
+    g.beginPath();
+    g.moveTo(cx - 8, cy - 8); g.lineTo(cx - 26, cy - 20); g.lineTo(cx - 14, cy); g.closePath(); g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 8, cy - 8); g.lineTo(cx + 26, cy - 20); g.lineTo(cx + 14, cy); g.closePath(); g.fillPath();
+    g.lineStyle(2.5, 0xcccccc);
+    g.lineBetween(cx - 8, cy + 14, cx - 12, cy + 26);
+    g.lineBetween(cx + 8, cy + 14, cx + 12, cy + 26);
+    g.generateTexture('wingedWarrior_hurt', 52, 52);
+    g.destroy();
+  }
+
+  private createWingedWarriorUnmaskedSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 26;
+    const cy = 28;
+    // Wings
+    g.fillStyle(0xe8dcc8, 0.9);
+    g.beginPath();
+    g.moveTo(cx - 8, cy - 8); g.lineTo(cx - 26, cy - 20); g.lineTo(cx - 14, cy); g.closePath(); g.fillPath();
+    g.beginPath();
+    g.moveTo(cx + 8, cy - 8); g.lineTo(cx + 26, cy - 20); g.lineTo(cx + 14, cy); g.closePath(); g.fillPath();
+    g.lineStyle(2, 0xc8b8a0);
+    g.lineBetween(cx - 26, cy - 20, cx - 28, cy - 16);
+    g.lineBetween(cx + 26, cy - 20, cx + 28, cy - 16);
+    // Mantle
+    g.fillStyle(0x2a2a2a);
+    g.beginPath(); g.moveTo(cx - 14, cy - 6); g.lineTo(cx - 18, cy + 6); g.lineTo(cx - 6, cy + 4); g.closePath(); g.fillPath();
+    g.beginPath(); g.moveTo(cx + 14, cy - 6); g.lineTo(cx + 18, cy + 6); g.lineTo(cx + 6, cy + 4); g.closePath(); g.fillPath();
+    // Body
+    g.fillStyle(0x7a1818);
+    g.fillEllipse(cx, cy + 4, 26, 26);
+    // Exposed head
+    g.fillStyle(0x6a1212);
+    g.fillEllipse(cx, cy - 10, 18, 14);
+    g.fillStyle(0x0a0a0a);
+    g.fillCircle(cx - 5, cy - 11, 3);
+    g.fillCircle(cx + 5, cy - 11, 3);
+    g.fillStyle(0xff4444, 0.8);
+    g.fillCircle(cx - 5, cy - 11, 1.5);
+    g.fillCircle(cx + 5, cy - 11, 1.5);
+    // Legs
+    g.lineStyle(2.5, 0x1a1a1a);
+    g.lineBetween(cx - 8, cy + 14, cx - 12, cy + 26);
+    g.lineBetween(cx + 8, cy + 14, cx + 12, cy + 26);
+    g.lineStyle(1.5, 0x4a0808);
+    g.strokeEllipse(cx, cy + 4, 26, 26);
+    g.generateTexture('wingedWarrior_unmasked', 52, 52);
+    g.destroy();
+  }
+
+  private createWingedWarriorUnmaskedHurtSprite(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 26;
+    const cy = 28;
+    g.fillStyle(0xffffff);
+    g.fillEllipse(cx, cy + 4, 26, 26);
+    g.fillEllipse(cx, cy - 10, 18, 14);
+    g.fillStyle(0xdddddd);
+    g.beginPath(); g.moveTo(cx - 8, cy - 8); g.lineTo(cx - 26, cy - 20); g.lineTo(cx - 14, cy); g.closePath(); g.fillPath();
+    g.beginPath(); g.moveTo(cx + 8, cy - 8); g.lineTo(cx + 26, cy - 20); g.lineTo(cx + 14, cy); g.closePath(); g.fillPath();
+    g.lineStyle(2.5, 0xcccccc);
+    g.lineBetween(cx - 8, cy + 14, cx - 12, cy + 26);
+    g.lineBetween(cx + 8, cy + 14, cx + 12, cy + 26);
+    g.generateTexture('wingedWarrior_unmasked_hurt', 52, 52);
+    g.destroy();
+  }
+
 
   private createBossSprites(): void {
     // False Champion - Armored beetle knight inspired by False Knight

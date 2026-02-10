@@ -369,5 +369,26 @@
     "height": 48,
     "isHuntersMarch": true,
     "isElite": false
+  },
+  "wingedWarrior": {
+    "id": "wingedWarrior",
+    "displayName": "Winged Warrior",
+    "hp": 8,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 40,
+    "moveSpeedAggro": 60,
+    "aggroRangePx": 250,
+    "deaggroRangePx": 350,
+    "knockbackOnHit": { "x": 25, "y": 15 },
+    "hitstunMs": 100,
+    "invulnOnHitMs": 130,
+    "dropShells": { "min": 25, "max": 40 },
+    "hurtFlashMs": 120,
+    "spriteKey": "wingedWarrior",
+    "width": 40,
+    "height": 44,
+    "isHuntersMarch": true,
+    "isFlying": true,
+    "isElite": true
   }
 }
