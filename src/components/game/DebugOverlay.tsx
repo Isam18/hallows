@@ -6,34 +6,47 @@ interface DebugOverlayProps {
 }
 
 export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
-  const [visible, setVisible] = useState(false);
+  const [manualToggle, setManualToggle] = useState<boolean | null>(null);
+  const [debugMode, setDebugMode] = useState(false);
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
 
+  // F1 manual override
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'F1') {
         e.preventDefault();
-        setVisible(v => !v);
+        setManualToggle(prev => prev === null ? !debugMode : !prev);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [debugMode]);
 
+  // Poll debugMode from registry and player debug state
   useEffect(() => {
-    if (!visible || !gameRef) return;
+    if (!gameRef) return;
 
     const interval = setInterval(() => {
+      const registryDebug = gameRef.registry?.get('debugMode') ?? false;
+      setDebugMode(registryDebug);
+
+      // When debug mode changes, reset manual override
+      if (registryDebug !== debugMode) {
+        setManualToggle(null);
+      }
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const scene = gameRef.scene.getScene('GameScene') as any; // eslint-disable-line @typescript-eslint/no-explicit-any
+      const scene = gameRef.scene.getScene('GameScene') as any;
       if (scene?.player) {
         setDebugState(scene.player.getDebugState());
       }
-    }, 50); // 20fps update for overlay
+    }, 50);
 
     return () => clearInterval(interval);
-  }, [visible, gameRef]);
+  }, [gameRef, debugMode]);
+
+  const visible = manualToggle !== null ? manualToggle : debugMode;
 
   // Show the overlay as soon as it's toggled on.
   // (Teleport should still be usable even if the player/debugState isn't ready yet.)
