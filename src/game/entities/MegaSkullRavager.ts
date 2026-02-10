@@ -150,6 +150,8 @@ export class MegaSkullRavager extends Enemy {
   }
 
   update(time: number, delta: number, player: any): void {
+    if (this.isDying() || !this.active) return;
+
     // Show boss intro when player gets close
     if (!this.hasShownIntro) {
       const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
@@ -236,11 +238,12 @@ export class MegaSkullRavager extends Enemy {
 
   private showDefeatText(): void {
     if (!this.scene) return;
-    const cam = this.scene.cameras.main;
+    const sceneRef = this.scene;
+    const cam = sceneRef.cameras.main;
     const cx = cam.width / 2;
     const cy = cam.height / 2;
 
-    const text = this.scene.add.text(cx, cy, 'BURNING MAULER DEFEATED', {
+    const text = sceneRef.add.text(cx, cy, 'BURNING MAULER DEFEATED', {
       fontFamily: 'Georgia, serif',
       fontSize: '42px',
       color: '#ff8800',
@@ -260,20 +263,24 @@ export class MegaSkullRavager extends Enemy {
     text.setDepth(1001);
     text.setAlpha(0);
 
-    this.scene.tweens.add({
+    sceneRef.tweens.add({
       targets: text,
       alpha: 1,
       duration: 500,
       ease: 'Power2'
     });
 
-    this.scene.time.delayedCall(3000, () => {
-      this.scene.tweens.add({
-        targets: text,
-        alpha: 0,
-        duration: 800,
-        onComplete: () => text.destroy()
-      });
+    sceneRef.time.delayedCall(3000, () => {
+      if (sceneRef.scene && sceneRef.scene.isActive()) {
+        sceneRef.tweens.add({
+          targets: text,
+          alpha: 0,
+          duration: 800,
+          onComplete: () => text.destroy()
+        });
+      } else {
+        text.destroy();
+      }
     });
   }
 
