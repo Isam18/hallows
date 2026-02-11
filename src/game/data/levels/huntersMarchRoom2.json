@@ -13,13 +13,19 @@
     { "x": 1170, "y": 30, "width": 30, "height": 420, "type": "wall" }
   ],
   "enemies": [
-    { "type": "huskGuard", "x": 750, "y": 400, "behavior": "patrol" }
+    { "type": "frontierWarrior", "x": 750, "y": 400, "behavior": "patrol" }
   ],
   "pickups": [],
-  "benches": [
-    { "x": 900, "y": 410, "type": "basic_bench" }
-  ],
   "triggers": [
+    {
+      "id": "huntersBench",
+      "type": "bench",
+      "benchTypeId": "basic_bench",
+      "x": 900,
+      "y": 410,
+      "width": 40,
+      "height": 40
+    },
     {
       "id": "room2Back",
       "type": "verdainaDoor",
