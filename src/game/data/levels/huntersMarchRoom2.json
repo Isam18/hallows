@@ -35,10 +35,21 @@
       "height": 100,
       "target": "huntersMarch",
       "targetSpawn": "fromRoom2"
+    },
+    {
+      "id": "room2Exit",
+      "type": "verdainaDoor",
+      "x": 1100,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRoom3",
+      "targetSpawn": "default"
     }
   ],
   "spawns": {
     "default": { "x": 100, "y": 400 },
-    "fromRoom1": { "x": 100, "y": 400 }
+    "fromRoom1": { "x": 100, "y": 400 },
+    "fromRoom3": { "x": 1080, "y": 400 }
   }
 }

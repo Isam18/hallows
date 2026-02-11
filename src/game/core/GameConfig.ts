@@ -149,6 +149,8 @@ export interface EnemySpawnConfig {
   type: string;
   x: number;
   y: number;
+  behavior?: string;
+  guaranteed?: boolean;
 }
 
 export interface PickupConfig {
