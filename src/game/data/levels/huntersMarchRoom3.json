@@ -1,0 +1,49 @@
+{
+  "id": "huntersMarchRoom3",
+  "name": "Hunter's March",
+  "biome": "huntersMarch",
+  "width": 1400,
+  "height": 700,
+  "backgroundColor": "#1a0a0a",
+  "spawnPoint": { "x": 80, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 1400, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 670, "type": "wall" },
+    { "x": 1370, "y": 30, "width": 30, "height": 670, "type": "wall" },
+
+    { "x": 30, "y": 450, "width": 120, "height": 250, "type": "ground" },
+
+    { "x": 250, "y": 500, "width": 100, "height": 18, "type": "platform" },
+    { "x": 450, "y": 440, "width": 90, "height": 18, "type": "platform" },
+    { "x": 620, "y": 380, "width": 80, "height": 18, "type": "platform" },
+    { "x": 780, "y": 440, "width": 90, "height": 18, "type": "platform" },
+    { "x": 950, "y": 380, "width": 80, "height": 18, "type": "platform" },
+    { "x": 1100, "y": 450, "width": 100, "height": 18, "type": "platform" },
+
+    { "x": 1250, "y": 450, "width": 120, "height": 250, "type": "ground" }
+  ],
+  "lavaPools": [
+    { "x": 150, "y": 660, "width": 1100, "height": 40 }
+  ],
+  "enemies": [
+    { "type": "wingedWarrior", "x": 500, "y": 350, "behavior": "patrol", "guaranteed": true },
+    { "type": "wingedWarrior", "x": 900, "y": 350, "behavior": "patrol", "guaranteed": true }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room3Back",
+      "type": "verdainaDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRoom2",
+      "targetSpawn": "fromRoom3"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 80, "y": 400 },
+    "fromRoom2": { "x": 80, "y": 400 }
+  }
+}

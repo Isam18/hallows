@@ -75,6 +75,7 @@ import skullRavagerArenaData from '../data/levels/medulla/skullRavagerArena.json
 import chamberOfTheHunterData from '../data/levels/medulla/chamberOfTheHunter.json';
 import huntersMarchData from '../data/levels/huntersMarch.json';
 import huntersMarchRoom2Data from '../data/levels/huntersMarchRoom2.json';
+import huntersMarchRoom3Data from '../data/levels/huntersMarchRoom3.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -109,6 +110,7 @@ const LEVELS: Record<string, LevelConfig> = {
   chamberOfTheHunter: chamberOfTheHunterData as unknown as LevelConfig,
   huntersMarch: huntersMarchData as unknown as LevelConfig,
   huntersMarchRoom2: huntersMarchRoom2Data as unknown as LevelConfig,
+  huntersMarchRoom3: huntersMarchRoom3Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -488,9 +490,13 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'frontierScout') {
           const scout = new FrontierScout(this, e.x, e.y, config);
           this.enemies.add(scout);
+        } else if (e.type === 'wingedWarrior') {
+          const wingedConfig = (enemiesData as any)['wingedWarrior'] as EnemyCombatConfig || config;
+          const winged = new WingedWarrior(this, e.x, e.y - 80, wingedConfig);
+          this.enemies.add(winged);
         } else if (e.type === 'frontierWarrior') {
-          // 30% chance to spawn as Winged Warrior variant
-          if (Math.random() < 0.3) {
+          // 30% chance to spawn as Winged Warrior variant (unless guaranteed)
+          if (!e.guaranteed && Math.random() < 0.3) {
             const wingedConfig = (enemiesData as any)['wingedWarrior'] as EnemyCombatConfig || config;
             const winged = new WingedWarrior(this, e.x, e.y - 80, wingedConfig);
             this.enemies.add(winged);
