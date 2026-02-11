@@ -79,6 +79,7 @@ export class WingedCommander extends Phaser.Physics.Arcade.Sprite {
 
     this.setSize(this.cfg.width, this.cfg.height);
     this.setCollideWorldBounds(true);
+    this.setScale(1.4);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(false);
