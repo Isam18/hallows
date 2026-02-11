@@ -373,7 +373,7 @@
   "wingedWarrior": {
     "id": "wingedWarrior",
     "displayName": "Winged Warrior",
-    "hp": 8,
+    "hp": 5,
     "contactDamage": 2,
     "moveSpeedPatrol": 40,
     "moveSpeedAggro": 60,
