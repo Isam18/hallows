@@ -77,6 +77,7 @@ import huntersMarchData from '../data/levels/huntersMarch.json';
 import huntersMarchRoom2Data from '../data/levels/huntersMarchRoom2.json';
 import huntersMarchRoom3Data from '../data/levels/huntersMarchRoom3.json';
 import huntersMarchRoom4Data from '../data/levels/huntersMarchRoom4.json';
+import huntersMarchRoom5Data from '../data/levels/huntersMarchRoom5.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -113,6 +114,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRoom2: huntersMarchRoom2Data as unknown as LevelConfig,
   huntersMarchRoom3: huntersMarchRoom3Data as unknown as LevelConfig,
   huntersMarchRoom4: huntersMarchRoom4Data as unknown as LevelConfig,
+  huntersMarchRoom5: huntersMarchRoom5Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -192,6 +194,9 @@ export class GameScene extends Phaser.Scene {
     this.lockedDoorPortal = null;
     this.lockedDoorBlocker = null;
     this.lockedDoorPrompt = null;
+    this.waveArenaActive = false;
+    this.currentWaveIndex = 0;
+    this.waveArenaComplete = false;
   }
 
   create(): void {
@@ -455,6 +460,8 @@ export class GameScene extends Phaser.Scene {
         this.createFakeBench(t.x, t.y, t as any);
       } else if (t.type === 'lockedVerdainaDoor') {
         this.createLockedVerdainaDoor(t.x, t.y, t.width, t.height, t.target!, t.targetSpawn || 'default');
+      } else if (t.type === 'waveArena') {
+        this.setupWaveArena();
       }
     });
     
@@ -2335,6 +2342,11 @@ export class GameScene extends Phaser.Scene {
   private lockedDoorBlocker: Phaser.GameObjects.Rectangle | null = null;
   private lockedDoorPrompt: Phaser.GameObjects.Text | null = null;
 
+  // ── Wave Arena ──
+  private waveArenaActive = false;
+  private currentWaveIndex = 0;
+  private waveArenaComplete = false;
+
   private createFakeBench(x: number, y: number, data: any): void {
     const benchSeat = this.add.rectangle(x, y, 50, 12, 0x8b7355);
     benchSeat.setStrokeStyle(2, 0x6b5335);
@@ -2442,7 +2454,7 @@ export class GameScene extends Phaser.Scene {
         return enemy.active && !enemy.isDying?.();
       });
 
-      if (aliveEnemies.length === 0 && this.fakeBenchTriggered) {
+      if (aliveEnemies.length === 0 && (this.fakeBenchTriggered || this.waveArenaComplete)) {
         // Unlock the door!
         this.tweens.add({
           targets: [chain1, chain2, lock],
@@ -2470,13 +2482,119 @@ export class GameScene extends Phaser.Scene {
 
     // Show locked text on approach
     this.physics.add.overlap(this.player, zone, () => {
-      if (!this.fakeBenchTriggered) return;
+      if (!this.fakeBenchTriggered && !this.waveArenaActive) return;
       const aliveEnemies = this.enemies.getChildren().filter(e => {
         const enemy = e as any;
         return enemy.active && !enemy.isDying?.();
       });
       if (aliveEnemies.length > 0) {
         lockedText.setVisible(true);
+      }
+    });
+  }
+
+  // ── Wave Arena System ──
+  private setupWaveArena(): void {
+    const special = (this.currentLevel as any).special;
+    if (!special?.waveArena || !special.waves) return;
+
+    // Trigger waves when player enters the arena zone
+    const trigger = this.currentLevel.triggers.find(t => t.type === 'waveArena' as any);
+    if (!trigger) return;
+
+    const zone = this.add.zone(trigger.x + trigger.width / 2, trigger.y + trigger.height / 2, trigger.width, trigger.height);
+    this.physics.add.existing(zone, true);
+
+    // Wave counter text
+    const waveText = this.add.text(this.currentLevel.width / 2, 60, '', {
+      fontSize: '18px', color: '#ff6644', fontFamily: 'Georgia, serif', fontStyle: 'bold'
+    });
+    waveText.setOrigin(0.5).setDepth(200).setVisible(false).setScrollFactor(0);
+
+    const startWaves = () => {
+      if (this.waveArenaActive) return;
+      this.waveArenaActive = true;
+      this.currentWaveIndex = 0;
+
+      // Screen shake and announcement
+      this.cameras.main.shake(400, 0.015);
+      waveText.setText('THE GATE IS SEALED').setVisible(true);
+      this.time.delayedCall(2000, () => this.spawnNextWave(special.waves, waveText));
+    };
+
+    // Deferred check - player may not exist during buildLevel
+    const checkTimer = this.time.addEvent({
+      delay: 200, loop: true,
+      callback: () => {
+        if (!this.player || this.waveArenaActive) { 
+          if (this.waveArenaActive) checkTimer.remove();
+          return; 
+        }
+        const dist = Phaser.Math.Distance.Between(
+          this.player.x, this.player.y,
+          trigger.x + trigger.width / 2, trigger.y + trigger.height / 2
+        );
+        if (dist < 400) {
+          checkTimer.remove();
+          startWaves();
+        }
+      }
+    });
+  }
+
+  private spawnNextWave(waves: any[], waveText: Phaser.GameObjects.Text): void {
+    if (this.currentWaveIndex >= waves.length) {
+      // All waves complete!
+      this.waveArenaComplete = true;
+      waveText.setText('THE GATE OPENS').setColor('#44cc44');
+      this.cameras.main.shake(300, 0.01);
+      this.time.delayedCall(2000, () => waveText.setVisible(false));
+      return;
+    }
+
+    const wave = waves[this.currentWaveIndex];
+    waveText.setText(`Wave ${this.currentWaveIndex + 1} / ${waves.length}`).setColor('#ff6644').setVisible(true);
+
+    // Spawn enemies for this wave
+    wave.enemies.forEach((e: any) => {
+      const config = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
+      if (!config) return;
+
+      let enemy: any = null;
+      if (e.type === 'frontierScout') {
+        enemy = new FrontierScout(this, e.x, e.y, config);
+      } else if (e.type === 'frontierWarrior') {
+        // Wave warriors never become winged variants
+        enemy = new FrontierWarrior(this, e.x, e.y, config);
+      } else if (e.type === 'wingedWarrior') {
+        enemy = new WingedWarrior(this, e.x, e.y - 80, config);
+      } else if (e.type === 'colonyVanguard') {
+        enemy = new ColonyVanguard(this, e.x, e.y, config);
+      } else if (e.type === 'wingedCommander') {
+        enemy = new WingedCommander(this, e.x, e.y - 60, config);
+      }
+
+      if (enemy) {
+        this.enemies.add(enemy);
+        // Spawn flash
+        const flash = this.add.circle(e.x, e.y, 30, 0xaa3333, 0.6);
+        this.tweens.add({ targets: flash, radius: 50, alpha: 0, duration: 300, onComplete: () => flash.destroy() });
+      }
+    });
+
+    // Check when all enemies in this wave are dead, then spawn next
+    const checkWaveClear = this.time.addEvent({
+      delay: 500, loop: true,
+      callback: () => {
+        const alive = this.enemies.getChildren().filter(e => {
+          const en = e as any;
+          return en.active && !en.isDying?.();
+        });
+        if (alive.length === 0) {
+          checkWaveClear.remove();
+          this.currentWaveIndex++;
+          this.time.delayedCall(1500, () => this.spawnNextWave(waves, waveText));
+        }
       }
     });
   }
