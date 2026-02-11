@@ -6,11 +6,11 @@ import { Pickup } from './Pickup';
 /**
  * Colony Vanguard - Mini-boss of the crimson insect tribe.
  * Phase 1: Armored with wide scythe sweeps, unstaggerable.
- * Phase 2 (Enraged): Faster, gains leaping slam + shockwave.
+ * Phase 2 (Enraged): Faster, gains leaping slam + shockwave, burrow attack.
  * Command Shout: Buffs nearby allies' speed.
  * Defensive Stance: Plants scythe to block.
  */
-type VanguardAIState = 'idle' | 'march' | 'telegraph' | 'sweep' | 'leapUp' | 'leapSlam' | 'shout' | 'defensiveStance' | 'hurt' | 'dead';
+type VanguardAIState = 'idle' | 'march' | 'telegraph' | 'sweep' | 'leapUp' | 'leapSlam' | 'shout' | 'defensiveStance' | 'burrowDown' | 'burrowMove' | 'burrowErupt' | 'jumpAttack' | 'jumpFall' | 'hurt' | 'dead';
 
 export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private cfg: EnemyCombatConfig;
@@ -27,7 +27,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private enragedMarchSpeed = 70;
 
   // Phase system
-  private armorHp: number = 12; // Armor bar - must break before staggering
+  private armorHp: number = 12;
   private armorBroken = false;
   private enraged = false;
 
@@ -42,7 +42,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private sweepTimer = 0;
   private sweepDuration = 500;
   private telegraphTimer = 0;
-  private telegraphDuration = 900;
+  private telegraphDuration = 600; // Faster windup (was 900)
   private sweepHitbox: Phaser.Geom.Rectangle | null = null;
   private sweepDealt = false;
 
@@ -51,6 +51,18 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private leapTarget = { x: 0, y: 0 };
   private leapPhase: 'rising' | 'hanging' | 'falling' = 'rising';
   private leapHangTimer = 0;
+
+  // Jump Attack (both phases - like Failed Knight)
+  private jumpAttackTimer = 0;
+  private jumpAttackDealt = false;
+
+  // Burrow Attack (Phase 2)
+  private burrowTimer = 0;
+  private burrowDuration = 2000;
+  private burrowTargetX = 0;
+  private burrowParticles: Phaser.GameObjects.Group | null = null;
+  private burrowEruptTimer = 0;
+  private lastBurrowY = 0;
 
   // Shout
   private shoutTimer = 0;
@@ -105,7 +117,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private createBossHPBar(): void {
     const barWidth = 160;
     const barHeight = 6;
-    // HP bar follows the vanguard
     this.hpBarBg = this.scene.add.rectangle(this.x, this.y - 50, barWidth + 4, barHeight + 4, 0x000000, 0.7);
     this.hpBarFill = this.scene.add.rectangle(this.x, this.y - 50, barWidth, barHeight, 0xcc2222);
     this.armorBarFill = this.scene.add.rectangle(this.x, this.y - 44, barWidth, 3, 0xe8dcc8);
@@ -128,6 +139,8 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     this.updateAI(player, delta);
     this.applyMovement(player, delta);
     this.updateAttacks(player, delta);
+    this.updateBurrow(player, delta);
+    this.updateJumpAttack(player, delta);
     this.updateVisuals();
     this.drawScythe();
     this.updateHPBar();
@@ -148,7 +161,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       return;
     }
     if (this.aiState === 'dead') return;
-    if (['telegraph', 'sweep', 'leapUp', 'leapSlam', 'shout', 'defensiveStance'].includes(this.aiState)) return;
+    if (['telegraph', 'sweep', 'leapUp', 'leapSlam', 'shout', 'defensiveStance', 'burrowDown', 'burrowMove', 'burrowErupt', 'jumpAttack', 'jumpFall'].includes(this.aiState)) return;
 
     const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
 
@@ -160,6 +173,18 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
         // Command shout occasionally
         if (this.shoutCooldown <= 0 && Math.random() < 0.15) {
           this.startShout();
+          return;
+        }
+
+        // Jump attack - both phases, close-mid range
+        if (dist > 60 && dist < 200 && Math.random() < 0.3) {
+          this.startJumpAttack(player);
+          return;
+        }
+
+        // Phase 2: Burrow attack
+        if (this.enraged && dist > 100 && Math.random() < 0.25) {
+          this.startBurrow(player);
           return;
         }
 
@@ -190,7 +215,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
 
   private startTelegraph(): void {
     this.aiState = 'telegraph';
-    this.telegraphTimer = this.enraged ? this.telegraphDuration * 0.6 : this.telegraphDuration;
+    this.telegraphTimer = this.enraged ? this.telegraphDuration * 0.5 : this.telegraphDuration;
     this.scytheAngle = -40;
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityX(0);
@@ -200,11 +225,268 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     this.aiState = 'leapUp';
     this.leapTarget = { x: player.x, y: player.y };
     this.leapPhase = 'rising';
-    this.leapTimer = 400;
+    this.leapTimer = 300; // Faster rise (was 400)
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0, -450);
+    body.setVelocity(0, -500); // Higher jump
     body.setAllowGravity(false);
-    this.actionCooldown = 2000;
+    this.actionCooldown = 1600;
+  }
+
+  // Jump Attack - like Failed Knight: quick leap forward and slam down
+  private startJumpAttack(player: Player): void {
+    this.aiState = 'jumpAttack';
+    this.jumpAttackTimer = 350;
+    this.jumpAttackDealt = false;
+
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    const dx = player.x - this.x;
+    this.facingDir = dx > 0 ? 1 : -1;
+    this.setFlipX(this.facingDir < 0);
+
+    // Quick forward leap
+    body.setVelocity(this.facingDir * 250, -350);
+    this.scytheAngle = -60; // Wind up scythe overhead
+
+    this.actionCooldown = 1200;
+  }
+
+  private updateJumpAttack(player: Player, delta: number): void {
+    if (this.aiState === 'jumpAttack') {
+      this.jumpAttackTimer -= delta;
+      // Transition to falling phase once at apex
+      const body = this.body as Phaser.Physics.Arcade.Body;
+      if (this.jumpAttackTimer <= 0 || body.velocity.y >= 0) {
+        this.aiState = 'jumpFall';
+        this.scytheAngle = 90; // Scythe slams down
+        body.setVelocityX(this.facingDir * 180);
+        body.setVelocityY(500); // Fast slam down
+      }
+    }
+
+    if (this.aiState === 'jumpFall') {
+      const body = this.body as Phaser.Physics.Arcade.Body;
+
+      // Hit player during fall
+      if (!this.jumpAttackDealt) {
+        const hb = new Phaser.Geom.Rectangle(
+          this.x - 30, this.y - 20, 60, 50
+        );
+        const pb = player.getBounds();
+        if (Phaser.Geom.Rectangle.Overlaps(hb, pb)) {
+          player.takeDamage(2, this.x);
+          this.jumpAttackDealt = true;
+        }
+      }
+
+      // Landing
+      if (body.blocked.down || body.touching.down) {
+        this.scytheAngle = 0;
+        this.scene.cameras.main.shake(150, 0.008);
+
+        // Landing shockwave
+        this.createLandingImpact();
+
+        // Damage player if close on landing
+        if (!this.jumpAttackDealt) {
+          const dist = Math.abs(player.x - this.x);
+          if (dist < 80 && Math.abs(player.y - this.y) < 50) {
+            player.takeDamage(2, this.x);
+            this.jumpAttackDealt = true;
+          }
+        }
+
+        this.aiState = 'march';
+        this.actionCooldown = 800;
+      }
+    }
+  }
+
+  private createLandingImpact(): void {
+    // Dust particles on landing
+    for (let i = 0; i < 8; i++) {
+      const side = i < 4 ? -1 : 1;
+      const dust = this.scene.add.circle(
+        this.x + side * Phaser.Math.Between(5, 20),
+        this.y + 20,
+        Phaser.Math.Between(3, 6),
+        0x8a6644, 0.6
+      );
+      this.scene.tweens.add({
+        targets: dust,
+        x: dust.x + side * Phaser.Math.Between(20, 50),
+        y: dust.y - Phaser.Math.Between(10, 30),
+        alpha: 0,
+        scale: 0.3,
+        duration: Phaser.Math.Between(250, 400),
+        onComplete: () => dust.destroy()
+      });
+    }
+
+    // Small ground crack line
+    const crack = this.scene.add.rectangle(this.x, this.y + 25, 40, 3, 0x4a3a2a, 0.6);
+    this.scene.tweens.add({
+      targets: crack,
+      scaleX: 2,
+      alpha: 0,
+      duration: 500,
+      onComplete: () => crack.destroy()
+    });
+  }
+
+  // Burrow Attack - digs underground, tracked by particles, erupts under player
+  private startBurrow(player: Player): void {
+    this.aiState = 'burrowDown';
+    this.burrowTimer = 400; // Time to dig down
+    this.lastBurrowY = this.y;
+
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0, 0);
+
+    // Dig-down particles
+    for (let i = 0; i < 6; i++) {
+      const p = this.scene.add.circle(
+        this.x + Phaser.Math.Between(-15, 15),
+        this.y + 15,
+        Phaser.Math.Between(3, 6),
+        0x6a5040
+      );
+      this.scene.tweens.add({
+        targets: p,
+        y: p.y - Phaser.Math.Between(20, 40),
+        alpha: 0,
+        duration: 400,
+        onComplete: () => p.destroy()
+      });
+    }
+
+    this.actionCooldown = 2500;
+  }
+
+  private updateBurrow(player: Player, delta: number): void {
+    if (this.aiState === 'burrowDown') {
+      this.burrowTimer -= delta;
+
+      // Sink into ground
+      this.setAlpha(Math.max(0, this.burrowTimer / 400));
+      const body = this.body as Phaser.Physics.Arcade.Body;
+      body.setVelocityY(100);
+
+      if (this.burrowTimer <= 0) {
+        this.aiState = 'burrowMove';
+        this.burrowTimer = this.burrowDuration;
+        this.setAlpha(0);
+        this.setVisible(false);
+        body.setVelocity(0, 0);
+        body.enable = false;
+        this.burrowTargetX = player.x;
+      }
+    }
+
+    if (this.aiState === 'burrowMove') {
+      this.burrowTimer -= delta;
+
+      // Track player position
+      this.burrowTargetX += (player.x - this.burrowTargetX) * 0.04;
+
+      // Move underground toward target
+      const speed = 200;
+      const dx = this.burrowTargetX - this.x;
+      if (Math.abs(dx) > 5) {
+        this.x += Math.sign(dx) * Math.min(speed * delta / 1000, Math.abs(dx));
+      }
+
+      // Spawn tracking particles above ground showing position
+      if (Math.random() < 0.3) {
+        const particleX = this.x + Phaser.Math.Between(-12, 12);
+        const particleY = this.lastBurrowY + Phaser.Math.Between(10, 20);
+
+        // Dirt/debris particles rising from ground
+        const dirt = this.scene.add.circle(
+          particleX, particleY,
+          Phaser.Math.Between(2, 5),
+          Phaser.Math.FloatBetween(0, 1) > 0.5 ? 0x8a6644 : 0x6a5040,
+          0.7
+        );
+        this.scene.tweens.add({
+          targets: dirt,
+          y: dirt.y - Phaser.Math.Between(15, 35),
+          alpha: 0,
+          scale: 0.3,
+          duration: Phaser.Math.Between(300, 500),
+          onComplete: () => dirt.destroy()
+        });
+
+        // Small rumble lines
+        if (Math.random() < 0.4) {
+          const line = this.scene.add.rectangle(
+            particleX, particleY + 5,
+            Phaser.Math.Between(8, 16), 2,
+            0x4a3a2a, 0.5
+          );
+          this.scene.tweens.add({
+            targets: line,
+            alpha: 0,
+            scaleX: 0.5,
+            duration: 300,
+            onComplete: () => line.destroy()
+          });
+        }
+      }
+
+      // Time to erupt
+      if (this.burrowTimer <= 0) {
+        this.startBurrowErupt(player);
+      }
+    }
+
+    if (this.aiState === 'burrowErupt') {
+      this.burrowEruptTimer -= delta;
+      if (this.burrowEruptTimer <= 0) {
+        this.aiState = 'march';
+        this.actionCooldown = 1000;
+      }
+    }
+  }
+
+  private startBurrowErupt(player: Player): void {
+    this.aiState = 'burrowErupt';
+    this.burrowEruptTimer = 500;
+
+    // Reappear at tracked position
+    this.y = this.lastBurrowY;
+    this.setVisible(true);
+    this.setAlpha(1);
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.enable = true;
+    body.setVelocity(0, -300); // Burst upward
+
+    this.scene.cameras.main.shake(250, 0.012);
+
+    // Eruption particles - big dramatic burst
+    for (let i = 0; i < 14; i++) {
+      const angle = (i / 14) * Math.PI * 2;
+      const color = [0x8a6644, 0x6a5040, 0x4a3a2a, 0xcc4444][i % 4];
+      const p = this.scene.add.circle(
+        this.x, this.y + 10,
+        Phaser.Math.Between(3, 8), color, 0.8
+      );
+      const dist = Phaser.Math.Between(30, 70);
+      this.scene.tweens.add({
+        targets: p,
+        x: p.x + Math.cos(angle) * dist,
+        y: p.y + Math.sin(angle) * dist - 20,
+        alpha: 0,
+        scale: 0.3,
+        duration: Phaser.Math.Between(300, 600),
+        onComplete: () => p.destroy()
+      });
+    }
+
+    // Damage player if close to eruption point
+    const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
+    if (dist < 70) {
+      player.takeDamage(2, this.x);
+    }
   }
 
   private startShout(): void {
@@ -214,10 +496,8 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityX(0);
 
-    // Screen shake
     this.scene.cameras.main.shake(300, 0.005);
 
-    // Visual ripple
     const ripple = this.scene.add.circle(this.x, this.y, 10, 0xff4444, 0.3);
     this.scene.tweens.add({
       targets: ripple,
@@ -227,14 +507,12 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       onComplete: () => ripple.destroy()
     });
 
-    // Buff nearby allies (find FrontierWarrior/Scout instances)
     const gameScene = this.scene as any;
     if (gameScene.enemies) {
       gameScene.enemies.getChildren().forEach((enemy: any) => {
         if (enemy !== this && enemy.active && !enemy.isDying?.()) {
           const d = Phaser.Math.Distance.Between(this.x, this.y, enemy.x, enemy.y);
           if (d < 250) {
-            // Brief speed buff visual
             const glow = this.scene.add.circle(enemy.x, enemy.y, 15, 0xff6644, 0.4);
             this.scene.tweens.add({
               targets: glow,
@@ -251,7 +529,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private startDefensiveStance(): void {
     this.aiState = 'defensiveStance';
     this.defenseTimer = 1500;
-    this.scytheAngle = -90; // Scythe planted
+    this.scytheAngle = -90;
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocityX(0);
   }
@@ -272,14 +550,13 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     // Telegraph
     if (this.aiState === 'telegraph') {
       this.telegraphTimer -= delta;
-      this.scytheAngle = -40 - (1 - this.telegraphTimer / (this.enraged ? this.telegraphDuration * 0.6 : this.telegraphDuration)) * 40;
+      this.scytheAngle = -40 - (1 - this.telegraphTimer / (this.enraged ? this.telegraphDuration * 0.5 : this.telegraphDuration)) * 40;
       if (this.telegraphTimer <= 0) {
         this.aiState = 'sweep';
         this.sweepTimer = this.sweepDuration;
         this.sweepDealt = false;
         this.scytheAngle = 80;
 
-        // Wide hitbox covering 40% of arena
         const sweepWidth = this.scene.scale.width * 0.4;
         const hbX = this.facingDir > 0 ? this.x : this.x - sweepWidth;
         this.sweepHitbox = new Phaser.Geom.Rectangle(hbX, this.y - 40, sweepWidth, 70);
@@ -299,7 +576,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       if (this.sweepTimer <= 0) {
         this.sweepHitbox = null;
         this.scytheAngle = 0;
-        this.actionCooldown = this.enraged ? 800 : 1400;
+        this.actionCooldown = this.enraged ? 600 : 1000; // Faster cooldown (was 800/1400)
         this.aiState = 'march';
       }
     }
@@ -310,10 +587,9 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       if (this.leapTimer <= 0) {
         if (this.leapPhase === 'rising') {
           this.leapPhase = 'hanging';
-          this.leapHangTimer = 500;
+          this.leapHangTimer = 350; // Faster hang (was 500)
           const body = this.body as Phaser.Physics.Arcade.Body;
           body.setVelocity(0, 0);
-          // Re-target player
           this.leapTarget = { x: player.x, y: player.y };
         }
       }
@@ -325,7 +601,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
         this.aiState = 'leapSlam';
         const body = this.body as Phaser.Physics.Arcade.Body;
         const dx = this.leapTarget.x - this.x;
-        body.setVelocity(dx * 0.8, 700);
+        body.setVelocity(dx * 1.0, 800); // Faster slam (was dx*0.8, 700)
         body.setAllowGravity(true);
         this.leapTimer = 1000;
       }
@@ -334,11 +610,10 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     if (this.aiState === 'leapSlam') {
       const body = this.body as Phaser.Physics.Arcade.Body;
       if (body.blocked.down || body.touching.down) {
-        // Landing - create shockwave
         this.createShockwave(player);
         this.scene.cameras.main.shake(200, 0.01);
         this.aiState = 'march';
-        this.actionCooldown = 1200;
+        this.actionCooldown = 900;
       }
       this.leapTimer -= delta;
       if (this.leapTimer <= 0) {
@@ -352,7 +627,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       this.shoutTimer -= delta;
       if (this.shoutTimer <= 0) {
         this.aiState = 'march';
-        this.actionCooldown = 800;
+        this.actionCooldown = 600;
       }
     }
 
@@ -362,13 +637,12 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       if (this.defenseTimer <= 0) {
         this.scytheAngle = 0;
         this.aiState = 'march';
-        this.actionCooldown = 600;
+        this.actionCooldown = 400;
       }
     }
   }
 
   private createShockwave(player: Player): void {
-    // Left shockwave
     const leftWave = this.scene.add.rectangle(this.x - 30, this.y + 10, 60, 20, 0xff4444, 0.5);
     this.scene.tweens.add({
       targets: leftWave,
@@ -379,7 +653,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       onComplete: () => leftWave.destroy()
     });
 
-    // Right shockwave
     const rightWave = this.scene.add.rectangle(this.x + 30, this.y + 10, 60, 20, 0xff4444, 0.5);
     this.scene.tweens.add({
       targets: rightWave,
@@ -390,7 +663,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       onComplete: () => rightWave.destroy()
     });
 
-    // Hit player if close
     const dist = Math.abs(player.x - this.x);
     if (dist < 120 && Math.abs(player.y - this.y) < 60) {
       player.takeDamage(2, this.x);
@@ -399,6 +671,10 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
 
   private drawScythe(): void {
     if (!this.scytheGraphic || this.isDead) return;
+    if (this.aiState === 'burrowMove' || !this.visible) {
+      this.scytheGraphic.clear();
+      return;
+    }
     this.scytheGraphic.clear();
 
     const cx = this.x + this.facingDir * 20;
@@ -410,11 +686,9 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     const endX = cx + Math.cos(angle) * len;
     const endY = cy - Math.sin(angle) * len;
 
-    // Handle
     this.scytheGraphic.lineStyle(5, 0x4a3a2a);
     this.scytheGraphic.lineBetween(cx, cy, endX, endY);
 
-    // Scythe blade - large curved bone
     const bladeAngle = angle + (this.facingDir > 0 ? 0.5 : -0.5);
     const bladeLen = 30;
     const bx = endX + Math.cos(bladeAngle) * bladeLen;
@@ -428,7 +702,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     this.scytheGraphic.closePath();
     this.scytheGraphic.fillPath();
 
-    // Serrated teeth
     this.scytheGraphic.fillStyle(0xd4c8b0);
     for (let i = 0; i < 4; i++) {
       const t = (i + 1) / 5;
@@ -444,6 +717,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   }
 
   private updateVisuals(): void {
+    if (this.aiState === 'burrowMove') return; // Hidden underground
     if (this.hurtFlashTimer > 0) {
       this.setTexture(this.armorBroken ? 'colonyVanguard_cracked_hurt' : 'colonyVanguard_hurt');
     } else if (this.invulnTimer > 0) {
@@ -458,17 +732,24 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     if (!this.hpBarBg || !this.hpBarFill || !this.armorBarFill || !this.nameText) return;
     const barWidth = 160;
 
+    // Hide HP bar when burrowed
+    const burrowed = this.aiState === 'burrowMove';
+    this.hpBarBg.setVisible(!burrowed);
+    this.hpBarFill.setVisible(!burrowed);
+    this.armorBarFill.setVisible(!burrowed && !this.armorBroken);
+    this.nameText.setVisible(!burrowed);
+
+    if (burrowed) return;
+
     this.hpBarBg.setPosition(this.x, this.y - 55);
     this.hpBarFill.setPosition(this.x, this.y - 55);
     this.armorBarFill.setPosition(this.x, this.y - 49);
     this.nameText.setPosition(this.x, this.y - 65);
 
-    // HP bar
     const hpRatio = this.currentHp / this.cfg.hp;
     this.hpBarFill.setSize(barWidth * hpRatio, 6);
     this.hpBarFill.setPosition(this.x - (barWidth * (1 - hpRatio)) / 2, this.y - 55);
 
-    // Armor bar
     if (!this.armorBroken) {
       const armorRatio = this.armorHp / 12;
       this.armorBarFill.setSize(barWidth * armorRatio, 3);
@@ -482,13 +763,12 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount: number, fromX: number, swingId: number = -1): boolean {
     if (this.isDead) return false;
     if (this.invulnTimer > 0) return false;
+    if (this.aiState === 'burrowMove' || this.aiState === 'burrowDown') return false; // Can't hit while underground
     if (swingId !== -1 && swingId === this.lastHitBySwingId) return false;
     this.lastHitBySwingId = swingId;
 
-    // Defensive stance - reduced damage
     if (this.aiState === 'defensiveStance') {
       amount = Math.max(1, Math.floor(amount * 0.3));
-      // Deflect visual
       const spark = this.scene.add.circle(this.x, this.y - 10, 8, 0xffee88, 0.8);
       this.scene.tweens.add({
         targets: spark,
@@ -509,17 +789,15 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
         this.createArmorBreakEffect();
       }
 
-      // Cannot be staggered while armored
       const knockDir = this.x > fromX ? 1 : -1;
       const body = this.body as Phaser.Physics.Arcade.Body;
-      body.setVelocity(knockDir * 15, -5); // Tiny nudge
+      body.setVelocity(knockDir * 15, -5);
       return true;
     }
 
-    // Armor broken - takes real damage
     this.currentHp -= amount;
     this.aiState = 'hurt';
-    this.hitstunTimer = this.cfg.hitstunMs * 0.6; // Still hard to stagger
+    this.hitstunTimer = this.cfg.hitstunMs * 0.6;
     this.invulnTimer = this.cfg.invulnOnHitMs;
     this.hurtFlashTimer = this.cfg.hurtFlashMs;
 
@@ -538,7 +816,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   }
 
   private createArmorBreakEffect(): void {
-    // Big dramatic flash
     const flash = this.scene.add.circle(this.x, this.y, 50, 0xffffff, 0.9);
     this.scene.tweens.add({
       targets: flash,
@@ -549,7 +826,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
 
     this.scene.cameras.main.shake(400, 0.015);
 
-    // Mask fragments
     for (let i = 0; i < 16; i++) {
       const frag = this.scene.add.rectangle(
         this.x + Phaser.Math.Between(-10, 10),
@@ -588,7 +864,6 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
 
     this.createDeathParticles();
 
-    // Drop shells
     const dropCount = Phaser.Math.Between(this.cfg.dropShells.min, this.cfg.dropShells.max);
     for (let i = 0; i < dropCount; i++) {
       const offsetX = Phaser.Math.Between(-30, 30);
