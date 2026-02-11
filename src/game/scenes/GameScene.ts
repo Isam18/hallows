@@ -2336,7 +2336,6 @@ export class GameScene extends Phaser.Scene {
   private lockedDoorPrompt: Phaser.GameObjects.Text | null = null;
 
   private createFakeBench(x: number, y: number, data: any): void {
-    // Create a bench-looking object
     const benchSeat = this.add.rectangle(x, y, 50, 12, 0x8b7355);
     benchSeat.setStrokeStyle(2, 0x6b5335);
     benchSeat.setDepth(5);
@@ -2346,67 +2345,58 @@ export class GameScene extends Phaser.Scene {
     const legR = this.add.rectangle(x + 18, y + 14, 6, 16, 0x6b5335);
     legR.setDepth(5);
 
-    // Gentle glow to lure player
     const glow = this.add.circle(x, y - 10, 30, 0xffffcc, 0.08);
     glow.setDepth(4);
     this.tweens.add({ targets: glow, alpha: 0.15, duration: 1500, yoyo: true, repeat: -1 });
 
-    // Prompt text
     const prompt = this.add.text(x, y - 40, 'Rest?', {
       fontSize: '12px', color: '#ccaa66', fontFamily: 'Georgia, serif', fontStyle: 'italic'
     });
     prompt.setOrigin(0.5).setDepth(100).setVisible(false);
 
-    // Trigger zone
-    const zone = this.add.zone(x, y, 100, 80);
-    this.physics.add.existing(zone, true);
+    // Deferred proximity check (player doesn't exist during buildLevel)
+    const checkTimer = this.time.addEvent({
+      delay: 100,
+      loop: true,
+      callback: () => {
+        if (!this.player || this.fakeBenchTriggered) {
+          if (this.fakeBenchTriggered) { prompt.setVisible(false); checkTimer.remove(); }
+          return;
+        }
+        const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, x, y);
+        if (dist < 120) prompt.setVisible(true);
+        else prompt.setVisible(false);
 
-    // Check overlap each frame
-    this.physics.add.overlap(this.player, zone, () => {
-      if (this.fakeBenchTriggered) return;
-      prompt.setVisible(true);
+        if (dist < 50) {
+          this.fakeBenchTriggered = true;
+          prompt.setVisible(false);
+          checkTimer.remove();
 
-      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, x, y);
-      if (dist < 45) {
-        this.fakeBenchTriggered = true;
-        prompt.setVisible(false);
-
-        // Bench vanishes with a poof
-        this.tweens.add({
-          targets: [benchSeat, legL, legR, glow],
-          alpha: 0, scaleX: 0.2, scaleY: 0.2, duration: 250,
-          onComplete: () => { benchSeat.destroy(); legL.destroy(); legR.destroy(); glow.destroy(); }
-        });
-
-        // Sinister laugh particles
-        for (let i = 0; i < 8; i++) {
-          const p = this.add.circle(x + Phaser.Math.Between(-20, 20), y + Phaser.Math.Between(-20, 10), 3, 0xff4444, 0.8);
           this.tweens.add({
-            targets: p, y: p.y - 40, alpha: 0, duration: 400 + i * 50,
-            onComplete: () => p.destroy()
+            targets: [benchSeat, legL, legR, glow],
+            alpha: 0, scaleX: 0.2, scaleY: 0.2, duration: 250,
+            onComplete: () => { benchSeat.destroy(); legL.destroy(); legR.destroy(); glow.destroy(); }
+          });
+
+          for (let i = 0; i < 8; i++) {
+            const p = this.add.circle(x + Phaser.Math.Between(-20, 20), y + Phaser.Math.Between(-20, 10), 3, 0xff4444, 0.8);
+            this.tweens.add({ targets: p, y: p.y - 40, alpha: 0, duration: 400 + i * 50, onComplete: () => p.destroy() });
+          }
+
+          this.cameras.main.shake(300, 0.01);
+
+          this.time.delayedCall(500, () => {
+            const spawnX = data.spawnX || x;
+            const spawnY = data.spawnY || y;
+            const config = (enemiesData as Record<string, EnemyCombatConfig>)[data.spawnEnemy || 'colonyVanguard'];
+            if (config) {
+              const vanguard = new ColonyVanguard(this, spawnX, spawnY, config);
+              this.enemies.add(vanguard);
+              const flash = this.add.circle(spawnX, spawnY, 40, 0xaa3333, 0.6);
+              this.tweens.add({ targets: flash, radius: 60, alpha: 0, duration: 300, onComplete: () => flash.destroy() });
+            }
           });
         }
-
-        // Screen shake
-        this.cameras.main.shake(300, 0.01);
-
-        // Spawn Colony Vanguard after brief delay
-        this.time.delayedCall(500, () => {
-          const spawnX = data.spawnX || x;
-          const spawnY = data.spawnY || y;
-          const config = (enemiesData as Record<string, EnemyCombatConfig>)[data.spawnEnemy || 'colonyVanguard'];
-          if (config) {
-            const vanguard = new ColonyVanguard(this, spawnX, spawnY, config);
-            this.enemies.add(vanguard);
-
-            // Flash effect on spawn
-            const flash = this.add.circle(spawnX, spawnY, 40, 0xaa3333, 0.6);
-            this.tweens.add({
-              targets: flash, radius: 60, alpha: 0, duration: 300,
-              onComplete: () => flash.destroy()
-            });
-          }
-        });
       }
     });
   }
