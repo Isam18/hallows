@@ -23,6 +23,7 @@ import { FrontierScout } from '../entities/FrontierScout';
 import { FrontierWarrior } from '../entities/FrontierWarrior';
 import { WingedWarrior } from '../entities/WingedWarrior';
 import { ColonyVanguard } from '../entities/ColonyVanguard';
+import { WingedCommander } from '../entities/WingedCommander';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { Pickup } from '../entities/Pickup';
@@ -498,6 +499,9 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'colonyVanguard') {
           const vanguard = new ColonyVanguard(this, e.x, e.y, config);
           this.enemies.add(vanguard);
+        } else if (e.type === 'wingedCommander') {
+          const commander = new WingedCommander(this, e.x, e.y - 60, config);
+          this.enemies.add(commander);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {

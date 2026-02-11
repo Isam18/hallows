@@ -1440,6 +1440,7 @@ export class BootScene extends Phaser.Scene {
     this.createWingedWarriorUnmaskedSprite();
     this.createWingedWarriorUnmaskedHurtSprite();
     this.createColonyVanguardSprites();
+    this.createWingedCommanderSprites();
   }
 
   private createFrontierScoutSprite(): void {
@@ -2147,6 +2148,131 @@ export class BootScene extends Phaser.Scene {
     ch.destroy();
   }
 
+  private createWingedCommanderSprites(): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 36;
+    const cy = 36;
+
+    // Ivory bone-wings (4 jagged extensions from pauldrons)
+    g.fillStyle(0xe8dcc8);
+    // Upper left wing
+    g.beginPath();
+    g.moveTo(cx - 14, cy - 12);
+    g.lineTo(cx - 38, cy - 34);
+    g.lineTo(cx - 30, cy - 18);
+    g.lineTo(cx - 18, cy - 8);
+    g.closePath();
+    g.fillPath();
+    // Lower left wing
+    g.beginPath();
+    g.moveTo(cx - 16, cy - 4);
+    g.lineTo(cx - 40, cy - 10);
+    g.lineTo(cx - 32, cy + 4);
+    g.lineTo(cx - 18, cy + 2);
+    g.closePath();
+    g.fillPath();
+    // Upper right wing
+    g.beginPath();
+    g.moveTo(cx + 14, cy - 12);
+    g.lineTo(cx + 38, cy - 34);
+    g.lineTo(cx + 30, cy - 18);
+    g.lineTo(cx + 18, cy - 8);
+    g.closePath();
+    g.fillPath();
+    // Lower right wing
+    g.beginPath();
+    g.moveTo(cx + 16, cy - 4);
+    g.lineTo(cx + 40, cy - 10);
+    g.lineTo(cx + 32, cy + 4);
+    g.lineTo(cx + 18, cy + 2);
+    g.closePath();
+    g.fillPath();
+
+    // Wing serrations
+    g.fillStyle(0xd4c8b0);
+    g.fillTriangle(cx - 34, cy - 30, cx - 42, cy - 36, cx - 36, cy - 24);
+    g.fillTriangle(cx + 34, cy - 30, cx + 42, cy - 36, cx + 36, cy - 24);
+    g.fillTriangle(cx - 36, cy - 6, cx - 44, cy - 12, cx - 38, cy);
+    g.fillTriangle(cx + 36, cy - 6, cx + 44, cy - 12, cx + 38, cy);
+
+    // Ivory pauldrons
+    g.fillStyle(0xe8dcc8);
+    g.fillEllipse(cx - 16, cy - 8, 18, 14);
+    g.fillEllipse(cx + 16, cy - 8, 18, 14);
+
+    // Pauldron jagged edges
+    g.fillStyle(0xd4c8b0);
+    g.fillTriangle(cx - 22, cy - 14, cx - 28, cy - 20, cx - 18, cy - 16);
+    g.fillTriangle(cx + 22, cy - 14, cx + 28, cy - 20, cx + 18, cy - 16);
+
+    // Body - sleek deep crimson
+    g.fillStyle(0x7a1a1a);
+    g.fillEllipse(cx, cy + 4, 28, 34);
+
+    // Carapace highlight
+    g.fillStyle(0x9a2828, 0.7);
+    g.fillEllipse(cx, cy, 20, 24);
+
+    // Bright highlight
+    g.fillStyle(0xbb3838, 0.4);
+    g.fillEllipse(cx - 2, cy - 4, 12, 14);
+
+    // Segment lines
+    g.lineStyle(1, 0x5a1010);
+    g.lineBetween(cx - 10, cy - 8, cx - 12, cy + 12);
+    g.lineBetween(cx + 10, cy - 8, cx + 12, cy + 12);
+
+    // Charcoal head
+    g.fillStyle(0x2a2a2a);
+    g.fillEllipse(cx, cy - 18, 20, 16);
+
+    // Head detail - darker
+    g.fillStyle(0x1a1a1a);
+    g.fillEllipse(cx, cy - 16, 16, 12);
+
+    // Small piercing black eyes
+    g.fillStyle(0x000000);
+    g.fillCircle(cx - 5, cy - 18, 3);
+    g.fillCircle(cx + 5, cy - 18, 3);
+
+    // Eye glint - menacing red
+    g.fillStyle(0xff4422, 0.6);
+    g.fillCircle(cx - 5, cy - 19, 1.5);
+    g.fillCircle(cx + 5, cy - 19, 1.5);
+
+    // Legs
+    g.fillStyle(0x5a1414);
+    g.fillRoundedRect(cx - 10, cy + 16, 8, 16, 2);
+    g.fillRoundedRect(cx + 2, cy + 16, 8, 16, 2);
+
+    // Outline
+    g.lineStyle(2, 0x0a0a0a);
+    g.strokeEllipse(cx, cy + 4, 28, 34);
+    g.strokeEllipse(cx, cy - 18, 20, 16);
+
+    g.generateTexture('wingedCommander', 72, 72);
+    g.destroy();
+
+    // Hurt version
+    const h = this.make.graphics({ x: 0, y: 0 });
+    // Wings
+    h.fillStyle(0xffffff, 0.8);
+    h.beginPath(); h.moveTo(cx - 14, cy - 12); h.lineTo(cx - 38, cy - 34); h.lineTo(cx - 30, cy - 18); h.lineTo(cx - 18, cy - 8); h.closePath(); h.fillPath();
+    h.beginPath(); h.moveTo(cx + 14, cy - 12); h.lineTo(cx + 38, cy - 34); h.lineTo(cx + 30, cy - 18); h.lineTo(cx + 18, cy - 8); h.closePath(); h.fillPath();
+    h.beginPath(); h.moveTo(cx - 16, cy - 4); h.lineTo(cx - 40, cy - 10); h.lineTo(cx - 32, cy + 4); h.lineTo(cx - 18, cy + 2); h.closePath(); h.fillPath();
+    h.beginPath(); h.moveTo(cx + 16, cy - 4); h.lineTo(cx + 40, cy - 10); h.lineTo(cx + 32, cy + 4); h.lineTo(cx + 18, cy + 2); h.closePath(); h.fillPath();
+    // Pauldrons
+    h.fillStyle(0xffffff);
+    h.fillEllipse(cx - 16, cy - 8, 18, 14);
+    h.fillEllipse(cx + 16, cy - 8, 18, 14);
+    // Body
+    h.fillEllipse(cx, cy + 4, 28, 34);
+    // Head
+    h.fillStyle(0xeeeeee);
+    h.fillEllipse(cx, cy - 18, 20, 16);
+    h.generateTexture('wingedCommander_hurt', 72, 72);
+    h.destroy();
+  }
 
   private createBossSprites(): void {
     // False Champion - Armored beetle knight inspired by False Knight

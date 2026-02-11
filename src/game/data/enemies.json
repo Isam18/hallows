@@ -411,5 +411,27 @@
     "isHuntersMarch": true,
     "isElite": true,
     "isBoss": true
+  },
+  "wingedCommander": {
+    "id": "wingedCommander",
+    "displayName": "Winged Commander",
+    "hp": 40,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 120,
+    "aggroRangePx": 400,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": { "x": 15, "y": 8 },
+    "hitstunMs": 60,
+    "invulnOnHitMs": 120,
+    "dropShells": { "min": 60, "max": 100 },
+    "hurtFlashMs": 100,
+    "spriteKey": "wingedCommander",
+    "width": 50,
+    "height": 50,
+    "isHuntersMarch": true,
+    "isFlying": true,
+    "isElite": true,
+    "isBoss": true
   }
 }
