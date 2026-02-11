@@ -15,10 +15,7 @@
     { "x": 660, "y": 520, "width": 140, "height": 18, "type": "platform" },
     { "x": 420, "y": 400, "width": 160, "height": 18, "type": "platform" }
   ],
-  "enemies": [
-    { "type": "colonyVanguard", "x": 400, "y": 580, "behavior": "miniboss" },
-    { "type": "wingedCommander", "x": 650, "y": 500, "behavior": "boss" }
-  ],
+  "enemies": [],
   "pickups": [],
   "triggers": [
     {
