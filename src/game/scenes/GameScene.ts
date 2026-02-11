@@ -76,6 +76,7 @@ import chamberOfTheHunterData from '../data/levels/medulla/chamberOfTheHunter.js
 import huntersMarchData from '../data/levels/huntersMarch.json';
 import huntersMarchRoom2Data from '../data/levels/huntersMarchRoom2.json';
 import huntersMarchRoom3Data from '../data/levels/huntersMarchRoom3.json';
+import huntersMarchRoom4Data from '../data/levels/huntersMarchRoom4.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -111,6 +112,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarch: huntersMarchData as unknown as LevelConfig,
   huntersMarchRoom2: huntersMarchRoom2Data as unknown as LevelConfig,
   huntersMarchRoom3: huntersMarchRoom3Data as unknown as LevelConfig,
+  huntersMarchRoom4: huntersMarchRoom4Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -186,6 +188,10 @@ export class GameScene extends Phaser.Scene {
     this.debugModeEnabled = data.debugMode || this.registry.get('debugMode') || false;
     this.inBossArena = false;
     this.bossGateClosed = false;
+    this.fakeBenchTriggered = false;
+    this.lockedDoorPortal = null;
+    this.lockedDoorBlocker = null;
+    this.lockedDoorPrompt = null;
   }
 
   create(): void {
@@ -445,6 +451,10 @@ export class GameScene extends Phaser.Scene {
           // Sealed mossy door (does nothing yet)
           this.createVerdainaDoor(t.x, t.y, t.width, t.height);
         }
+      } else if (t.type === 'fakeBench') {
+        this.createFakeBench(t.x, t.y, t as any);
+      } else if (t.type === 'lockedVerdainaDoor') {
+        this.createLockedVerdainaDoor(t.x, t.y, t.width, t.height, t.target!, t.targetSpawn || 'default');
       }
     });
     
@@ -2317,5 +2327,167 @@ export class GameScene extends Phaser.Scene {
       }
     }
     return bestY;
+  }
+
+  // ── Fake Bench Trap ──
+  private fakeBenchTriggered = false;
+  private lockedDoorPortal: Portal | null = null;
+  private lockedDoorBlocker: Phaser.GameObjects.Rectangle | null = null;
+  private lockedDoorPrompt: Phaser.GameObjects.Text | null = null;
+
+  private createFakeBench(x: number, y: number, data: any): void {
+    // Create a bench-looking object
+    const benchSeat = this.add.rectangle(x, y, 50, 12, 0x8b7355);
+    benchSeat.setStrokeStyle(2, 0x6b5335);
+    benchSeat.setDepth(5);
+
+    const legL = this.add.rectangle(x - 18, y + 14, 6, 16, 0x6b5335);
+    legL.setDepth(5);
+    const legR = this.add.rectangle(x + 18, y + 14, 6, 16, 0x6b5335);
+    legR.setDepth(5);
+
+    // Gentle glow to lure player
+    const glow = this.add.circle(x, y - 10, 30, 0xffffcc, 0.08);
+    glow.setDepth(4);
+    this.tweens.add({ targets: glow, alpha: 0.15, duration: 1500, yoyo: true, repeat: -1 });
+
+    // Prompt text
+    const prompt = this.add.text(x, y - 40, 'Rest?', {
+      fontSize: '12px', color: '#ccaa66', fontFamily: 'Georgia, serif', fontStyle: 'italic'
+    });
+    prompt.setOrigin(0.5).setDepth(100).setVisible(false);
+
+    // Trigger zone
+    const zone = this.add.zone(x, y, 100, 80);
+    this.physics.add.existing(zone, true);
+
+    // Check overlap each frame
+    this.physics.add.overlap(this.player, zone, () => {
+      if (this.fakeBenchTriggered) return;
+      prompt.setVisible(true);
+
+      const dist = Phaser.Math.Distance.Between(this.player.x, this.player.y, x, y);
+      if (dist < 45) {
+        this.fakeBenchTriggered = true;
+        prompt.setVisible(false);
+
+        // Bench vanishes with a poof
+        this.tweens.add({
+          targets: [benchSeat, legL, legR, glow],
+          alpha: 0, scaleX: 0.2, scaleY: 0.2, duration: 250,
+          onComplete: () => { benchSeat.destroy(); legL.destroy(); legR.destroy(); glow.destroy(); }
+        });
+
+        // Sinister laugh particles
+        for (let i = 0; i < 8; i++) {
+          const p = this.add.circle(x + Phaser.Math.Between(-20, 20), y + Phaser.Math.Between(-20, 10), 3, 0xff4444, 0.8);
+          this.tweens.add({
+            targets: p, y: p.y - 40, alpha: 0, duration: 400 + i * 50,
+            onComplete: () => p.destroy()
+          });
+        }
+
+        // Screen shake
+        this.cameras.main.shake(300, 0.01);
+
+        // Spawn Colony Vanguard after brief delay
+        this.time.delayedCall(500, () => {
+          const spawnX = data.spawnX || x;
+          const spawnY = data.spawnY || y;
+          const config = (enemiesData as Record<string, EnemyCombatConfig>)[data.spawnEnemy || 'colonyVanguard'];
+          if (config) {
+            const vanguard = new ColonyVanguard(this, spawnX, spawnY, config);
+            this.enemies.add(vanguard);
+
+            // Flash effect on spawn
+            const flash = this.add.circle(spawnX, spawnY, 40, 0xaa3333, 0.6);
+            this.tweens.add({
+              targets: flash, radius: 60, alpha: 0, duration: 300,
+              onComplete: () => flash.destroy()
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private createLockedVerdainaDoor(x: number, y: number, width: number, height: number, target: string, targetSpawn: string): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Door visuals (same as verdainaDoor but with chains)
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x3a1a1a);
+    doorFrame.setStrokeStyle(3, 0x2a0a0a);
+    doorFrame.setDepth(5);
+
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x4a2a2a);
+    doorSurface.setStrokeStyle(2, 0x3a1a1a);
+    doorSurface.setDepth(6);
+
+    // Chain/lock visuals
+    const chain1 = this.add.rectangle(doorX, doorY - 20, width + 6, 6, 0x888888, 0.8);
+    chain1.setDepth(8);
+    const chain2 = this.add.rectangle(doorX, doorY + 20, width + 6, 6, 0x888888, 0.8);
+    chain2.setDepth(8);
+    const lock = this.add.circle(doorX, doorY, 8, 0xaa8844);
+    lock.setStrokeStyle(2, 0x886622);
+    lock.setDepth(9);
+
+    // "Locked" prompt
+    const lockedText = this.add.text(doorX, doorY - 65, 'Defeat the guardian...', {
+      fontSize: '11px', color: '#cc4444', fontFamily: 'Georgia, serif', fontStyle: 'italic'
+    });
+    lockedText.setOrigin(0.5).setDepth(100).setVisible(false);
+
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    // Store references for unlocking
+    this.lockedDoorPrompt = lockedText;
+
+    // Check each frame if enemies are dead
+    const checkUnlock = () => {
+      const aliveEnemies = this.enemies.getChildren().filter(e => {
+        const enemy = e as any;
+        return enemy.active && !enemy.isDying?.();
+      });
+
+      if (aliveEnemies.length === 0 && this.fakeBenchTriggered) {
+        // Unlock the door!
+        this.tweens.add({
+          targets: [chain1, chain2, lock],
+          alpha: 0, duration: 400,
+          onComplete: () => { chain1.destroy(); chain2.destroy(); lock.destroy(); }
+        });
+
+        lockedText.setText('Press E to enter');
+        lockedText.setColor('#44cc44');
+
+        // Now make it function as a real door
+        this.physics.add.overlap(this.player, zone, () => {
+          lockedText.setVisible(true);
+          if (this.input.keyboard && Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('E'))) {
+            this.scene.start('GameScene', { levelId: target, spawnId: targetSpawn });
+          }
+        });
+
+        // Stop checking
+        if (unlockEvent) unlockEvent.remove();
+      }
+    };
+
+    const unlockEvent = this.time.addEvent({ delay: 500, callback: checkUnlock, loop: true });
+
+    // Show locked text on approach
+    this.physics.add.overlap(this.player, zone, () => {
+      if (!this.fakeBenchTriggered) return;
+      const aliveEnemies = this.enemies.getChildren().filter(e => {
+        const enemy = e as any;
+        return enemy.active && !enemy.isDying?.();
+      });
+      if (aliveEnemies.length > 0) {
+        lockedText.setVisible(true);
+      }
+    });
   }
 }
