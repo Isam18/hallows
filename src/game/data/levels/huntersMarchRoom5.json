@@ -1,0 +1,97 @@
+{
+  "id": "huntersMarchRoom5",
+  "name": "Hunter's March - The Gauntlet",
+  "biome": "huntersMarch",
+  "width": 1200,
+  "height": 700,
+  "backgroundColor": "#1a0a0a",
+  "spawnPoint": { "x": 100, "y": 600 },
+  "platforms": [
+    { "x": 0, "y": 650, "width": 1200, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1200, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 1170, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 200, "y": 500, "width": 150, "height": 18, "type": "platform" },
+    { "x": 500, "y": 420, "width": 200, "height": 18, "type": "platform" },
+    { "x": 850, "y": 500, "width": 150, "height": 18, "type": "platform" },
+    { "x": 350, "y": 300, "width": 140, "height": 18, "type": "platform" },
+    { "x": 700, "y": 300, "width": 140, "height": 18, "type": "platform" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room5Back",
+      "type": "lockedVerdainaDoor",
+      "x": 40,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRoom4",
+      "targetSpawn": "fromRoom5"
+    },
+    {
+      "id": "room5Exit",
+      "type": "lockedVerdainaDoor",
+      "x": 1080,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRoom6",
+      "targetSpawn": "default"
+    },
+    {
+      "id": "waveArena",
+      "type": "waveArena",
+      "x": 200,
+      "y": 200,
+      "width": 800,
+      "height": 400
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 600 },
+    "fromRoom4": { "x": 100, "y": 600 }
+  },
+  "special": {
+    "waveArena": true,
+    "waves": [
+      {
+        "wave": 1,
+        "enemies": [
+          { "type": "frontierScout", "x": 200, "y": 600 },
+          { "type": "frontierScout", "x": 600, "y": 600 },
+          { "type": "frontierScout", "x": 1000, "y": 600 }
+        ]
+      },
+      {
+        "wave": 2,
+        "enemies": [
+          { "type": "frontierWarrior", "x": 300, "y": 600, "guaranteed": true },
+          { "type": "frontierWarrior", "x": 900, "y": 600, "guaranteed": true }
+        ]
+      },
+      {
+        "wave": 3,
+        "enemies": [
+          { "type": "wingedWarrior", "x": 200, "y": 350 },
+          { "type": "wingedWarrior", "x": 500, "y": 250 },
+          { "type": "wingedWarrior", "x": 700, "y": 250 },
+          { "type": "wingedWarrior", "x": 1000, "y": 350 }
+        ]
+      },
+      {
+        "wave": 4,
+        "enemies": [
+          { "type": "colonyVanguard", "x": 600, "y": 600 }
+        ]
+      },
+      {
+        "wave": 5,
+        "enemies": [
+          { "type": "wingedCommander", "x": 600, "y": 300 }
+        ]
+      }
+    ]
+  }
+}

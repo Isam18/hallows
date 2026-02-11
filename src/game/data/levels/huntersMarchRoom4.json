@@ -49,6 +49,7 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 500 },
-    "fromRoom3": { "x": 100, "y": 500 }
+    "fromRoom3": { "x": 100, "y": 500 },
+    "fromRoom5": { "x": 850, "y": 500 }
   }
 }
