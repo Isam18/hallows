@@ -21,7 +21,7 @@ export class WingedWarrior extends Phaser.Physics.Arcade.Sprite {
   // Hover
   private hoverBaseY: number;
   private hoverOffset = 0;
-  private hoverSpeed = 40;
+  private hoverSpeed = 120;
   private preferredHeight = 120; // pixels above ground
 
   // Timers
@@ -29,7 +29,7 @@ export class WingedWarrior extends Phaser.Physics.Arcade.Sprite {
   private invulnTimer = 0;
   private hurtFlashTimer = 0;
   private actionCooldown = 0;
-  private actionCooldownMax = 1800;
+  private actionCooldownMax = 1200;
   private stallTimer = 0;
   private stallDuration = 600;
   private diveTimer = 0;
@@ -117,19 +117,23 @@ export class WingedWarrior extends Phaser.Physics.Arcade.Sprite {
     this.setFlipX(this.facingDir < 0);
 
     if (this.aiState === 'hover') {
+      // Update hover base to follow player vertically
+      const targetHoverY = player.y - this.preferredHeight;
+      this.hoverBaseY += (targetHoverY - this.hoverBaseY) * 0.02;
+
       // Hover with sine wave
       const targetY = this.hoverBaseY + Math.sin(this.hoverOffset) * 15;
-      body.setVelocityY((targetY - this.y) * 2);
+      body.setVelocityY((targetY - this.y) * 3);
 
-      // Drift toward player horizontally at moderate range
+      // Actively follow player horizontally
       const dx = player.x - this.x;
-      const preferDist = 100;
-      if (Math.abs(dx) > preferDist + 30) {
+      const preferDist = 80;
+      if (Math.abs(dx) > preferDist + 20) {
         body.setVelocityX(Math.sign(dx) * this.hoverSpeed);
-      } else if (Math.abs(dx) < preferDist - 30) {
-        body.setVelocityX(-Math.sign(dx) * this.hoverSpeed * 0.5);
+      } else if (Math.abs(dx) < preferDist - 20) {
+        body.setVelocityX(-Math.sign(dx) * this.hoverSpeed * 0.4);
       } else {
-        body.setVelocityX(0);
+        body.setVelocityX(Math.sign(dx) * this.hoverSpeed * 0.3);
       }
 
       if (this.actionCooldown <= 0) {
@@ -140,7 +144,7 @@ export class WingedWarrior extends Phaser.Physics.Arcade.Sprite {
 
         if (playerRising && playerClose) {
           this.startHoverSwing();
-        } else if (dist < 250) {
+        } else if (dist < 450) {
           this.startAerialSlam(player);
         }
       }
@@ -162,12 +166,12 @@ export class WingedWarrior extends Phaser.Physics.Arcade.Sprite {
       this.diveTimer -= delta;
       if (this.diveTarget) {
         const angle = Phaser.Math.Angle.Between(this.x, this.y, this.diveTarget.x, this.diveTarget.y);
-        const speed = 280;
+        const speed = 380;
         body.setVelocity(Math.cos(angle) * speed, Math.sin(angle) * speed);
 
         // Hitbox during dive
         if (!this.swingDealt) {
-          const hb = new Phaser.Geom.Rectangle(this.x - 20, this.y - 15, 40, 40);
+          const hb = new Phaser.Geom.Rectangle(this.x - 25, this.y - 20, 50, 50);
           const playerBounds = player.getBounds();
           if (Phaser.Geom.Rectangle.Overlaps(hb, playerBounds)) {
             player.takeDamage(2, this.x);
