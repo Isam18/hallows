@@ -1439,6 +1439,7 @@ export class BootScene extends Phaser.Scene {
     this.createWingedWarriorHurtSprite();
     this.createWingedWarriorUnmaskedSprite();
     this.createWingedWarriorUnmaskedHurtSprite();
+    this.createColonyVanguardSprites();
   }
 
   private createFrontierScoutSprite(): void {
@@ -1986,6 +1987,164 @@ export class BootScene extends Phaser.Scene {
     g.lineBetween(cx + 8, cy + 14, cx + 12, cy + 26);
     g.generateTexture('wingedWarrior_unmasked_hurt', 52, 52);
     g.destroy();
+  }
+
+  private createColonyVanguardSprites(): void {
+    // Normal (armored)
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 44;
+    const cy = 48;
+
+    // Voluminous black fur cloak (behind body)
+    g.fillStyle(0x1a1a1a);
+    g.beginPath();
+    g.moveTo(cx - 26, cy - 10);
+    g.lineTo(cx - 34, cy + 30);
+    g.lineTo(cx - 20, cy + 36);
+    g.lineTo(cx + 20, cy + 36);
+    g.lineTo(cx + 34, cy + 30);
+    g.lineTo(cx + 26, cy - 10);
+    g.closePath();
+    g.fillPath();
+
+    // Cloak tattered edges
+    g.fillStyle(0x222222);
+    g.fillTriangle(cx - 30, cy + 30, cx - 38, cy + 40, cx - 22, cy + 34);
+    g.fillTriangle(cx + 30, cy + 30, cx + 38, cy + 40, cx + 22, cy + 34);
+    g.fillTriangle(cx - 10, cy + 34, cx - 14, cy + 42, cx - 6, cy + 38);
+    g.fillTriangle(cx + 10, cy + 34, cx + 14, cy + 42, cx + 6, cy + 38);
+
+    // Body - thick-plated deep crimson
+    g.fillStyle(0x7a1a1a);
+    g.fillEllipse(cx, cy, 40, 48);
+
+    // Carapace plates
+    g.fillStyle(0x8a2222);
+    g.fillEllipse(cx, cy - 4, 34, 36);
+
+    g.fillStyle(0x9a3333, 0.6);
+    g.fillEllipse(cx - 4, cy - 8, 20, 22);
+
+    // Plate lines
+    g.lineStyle(1.5, 0x5a1111);
+    g.lineBetween(cx - 14, cy - 16, cx - 16, cy + 12);
+    g.lineBetween(cx + 14, cy - 16, cx + 16, cy + 12);
+
+    // Elaborate ivory mask - covers entire head
+    g.fillStyle(0xe8dcc8);
+    g.fillEllipse(cx, cy - 24, 36, 28);
+
+    // Crown-like jagged spikes
+    g.fillStyle(0xd4c8b0);
+    g.fillTriangle(cx - 14, cy - 38, cx - 18, cy - 52, cx - 10, cy - 40);
+    g.fillTriangle(cx - 4, cy - 37, cx - 6, cy - 56, cx, cy - 39);
+    g.fillTriangle(cx + 6, cy - 37, cx + 8, cy - 54, cx + 12, cy - 39);
+    g.fillTriangle(cx + 16, cy - 36, cx + 20, cy - 50, cx + 22, cy - 38);
+
+    // Spike highlights
+    g.fillStyle(0xfff8ee, 0.4);
+    g.fillTriangle(cx - 5, cy - 38, cx - 6, cy - 50, cx - 2, cy - 39);
+    g.fillTriangle(cx + 7, cy - 38, cx + 8, cy - 48, cx + 10, cy - 39);
+
+    // Four eye-holes
+    g.fillStyle(0x0a0a0a);
+    g.fillEllipse(cx - 10, cy - 28, 6, 8);
+    g.fillEllipse(cx - 3, cy - 24, 5, 6);
+    g.fillEllipse(cx + 6, cy - 28, 6, 8);
+    g.fillEllipse(cx + 13, cy - 24, 5, 6);
+
+    // Mask detail lines
+    g.lineStyle(1, 0xb0a898);
+    g.lineBetween(cx - 16, cy - 18, cx + 16, cy - 18);
+    g.lineBetween(cx, cy - 36, cx, cy - 14);
+
+    // Legs - thick armored
+    g.fillStyle(0x6a1818);
+    g.fillRoundedRect(cx - 16, cy + 18, 12, 22, 3);
+    g.fillRoundedRect(cx + 4, cy + 18, 12, 22, 3);
+
+    // Feet
+    g.fillStyle(0x8a2222);
+    g.fillEllipse(cx - 10, cy + 38, 14, 6);
+    g.fillEllipse(cx + 10, cy + 38, 14, 6);
+
+    // Outline
+    g.lineStyle(2, 0x0a0a0a);
+    g.strokeEllipse(cx, cy, 40, 48);
+    g.strokeEllipse(cx, cy - 24, 36, 28);
+
+    g.generateTexture('colonyVanguard', 88, 88);
+    g.destroy();
+
+    // Hurt version
+    const h = this.make.graphics({ x: 0, y: 0 });
+    h.fillStyle(0xffffff);
+    h.fillEllipse(cx, cy, 40, 48);
+    h.fillEllipse(cx, cy - 24, 36, 28);
+    h.fillStyle(0xeeeedd);
+    h.fillTriangle(cx - 14, cy - 38, cx - 18, cy - 52, cx - 10, cy - 40);
+    h.fillTriangle(cx + 6, cy - 37, cx + 8, cy - 54, cx + 12, cy - 39);
+    h.fillRoundedRect(cx - 16, cy + 18, 12, 22, 3);
+    h.fillRoundedRect(cx + 4, cy + 18, 12, 22, 3);
+    h.generateTexture('colonyVanguard_hurt', 88, 88);
+    h.destroy();
+
+    // Cracked (armor broken) version
+    const c = this.make.graphics({ x: 0, y: 0 });
+    // Cloak
+    c.fillStyle(0x1a1a1a);
+    c.beginPath();
+    c.moveTo(cx - 26, cy - 10);
+    c.lineTo(cx - 34, cy + 30);
+    c.lineTo(cx + 34, cy + 30);
+    c.lineTo(cx + 26, cy - 10);
+    c.closePath();
+    c.fillPath();
+
+    // Body - darker, exposed
+    c.fillStyle(0x5a1010);
+    c.fillEllipse(cx, cy, 40, 48);
+    c.fillStyle(0x6a1818);
+    c.fillEllipse(cx, cy - 4, 34, 36);
+
+    // Broken mask fragments still on face
+    c.fillStyle(0xd4c8b0, 0.6);
+    c.fillEllipse(cx - 8, cy - 26, 12, 10);
+    c.fillEllipse(cx + 10, cy - 22, 10, 8);
+
+    // Exposed crimson head
+    c.fillStyle(0x8a2222);
+    c.fillEllipse(cx, cy - 24, 30, 24);
+
+    // Angry glowing eyes
+    c.fillStyle(0xff4422);
+    c.fillEllipse(cx - 8, cy - 26, 6, 7);
+    c.fillEllipse(cx + 8, cy - 26, 6, 7);
+    c.fillStyle(0xffaa44);
+    c.fillCircle(cx - 8, cy - 27, 2);
+    c.fillCircle(cx + 8, cy - 27, 2);
+
+    // Legs
+    c.fillStyle(0x6a1818);
+    c.fillRoundedRect(cx - 16, cy + 18, 12, 22, 3);
+    c.fillRoundedRect(cx + 4, cy + 18, 12, 22, 3);
+
+    c.lineStyle(2, 0x0a0a0a);
+    c.strokeEllipse(cx, cy, 40, 48);
+
+    c.generateTexture('colonyVanguard_cracked', 88, 88);
+    c.destroy();
+
+    // Cracked hurt
+    const ch = this.make.graphics({ x: 0, y: 0 });
+    ch.fillStyle(0xffffff);
+    ch.fillEllipse(cx, cy, 40, 48);
+    ch.fillEllipse(cx, cy - 24, 30, 24);
+    ch.fillStyle(0xeedddd);
+    ch.fillRoundedRect(cx - 16, cy + 18, 12, 22, 3);
+    ch.fillRoundedRect(cx + 4, cy + 18, 12, 22, 3);
+    ch.generateTexture('colonyVanguard_cracked_hurt', 88, 88);
+    ch.destroy();
   }
 
 

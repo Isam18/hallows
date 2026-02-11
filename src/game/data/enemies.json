@@ -390,5 +390,26 @@
     "isHuntersMarch": true,
     "isFlying": true,
     "isElite": true
+  },
+  "colonyVanguard": {
+    "id": "colonyVanguard",
+    "displayName": "Colony Vanguard",
+    "hp": 35,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 20,
+    "moveSpeedAggro": 40,
+    "aggroRangePx": 300,
+    "deaggroRangePx": 400,
+    "knockbackOnHit": { "x": 20, "y": 10 },
+    "hitstunMs": 80,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 50, "max": 80 },
+    "hurtFlashMs": 100,
+    "spriteKey": "colonyVanguard",
+    "width": 64,
+    "height": 70,
+    "isHuntersMarch": true,
+    "isElite": true,
+    "isBoss": true
   }
 }
