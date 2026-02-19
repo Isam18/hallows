@@ -229,7 +229,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0, -500); // Higher jump
     body.setAllowGravity(false);
-    this.actionCooldown = 1600;
+    this.actionCooldown = 2200;
   }
 
   // Jump Attack - like Failed Knight: quick leap forward and slam down
@@ -247,7 +247,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
     body.setVelocity(this.facingDir * 250, -350);
     this.scytheAngle = -60; // Wind up scythe overhead
 
-    this.actionCooldown = 1200;
+    this.actionCooldown = 1800;
   }
 
   private updateJumpAttack(player: Player, delta: number): void {
@@ -296,7 +296,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
         }
 
         this.aiState = 'march';
-        this.actionCooldown = 800;
+        this.actionCooldown = 1200;
       }
     }
   }
@@ -359,7 +359,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       });
     }
 
-    this.actionCooldown = 2500;
+    this.actionCooldown = 3200;
   }
 
   private updateBurrow(player: Player, delta: number): void {
@@ -576,7 +576,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       if (this.sweepTimer <= 0) {
         this.sweepHitbox = null;
         this.scytheAngle = 0;
-        this.actionCooldown = this.enraged ? 600 : 1000; // Faster cooldown (was 800/1400)
+        this.actionCooldown = this.enraged ? 900 : 1400;
         this.aiState = 'march';
       }
     }
@@ -613,7 +613,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
         this.createShockwave(player);
         this.scene.cameras.main.shake(200, 0.01);
         this.aiState = 'march';
-        this.actionCooldown = 900;
+        this.actionCooldown = 1400;
       }
       this.leapTimer -= delta;
       if (this.leapTimer <= 0) {

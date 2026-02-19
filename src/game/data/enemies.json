@@ -394,8 +394,8 @@
   "colonyVanguard": {
     "id": "colonyVanguard",
     "displayName": "Colony Vanguard",
-    "hp": 35,
-    "contactDamage": 2,
+    "hp": 28,
+    "contactDamage": 1,
     "moveSpeedPatrol": 20,
     "moveSpeedAggro": 40,
     "aggroRangePx": 300,
