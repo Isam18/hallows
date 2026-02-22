@@ -63,6 +63,7 @@
   "spawns": {
     "default": { "x": 100, "y": 600 },
     "fromRoom4": { "x": 100, "y": 600 },
+    "fromRoom6": { "x": 1050, "y": 600 },
     "benchGauntlet": { "x": 550, "y": 260 }
   },
   "special": {

@@ -1,0 +1,44 @@
+{
+  "id": "huntersMarchRoom6",
+  "name": "Hunter's March - The Camp",
+  "biome": "huntersMarch",
+  "width": 1000,
+  "height": 600,
+  "backgroundColor": "#1a0a0a",
+  "spawnPoint": { "x": 100, "y": 500 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 1000, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1000, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall" },
+    { "x": 970, "y": 30, "width": 30, "height": 520, "type": "wall" }
+  ],
+  "enemies": [
+    { "type": "frontierScout", "x": 400, "y": 500, "behavior": "patrol" },
+    { "type": "frontierWarrior", "x": 600, "y": 500, "behavior": "patrol" }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "campfire",
+      "type": "campfire",
+      "x": 500,
+      "y": 530,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "id": "room6Back",
+      "type": "verdainaDoor",
+      "x": 40,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRoom5",
+      "targetSpawn": "fromRoom6"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 500 },
+    "fromRoom5": { "x": 100, "y": 500 }
+  }
+}

@@ -78,6 +78,7 @@ import huntersMarchRoom2Data from '../data/levels/huntersMarchRoom2.json';
 import huntersMarchRoom3Data from '../data/levels/huntersMarchRoom3.json';
 import huntersMarchRoom4Data from '../data/levels/huntersMarchRoom4.json';
 import huntersMarchRoom5Data from '../data/levels/huntersMarchRoom5.json';
+import huntersMarchRoom6Data from '../data/levels/huntersMarchRoom6.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -115,6 +116,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRoom3: huntersMarchRoom3Data as unknown as LevelConfig,
   huntersMarchRoom4: huntersMarchRoom4Data as unknown as LevelConfig,
   huntersMarchRoom5: huntersMarchRoom5Data as unknown as LevelConfig,
+  huntersMarchRoom6: huntersMarchRoom6Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -462,6 +464,8 @@ export class GameScene extends Phaser.Scene {
         this.createLockedVerdainaDoor(t.x, t.y, t.width, t.height, t.target!, t.targetSpawn || 'default');
       } else if (t.type === 'waveArena') {
         this.setupWaveArena();
+      } else if (t.type === 'campfire') {
+        this.createCampfire(t.x, t.y);
       }
     });
     
@@ -2410,6 +2414,49 @@ export class GameScene extends Phaser.Scene {
           });
         }
       }
+    });
+  }
+
+  private createCampfire(x: number, y: number): void {
+    // Fire base (logs)
+    const log1 = this.add.rectangle(x - 8, y + 8, 24, 6, 0x5c3a1a);
+    log1.setAngle(15);
+    log1.setDepth(3);
+    const log2 = this.add.rectangle(x + 8, y + 8, 24, 6, 0x4a2e14);
+    log2.setAngle(-15);
+    log2.setDepth(3);
+
+    // Fire glow on ground
+    const glow = this.add.circle(x, y, 50, 0xff6600, 0.08);
+    glow.setDepth(1);
+
+    // Animated fire particles
+    const fireColors = [0xff4400, 0xff6600, 0xffaa00, 0xffcc00];
+    const fireParticles: Phaser.GameObjects.Arc[] = [];
+
+    for (let i = 0; i < 8; i++) {
+      const color = fireColors[Phaser.Math.Between(0, fireColors.length - 1)];
+      const particle = this.add.circle(x, y, Phaser.Math.Between(3, 6), color, 0.8);
+      particle.setDepth(4);
+      fireParticles.push(particle);
+    }
+
+    // Animate fire particles
+    this.time.addEvent({
+      delay: 80,
+      loop: true,
+      callback: () => {
+        fireParticles.forEach(p => {
+          p.x = x + Phaser.Math.Between(-10, 10);
+          p.y = y + Phaser.Math.Between(-20, -2);
+          p.setScale(Phaser.Math.FloatBetween(0.5, 1.2));
+          p.setAlpha(Phaser.Math.FloatBetween(0.4, 0.9));
+          const color = fireColors[Phaser.Math.Between(0, fireColors.length - 1)];
+          p.setFillStyle(color);
+        });
+        // Flicker glow
+        glow.setAlpha(Phaser.Math.FloatBetween(0.06, 0.12));
+      },
     });
   }
 
