@@ -15,14 +15,25 @@
     { "x": 500, "y": 420, "width": 200, "height": 18, "type": "platform" },
     { "x": 850, "y": 500, "width": 150, "height": 18, "type": "platform" },
     { "x": 350, "y": 300, "width": 140, "height": 18, "type": "platform" },
+    { "x": 500, "y": 300, "width": 200, "height": 18, "type": "platform" },
     { "x": 700, "y": 300, "width": 140, "height": 18, "type": "platform" }
   ],
   "enemies": [],
   "pickups": [],
   "triggers": [
     {
+      "id": "gauntletBench",
+      "type": "bench",
+      "benchTypeId": "combat_bench",
+      "x": 550,
+      "y": 260,
+      "width": 60,
+      "height": 40,
+      "spawnId": "benchGauntlet"
+    },
+    {
       "id": "room5Back",
-      "type": "lockedVerdainaDoor",
+      "type": "verdainaDoor",
       "x": 40,
       "y": 550,
       "width": 50,
@@ -51,7 +62,8 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 600 },
-    "fromRoom4": { "x": 100, "y": 600 }
+    "fromRoom4": { "x": 100, "y": 600 },
+    "benchGauntlet": { "x": 550, "y": 260 }
   },
   "special": {
     "waveArena": true,
