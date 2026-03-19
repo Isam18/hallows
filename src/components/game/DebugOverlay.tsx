@@ -11,7 +11,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
   const prevDebugMode = useRef(false);
 
-  // F1 manual override
+  // F1 manual override for movement overlay, A to toggle debug mode on/off
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'F1') {
@@ -21,11 +21,21 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           return !currentlyVisible;
         });
       }
+      if (e.code === 'KeyA' && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        // Only toggle if not typing in an input
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        
+        if (gameRef) {
+          const current = gameRef.registry?.get('debugMode') ?? false;
+          gameRef.registry.set('debugMode', !current);
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [gameRef]);
 
   // Poll debugMode from registry and player debug state
   useEffect(() => {
