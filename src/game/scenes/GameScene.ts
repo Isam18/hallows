@@ -2129,7 +2129,23 @@ export class GameScene extends Phaser.Scene {
   /**
    * Check if all enemies are dead and summon boss for Moss Titan Arena
    */
+  private bossExitDoorOpened = false;
+
   private checkBossSummon(): void {
+    // Check Skull Ravager Arena - open exit door when all enemies dead
+    if (this.levelId === 'skullRavagerArena' && !this.bossExitDoorOpened) {
+      const activeEnemies = this.enemies.getChildren().filter((enemy) => {
+        const e = enemy as any;
+        return !e.isDying();
+      });
+      if (activeEnemies.length === 0) {
+        this.bossExitDoorOpened = true;
+        this.time.delayedCall(1500, () => {
+          this.openBossExitDoor();
+        });
+      }
+    }
+
     // Only for Moss Titan Arena level
     if (this.levelId !== 'mossTitanArena') return;
     
