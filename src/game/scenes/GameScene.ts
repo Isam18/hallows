@@ -2367,6 +2367,10 @@ export class GameScene extends Phaser.Scene {
   private waveArenaActive = false;
   private currentWaveIndex = 0;
   private waveArenaComplete = false;
+  private waveBenchBlocker: Phaser.GameObjects.Rectangle | null = null;
+  private waveBenchMidRest = false;
+  private waveArenaWaves: any[] | null = null;
+  private waveArenaText: Phaser.GameObjects.Text | null = null;
 
   private createFakeBench(x: number, y: number, data: any): void {
     const benchSeat = this.add.rectangle(x, y, 50, 12, 0x8b7355);
