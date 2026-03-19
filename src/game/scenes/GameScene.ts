@@ -2685,4 +2685,53 @@ export class GameScene extends Phaser.Scene {
       }
     });
   }
+
+  /**
+   * After wave 2, remove bench blocker, teleport player to bench for a rest
+   */
+  private grantMidArenaBenchRest(waves: any[], waveText: Phaser.GameObjects.Text): void {
+    // Remove the bench blocker
+    if (this.waveBenchBlocker) {
+      this.waveBenchBlocker.destroy();
+      this.waveBenchBlocker = null;
+    }
+
+    // Show message
+    waveText.setText('REST AT THE BENCH').setColor('#44bbff').setVisible(true);
+
+    // Teleport player to bench location
+    const benchTrigger = this.currentLevel.triggers.find(t => t.type === 'bench' as any);
+    if (benchTrigger && this.player) {
+      this.player.setPosition(benchTrigger.x + 30, benchTrigger.y - 20);
+      this.player.setVelocity(0, 0);
+    }
+  }
+
+  /**
+   * After mid-arena bench rest, teleport player back, re-block bench, continue waves
+   */
+  private resumeArenaAfterBenchRest(): void {
+    // Teleport player back to the floor
+    if (this.player) {
+      this.player.setPosition(600, 600);
+      this.player.setVelocity(0, 0);
+    }
+
+    // Re-block the bench
+    const benchTrigger = this.currentLevel.triggers.find(t => t.type === 'bench' as any);
+    if (benchTrigger) {
+      this.waveBenchBlocker = this.add.rectangle(
+        benchTrigger.x + 30, benchTrigger.y - 10, 80, 60, 0x882222, 0.6
+      );
+      this.physics.add.existing(this.waveBenchBlocker, true);
+      if (this.player) {
+        this.physics.add.collider(this.player, this.waveBenchBlocker);
+      }
+    }
+
+    // Continue waves
+    if (this.waveArenaWaves && this.waveArenaText) {
+      this.time.delayedCall(1500, () => this.spawnNextWave(this.waveArenaWaves!, this.waveArenaText!));
+    }
+  }
 }
