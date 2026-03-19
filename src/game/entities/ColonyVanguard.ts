@@ -587,7 +587,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       if (this.leapTimer <= 0) {
         if (this.leapPhase === 'rising') {
           this.leapPhase = 'hanging';
-          this.leapHangTimer = 350; // Faster hang (was 500)
+          this.leapHangTimer = 550; // Longer hang time at apex
           const body = this.body as Phaser.Physics.Arcade.Body;
           body.setVelocity(0, 0);
           this.leapTarget = { x: player.x, y: player.y };
