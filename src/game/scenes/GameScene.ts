@@ -1326,6 +1326,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   resumeFromBench(): void {
+    // If this is a mid-arena bench rest, don't respawn enemies - continue waves
+    if (this.waveArenaActive && this.waveBenchMidRest && !this.waveArenaComplete) {
+      // Clear bench tracking
+      this.currentBench = null;
+      this.activeBenchConfig = null;
+      
+      // Resume gameplay
+      gameState.setState('playing');
+      this.emitUIEvent('benchClosed', null);
+      
+      // Teleport back and continue arena
+      this.resumeArenaAfterBenchRest();
+      return;
+    }
+    
     // Handle enemy respawn based on bench config
     if (this.activeBenchConfig) {
       const respawnMode = this.activeBenchConfig.enemyRespawnMode;
