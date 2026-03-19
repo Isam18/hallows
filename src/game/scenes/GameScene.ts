@@ -2673,7 +2673,14 @@ export class GameScene extends Phaser.Scene {
         if (alive.length === 0) {
           checkWaveClear.remove();
           this.currentWaveIndex++;
-          this.time.delayedCall(1500, () => this.spawnNextWave(waves, waveText));
+          
+          // After wave 2 (index becomes 2), grant mid-arena bench rest
+          if (this.currentWaveIndex === 2 && !this.waveBenchMidRest) {
+            this.waveBenchMidRest = true;
+            this.grantMidArenaBenchRest(waves, waveText);
+          } else {
+            this.time.delayedCall(1500, () => this.spawnNextWave(waves, waveText));
+          }
         }
       }
     });
