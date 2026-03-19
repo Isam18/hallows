@@ -199,6 +199,7 @@ export class GameScene extends Phaser.Scene {
     this.waveArenaActive = false;
     this.currentWaveIndex = 0;
     this.waveArenaComplete = false;
+    this.bossExitDoorOpened = false;
   }
 
   create(): void {
