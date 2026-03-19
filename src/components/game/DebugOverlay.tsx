@@ -11,7 +11,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
   const prevDebugMode = useRef(false);
 
-  // F1 manual override
+  // F1 manual override for movement overlay, A to toggle debug mode on/off
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.code === 'F1') {
@@ -21,11 +21,21 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           return !currentlyVisible;
         });
       }
+      if (e.code === 'KeyA' && !e.repeat && !e.ctrlKey && !e.altKey && !e.metaKey) {
+        // Only toggle if not typing in an input
+        const tag = (e.target as HTMLElement)?.tagName;
+        if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+        
+        if (gameRef) {
+          const current = gameRef.registry?.get('debugMode') ?? false;
+          gameRef.registry.set('debugMode', !current);
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+  }, [gameRef]);
 
   // Poll debugMode from registry and player debug state
   useEffect(() => {
@@ -190,12 +200,13 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           <button onClick={() => handleTeleport('huntersMarchRoom3')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors">HM Room 3</button>
           <button onClick={() => handleTeleport('huntersMarchRoom4')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors">HM Room 4</button>
           <button onClick={() => handleTeleport('huntersMarchRoom5')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold">⚔️ HM Gauntlet</button>
+          <button onClick={() => handleTeleport('huntersMarchRoom6')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors">HM Room 6: Camp</button>
           <button onClick={() => handleTeleport('mossTitanArena')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Moss Titan Arena</button>
         </div>
       </div>
 
       <div className="mt-3 pt-2 border-t border-border text-xs text-muted-foreground text-center">
-        Press F1 to toggle
+        Press A to toggle debug · F1 for overlay
       </div>
     </div>
   );
