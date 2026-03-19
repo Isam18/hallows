@@ -199,6 +199,10 @@ export class GameScene extends Phaser.Scene {
     this.waveArenaActive = false;
     this.currentWaveIndex = 0;
     this.waveArenaComplete = false;
+    this.waveBenchBlocker = null;
+    this.waveBenchMidRest = false;
+    this.waveArenaWaves = null;
+    this.waveArenaText = null;
     this.bossExitDoorOpened = false;
   }
 
@@ -1326,6 +1330,21 @@ export class GameScene extends Phaser.Scene {
   }
 
   resumeFromBench(): void {
+    // If this is a mid-arena bench rest, don't respawn enemies - continue waves
+    if (this.waveArenaActive && this.waveBenchMidRest && !this.waveArenaComplete) {
+      // Clear bench tracking
+      this.currentBench = null;
+      this.activeBenchConfig = null;
+      
+      // Resume gameplay
+      gameState.setState('playing');
+      this.emitUIEvent('benchClosed', null);
+      
+      // Teleport back and continue arena
+      this.resumeArenaAfterBenchRest();
+      return;
+    }
+    
     // Handle enemy respawn based on bench config
     if (this.activeBenchConfig) {
       const respawnMode = this.activeBenchConfig.enemyRespawnMode;
@@ -2367,6 +2386,10 @@ export class GameScene extends Phaser.Scene {
   private waveArenaActive = false;
   private currentWaveIndex = 0;
   private waveArenaComplete = false;
+  private waveBenchBlocker: Phaser.GameObjects.Rectangle | null = null;
+  private waveBenchMidRest = false;
+  private waveArenaWaves: any[] | null = null;
+  private waveArenaText: Phaser.GameObjects.Text | null = null;
 
   private createFakeBench(x: number, y: number, data: any): void {
     const benchSeat = this.add.rectangle(x, y, 50, 12, 0x8b7355);
@@ -2569,11 +2592,23 @@ export class GameScene extends Phaser.Scene {
     const zone = this.add.zone(trigger.x + trigger.width / 2, trigger.y + trigger.height / 2, trigger.width, trigger.height);
     this.physics.add.existing(zone, true);
 
+    // Block the bench with a barrier until needed
+    const benchTrigger = this.currentLevel.triggers.find(t => t.type === 'bench' as any);
+    if (benchTrigger) {
+      this.waveBenchBlocker = this.add.rectangle(
+        benchTrigger.x + 30, benchTrigger.y - 10, 80, 60, 0x882222, 0.6
+      );
+      this.physics.add.existing(this.waveBenchBlocker, true);
+      this.physics.add.collider(this.player!, this.waveBenchBlocker);
+    }
+
     // Wave counter text
     const waveText = this.add.text(this.currentLevel.width / 2, 60, '', {
       fontSize: '18px', color: '#ff6644', fontFamily: 'Georgia, serif', fontStyle: 'bold'
     });
     waveText.setOrigin(0.5).setDepth(200).setVisible(false).setScrollFactor(0);
+    this.waveArenaText = waveText;
+    this.waveArenaWaves = special.waves;
 
     const startWaves = () => {
       if (this.waveArenaActive) return;
@@ -2613,6 +2648,12 @@ export class GameScene extends Phaser.Scene {
       waveText.setText('THE GATE OPENS').setColor('#44cc44');
       this.cameras.main.shake(300, 0.01);
       this.time.delayedCall(2000, () => waveText.setVisible(false));
+      
+      // Permanently remove bench blocker
+      if (this.waveBenchBlocker) {
+        this.waveBenchBlocker.destroy();
+        this.waveBenchBlocker = null;
+      }
       return;
     }
 
@@ -2657,9 +2698,65 @@ export class GameScene extends Phaser.Scene {
         if (alive.length === 0) {
           checkWaveClear.remove();
           this.currentWaveIndex++;
-          this.time.delayedCall(1500, () => this.spawnNextWave(waves, waveText));
+          
+          // After wave 2 (index becomes 2), grant mid-arena bench rest
+          if (this.currentWaveIndex === 2 && !this.waveBenchMidRest) {
+            this.waveBenchMidRest = true;
+            this.grantMidArenaBenchRest(waves, waveText);
+          } else {
+            this.time.delayedCall(1500, () => this.spawnNextWave(waves, waveText));
+          }
         }
       }
     });
+  }
+
+  /**
+   * After wave 2, remove bench blocker, teleport player to bench for a rest
+   */
+  private grantMidArenaBenchRest(waves: any[], waveText: Phaser.GameObjects.Text): void {
+    // Remove the bench blocker
+    if (this.waveBenchBlocker) {
+      this.waveBenchBlocker.destroy();
+      this.waveBenchBlocker = null;
+    }
+
+    // Show message
+    waveText.setText('REST AT THE BENCH').setColor('#44bbff').setVisible(true);
+
+    // Teleport player to bench location
+    const benchTrigger = this.currentLevel.triggers.find(t => t.type === 'bench' as any);
+    if (benchTrigger && this.player) {
+      this.player.setPosition(benchTrigger.x + 30, benchTrigger.y - 20);
+      this.player.setVelocity(0, 0);
+    }
+  }
+
+  /**
+   * After mid-arena bench rest, teleport player back, re-block bench, continue waves
+   */
+  private resumeArenaAfterBenchRest(): void {
+    // Teleport player back to the floor
+    if (this.player) {
+      this.player.setPosition(600, 600);
+      this.player.setVelocity(0, 0);
+    }
+
+    // Re-block the bench
+    const benchTrigger = this.currentLevel.triggers.find(t => t.type === 'bench' as any);
+    if (benchTrigger) {
+      this.waveBenchBlocker = this.add.rectangle(
+        benchTrigger.x + 30, benchTrigger.y - 10, 80, 60, 0x882222, 0.6
+      );
+      this.physics.add.existing(this.waveBenchBlocker, true);
+      if (this.player) {
+        this.physics.add.collider(this.player, this.waveBenchBlocker);
+      }
+    }
+
+    // Continue waves
+    if (this.waveArenaWaves && this.waveArenaText) {
+      this.time.delayedCall(1500, () => this.spawnNextWave(this.waveArenaWaves!, this.waveArenaText!));
+    }
   }
 }
