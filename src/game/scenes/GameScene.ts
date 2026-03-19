@@ -2573,11 +2573,23 @@ export class GameScene extends Phaser.Scene {
     const zone = this.add.zone(trigger.x + trigger.width / 2, trigger.y + trigger.height / 2, trigger.width, trigger.height);
     this.physics.add.existing(zone, true);
 
+    // Block the bench with a barrier until needed
+    const benchTrigger = this.currentLevel.triggers.find(t => t.type === 'bench' as any);
+    if (benchTrigger) {
+      this.waveBenchBlocker = this.add.rectangle(
+        benchTrigger.x + 30, benchTrigger.y - 10, 80, 60, 0x882222, 0.6
+      );
+      this.physics.add.existing(this.waveBenchBlocker, true);
+      this.physics.add.collider(this.player!, this.waveBenchBlocker);
+    }
+
     // Wave counter text
     const waveText = this.add.text(this.currentLevel.width / 2, 60, '', {
       fontSize: '18px', color: '#ff6644', fontFamily: 'Georgia, serif', fontStyle: 'bold'
     });
     waveText.setOrigin(0.5).setDepth(200).setVisible(false).setScrollFactor(0);
+    this.waveArenaText = waveText;
+    this.waveArenaWaves = special.waves;
 
     const startWaves = () => {
       if (this.waveArenaActive) return;
