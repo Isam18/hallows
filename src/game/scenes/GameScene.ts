@@ -2644,6 +2644,12 @@ export class GameScene extends Phaser.Scene {
       waveText.setText('THE GATE OPENS').setColor('#44cc44');
       this.cameras.main.shake(300, 0.01);
       this.time.delayedCall(2000, () => waveText.setVisible(false));
+      
+      // Permanently remove bench blocker
+      if (this.waveBenchBlocker) {
+        this.waveBenchBlocker.destroy();
+        this.waveBenchBlocker = null;
+      }
       return;
     }
 
