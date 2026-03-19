@@ -228,16 +228,16 @@ export class WingedCommander extends Phaser.Physics.Arcade.Sprite {
   // === AERIAL GROUND SMASH ===
   private startDive(): void {
     this.aiState = 'dive_windup';
-    this.stateTimer = 700;
+    this.stateTimer = 400;
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0, -200); // Higher rise before diving
+    body.setVelocity(0, -100); // Brief rise before diving
 
     // Warning indicator
-    const warning = this.scene.add.circle(this.x, this.y + 300, 20, 0xff2222, 0.3);
+    const warning = this.scene.add.circle(this.x, this.y + 200, 20, 0xff2222, 0.3);
     this.scene.tweens.add({
       targets: warning,
       alpha: 0, scaleX: 3, scaleY: 0.3,
-      duration: 700,
+      duration: 400,
       onComplete: () => warning.destroy()
     });
   }
