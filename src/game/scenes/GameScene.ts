@@ -1229,6 +1229,68 @@ export class GameScene extends Phaser.Scene {
       this.showAntElderVictory();
     }
   }
+
+  showAntElderVictory(): void {
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+
+    // Background bar
+    const bgBar = this.add.rectangle(centerX, centerY, 0, 80, 0x000000, 0.9);
+    bgBar.setScrollFactor(0);
+    bgBar.setDepth(1000);
+
+    // Victory text - red and dark green
+    const victoryText = this.add.text(centerX, centerY, 'ANT ELDER HAS BEEN DEFEATED', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '36px',
+      color: '#cc2222',
+      fontStyle: 'bold italic',
+      stroke: '#1a3a1a',
+      strokeThickness: 6,
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: '#002200',
+        blur: 5,
+        fill: true
+      }
+    });
+    victoryText.setOrigin(0.5);
+    victoryText.setScrollFactor(0);
+    victoryText.setDepth(1001);
+    victoryText.setAlpha(0);
+
+    this.tweens.add({
+      targets: bgBar,
+      width: 700,
+      duration: 400,
+      ease: 'Power2'
+    });
+
+    this.tweens.add({
+      targets: victoryText,
+      alpha: 1,
+      scale: { from: 0.8, to: 1 },
+      duration: 600,
+      delay: 300,
+      ease: 'Elastic.easeOut'
+    });
+
+    // After 4 seconds, transition to the post-Ant-Elder chain room
+    this.time.delayedCall(4000, () => {
+      this.tweens.add({
+        targets: [victoryText, bgBar],
+        alpha: 0,
+        duration: 500,
+        ease: 'Power2',
+        onComplete: () => {
+          victoryText.destroy();
+          bgBar.destroy();
+          this.transitionToLevel('chainRoomPostAntElder', 'fromBoss');
+        }
+      });
+    });
+  }
   
   showMossTitanVictory(): void {
     const centerX = this.cameras.main.width / 2;
