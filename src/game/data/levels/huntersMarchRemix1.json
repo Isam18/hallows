@@ -1,0 +1,51 @@
+{
+  "id": "huntersMarchRemix1",
+  "name": "Hunter's March - Remix",
+  "biome": "huntersMarch",
+  "width": 1000,
+  "height": 700,
+  "backgroundColor": "#1a0a0a",
+  "spawnPoint": { "x": 100, "y": 600 },
+  "platforms": [
+    { "x": 0, "y": 650, "width": 1000, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1000, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 970, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 200, "y": 520, "width": 140, "height": 18, "type": "platform" },
+    { "x": 660, "y": 520, "width": 140, "height": 18, "type": "platform" },
+    { "x": 420, "y": 400, "width": 160, "height": 18, "type": "platform" }
+  ],
+  "enemies": [
+    { "type": "frontierWarrior", "x": 350, "y": 600, "behavior": "patrol", "guaranteed": true },
+    { "type": "frontierWarrior", "x": 650, "y": 600, "behavior": "patrol", "guaranteed": true },
+    { "type": "wingedWarrior", "x": 450, "y": 350, "behavior": "patrol", "guaranteed": true }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "remix1Back",
+      "type": "verdainaDoor",
+      "x": 40,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRoom6",
+      "targetSpawn": "fromRemix"
+    },
+    {
+      "id": "remix1Exit",
+      "type": "verdainaDoor",
+      "x": 880,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRemix2",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 600 },
+    "fromCamp": { "x": 100, "y": 600 },
+    "fromRemix2": { "x": 850, "y": 600 }
+  }
+}

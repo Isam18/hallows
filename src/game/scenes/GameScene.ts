@@ -79,6 +79,10 @@ import huntersMarchRoom3Data from '../data/levels/huntersMarchRoom3.json';
 import huntersMarchRoom4Data from '../data/levels/huntersMarchRoom4.json';
 import huntersMarchRoom5Data from '../data/levels/huntersMarchRoom5.json';
 import huntersMarchRoom6Data from '../data/levels/huntersMarchRoom6.json';
+import huntersMarchRemix1Data from '../data/levels/huntersMarchRemix1.json';
+import huntersMarchRemix2Data from '../data/levels/huntersMarchRemix2.json';
+import huntersMarchRemix3Data from '../data/levels/huntersMarchRemix3.json';
+import huntersMarchRemix4Data from '../data/levels/huntersMarchRemix4.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -117,6 +121,10 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRoom4: huntersMarchRoom4Data as unknown as LevelConfig,
   huntersMarchRoom5: huntersMarchRoom5Data as unknown as LevelConfig,
   huntersMarchRoom6: huntersMarchRoom6Data as unknown as LevelConfig,
+  huntersMarchRemix1: huntersMarchRemix1Data as unknown as LevelConfig,
+  huntersMarchRemix2: huntersMarchRemix2Data as unknown as LevelConfig,
+  huntersMarchRemix3: huntersMarchRemix3Data as unknown as LevelConfig,
+  huntersMarchRemix4: huntersMarchRemix4Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
