@@ -35,6 +35,26 @@
       "height": 100,
       "target": "huntersMarchRoom5",
       "targetSpawn": "fromRoom6"
+    },
+    {
+      "id": "replayDoor",
+      "type": "verdainaDoor",
+      "x": 700,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarch",
+      "targetSpawn": "default"
+    },
+    {
+      "id": "forwardDoor",
+      "type": "verdainaDoor",
+      "x": 880,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "fadingTown",
+      "targetSpawn": "default"
     }
   ],
   "spawns": {
