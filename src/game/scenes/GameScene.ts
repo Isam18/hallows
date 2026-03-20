@@ -127,6 +127,8 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRemix2: huntersMarchRemix2Data as unknown as LevelConfig,
   huntersMarchRemix3: huntersMarchRemix3Data as unknown as LevelConfig,
   huntersMarchRemix4: huntersMarchRemix4Data as unknown as LevelConfig,
+  huntersMarchBenchRoom: huntersMarchBenchRoomData as unknown as LevelConfig,
+  huntersMarchBossArena: huntersMarchBossArenaData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
