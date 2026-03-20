@@ -2868,6 +2868,8 @@ export class GameScene extends Phaser.Scene {
   private generateRemixEnemies(): Array<{ type: string; x: number; y: number; behavior: string; guaranteed?: boolean }> {
     const groundTypes = ['frontierScout', 'frontierWarrior'];
     const flyingTypes = ['wingedWarrior'];
+    const rareGroundTypes = ['colonyVanguard'];
+    const rareFlyingTypes = ['wingedCommander'];
     const allTypes = [...groundTypes, ...flyingTypes];
     
     const groundY = this.currentLevel.height - 100;
@@ -2879,19 +2881,24 @@ export class GameScene extends Phaser.Scene {
     const count = Phaser.Math.Between(2, 5);
     const enemies: Array<{ type: string; x: number; y: number; behavior: string; guaranteed?: boolean }> = [];
     
-    for (let i = 0; i < count; i++) {
+    // 20% chance to include one rare enemy per room
+    let hasRare = false;
+    if (Math.random() < 0.2) {
+      hasRare = true;
+      const rareType = Phaser.Utils.Array.GetRandom([...rareGroundTypes, ...rareFlyingTypes]);
+      const isFlying = rareFlyingTypes.includes(rareType);
+      const x = Phaser.Math.Between(minX, maxX);
+      const y = isFlying ? flyingY : groundY;
+      enemies.push({ type: rareType, x, y, behavior: 'patrol', guaranteed: true });
+    }
+    
+    const remaining = hasRare ? count - 1 : count;
+    for (let i = 0; i < remaining; i++) {
       const type = Phaser.Utils.Array.GetRandom(allTypes);
       const isFlying = flyingTypes.includes(type);
       const x = Phaser.Math.Between(minX, maxX);
       const y = isFlying ? flyingY : groundY;
-      
-      enemies.push({
-        type,
-        x,
-        y,
-        behavior: 'patrol',
-        guaranteed: true
-      });
+      enemies.push({ type, x, y, behavior: 'patrol', guaranteed: true });
     }
     
     return enemies;
