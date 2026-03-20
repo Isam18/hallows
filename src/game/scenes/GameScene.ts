@@ -86,6 +86,7 @@ import huntersMarchRemix3Data from '../data/levels/huntersMarchRemix3.json';
 import huntersMarchRemix4Data from '../data/levels/huntersMarchRemix4.json';
 import huntersMarchBenchRoomData from '../data/levels/huntersMarchBenchRoom.json';
 import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json';
+import chainRoomPostAntElderData from '../data/levels/chainRoomPostAntElder.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -130,6 +131,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRemix4: huntersMarchRemix4Data as unknown as LevelConfig,
   huntersMarchBenchRoom: huntersMarchBenchRoomData as unknown as LevelConfig,
   huntersMarchBossArena: huntersMarchBossArenaData as unknown as LevelConfig,
+  chainRoomPostAntElder: chainRoomPostAntElderData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -470,6 +472,9 @@ export class GameScene extends Phaser.Scene {
       } else if (t.type === 'verdantDoor') {
         // Light green plant door (unopenable for now)
         this.createVerdantDoor(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'fungusDoor') {
+        // Fungus yellow/black door (unopenable for now)
+        this.createFungusDoor(t.x, t.y, t.width, t.height);
       } else if (t.type === 'bossExitTransition') {
         // Hidden exit that appears after boss is defeated
         this.createBossExitDoor(t.x, t.y, t.width, t.height, t.target, t.targetSpawn);
@@ -1218,6 +1223,73 @@ export class GameScene extends Phaser.Scene {
       reward: 100,
     });
     this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+
+    // Determine which boss was defeated and show appropriate victory
+    if (this.levelId === 'huntersMarchBossArena') {
+      this.showAntElderVictory();
+    }
+  }
+
+  showAntElderVictory(): void {
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+
+    // Background bar
+    const bgBar = this.add.rectangle(centerX, centerY, 0, 80, 0x000000, 0.9);
+    bgBar.setScrollFactor(0);
+    bgBar.setDepth(1000);
+
+    // Victory text - red and dark green
+    const victoryText = this.add.text(centerX, centerY, 'ANT ELDER HAS BEEN DEFEATED', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '36px',
+      color: '#cc2222',
+      fontStyle: 'bold italic',
+      stroke: '#1a3a1a',
+      strokeThickness: 6,
+      shadow: {
+        offsetX: 2,
+        offsetY: 2,
+        color: '#002200',
+        blur: 5,
+        fill: true
+      }
+    });
+    victoryText.setOrigin(0.5);
+    victoryText.setScrollFactor(0);
+    victoryText.setDepth(1001);
+    victoryText.setAlpha(0);
+
+    this.tweens.add({
+      targets: bgBar,
+      width: 700,
+      duration: 400,
+      ease: 'Power2'
+    });
+
+    this.tweens.add({
+      targets: victoryText,
+      alpha: 1,
+      scale: { from: 0.8, to: 1 },
+      duration: 600,
+      delay: 300,
+      ease: 'Elastic.easeOut'
+    });
+
+    // After 4 seconds, transition to the post-Ant-Elder chain room
+    this.time.delayedCall(4000, () => {
+      this.tweens.add({
+        targets: [victoryText, bgBar],
+        alpha: 0,
+        duration: 500,
+        ease: 'Power2',
+        onComplete: () => {
+          victoryText.destroy();
+          bgBar.destroy();
+          this.transitionToLevel('chainRoomPostAntElder', 'fromBoss');
+        }
+      });
+    });
   }
   
   showMossTitanVictory(): void {
@@ -1507,6 +1579,12 @@ export class GameScene extends Phaser.Scene {
     if ((this as any)._verdantDoorZone && (this as any)._verdantDoorText) {
       const inRange = this.physics.overlap(this.player, (this as any)._verdantDoorZone);
       (this as any)._verdantDoorText.setVisible(inRange);
+    }
+
+    // Check fungus door proximity
+    if ((this as any)._fungusDoorZone && (this as any)._fungusDoorText) {
+      const inRange = this.physics.overlap(this.player, (this as any)._fungusDoorZone);
+      (this as any)._fungusDoorText.setVisible(inRange);
     }
 
     // Check verdaina door proximity
@@ -1881,6 +1959,69 @@ export class GameScene extends Phaser.Scene {
     // Poll for proximity in update - store refs
     (this as any)._verdantDoorZone = zone;
     (this as any)._verdantDoorText = sealedText;
+  }
+
+  private createFungusDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Dark frame
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 12, height + 12, 0x1a1a0a);
+    doorFrame.setStrokeStyle(3, 0x0a0a00);
+    doorFrame.setDepth(5);
+
+    // Door surface - dark with yellow fungus streaks
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x2a2a1a);
+    doorSurface.setStrokeStyle(2, 0x1a1a0a);
+    doorSurface.setDepth(6);
+
+    // Yellow/black fungus growths
+    const fungusColors = [0xccaa22, 0xddbb33, 0x998811, 0x111100];
+    for (let i = 0; i < 8; i++) {
+      const fx = doorX + Phaser.Math.Between(-18, 18);
+      const fy = doorY + Phaser.Math.Between(-40, 40);
+      const color = Phaser.Utils.Array.GetRandom(fungusColors);
+      const blob = this.add.ellipse(fx, fy, 6 + Math.random() * 8, 8 + Math.random() * 10, color, 0.8);
+      blob.setDepth(7);
+    }
+
+    // Black veins
+    for (let i = 0; i < 3; i++) {
+      const vx = doorX + Phaser.Math.Between(-12, 12);
+      const vy = doorY + Phaser.Math.Between(-30, 30);
+      const vein = this.add.rectangle(vx, vy, 2, 20 + Math.random() * 15, 0x111100, 0.7);
+      vein.setRotation(Math.random() * 0.5 - 0.25);
+      vein.setDepth(7);
+    }
+
+    // Pulsing yellow glow
+    const glow = this.add.rectangle(doorX, doorY, width + 25, height + 20, 0xccaa22, 0.08);
+    glow.setDepth(4);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.04, to: 0.15 },
+      duration: 2500,
+      yoyo: true,
+      repeat: -1
+    });
+
+    // "Sealed" text
+    const sealedText = this.add.text(doorX, doorY - 60, 'A strange fungal growth blocks the way...', {
+      fontSize: '12px',
+      color: '#ccaa22',
+      fontFamily: 'Georgia, serif',
+      fontStyle: 'italic',
+    });
+    sealedText.setOrigin(0.5);
+    sealedText.setDepth(100);
+    sealedText.setVisible(false);
+
+    // Interaction zone
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    (this as any)._fungusDoorZone = zone;
+    (this as any)._fungusDoorText = sealedText;
   }
 
   private bossExitDoorVisuals: Phaser.GameObjects.GameObject[] = [];
