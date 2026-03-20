@@ -1581,6 +1581,12 @@ export class GameScene extends Phaser.Scene {
       (this as any)._verdantDoorText.setVisible(inRange);
     }
 
+    // Check fungus door proximity
+    if ((this as any)._fungusDoorZone && (this as any)._fungusDoorText) {
+      const inRange = this.physics.overlap(this.player, (this as any)._fungusDoorZone);
+      (this as any)._fungusDoorText.setVisible(inRange);
+    }
+
     // Check verdaina door proximity
     if ((this as any)._verdainaDoorZone && (this as any)._verdainaDoorText) {
       const inRange = this.physics.overlap(this.player, (this as any)._verdainaDoorZone);
