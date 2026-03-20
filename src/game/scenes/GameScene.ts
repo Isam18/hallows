@@ -222,6 +222,11 @@ export class GameScene extends Phaser.Scene {
       this.currentLevel = LEVELS.fadingTown;
     }
     
+    // Randomize enemies for remix rooms
+    if ((this.currentLevel as any).isRemix) {
+      this.currentLevel = { ...this.currentLevel, enemies: this.generateRemixEnemies() };
+    }
+    
     // Set up world bounds
     this.physics.world.setBounds(0, 0, this.currentLevel.width, this.currentLevel.height);
     
@@ -2858,5 +2863,37 @@ export class GameScene extends Phaser.Scene {
     if (this.waveArenaWaves && this.waveArenaText) {
       this.time.delayedCall(1500, () => this.spawnNextWave(this.waveArenaWaves!, this.waveArenaText!));
     }
+  }
+
+  private generateRemixEnemies(): Array<{ type: string; x: number; y: number; behavior: string; guaranteed?: boolean }> {
+    const groundTypes = ['frontierScout', 'frontierWarrior'];
+    const flyingTypes = ['wingedWarrior'];
+    const allTypes = [...groundTypes, ...flyingTypes];
+    
+    const groundY = this.currentLevel.height - 100;
+    const flyingY = this.currentLevel.height - 250;
+    const minX = 150;
+    const maxX = this.currentLevel.width - 150;
+    
+    // Random count: 2-5 enemies
+    const count = Phaser.Math.Between(2, 5);
+    const enemies: Array<{ type: string; x: number; y: number; behavior: string; guaranteed?: boolean }> = [];
+    
+    for (let i = 0; i < count; i++) {
+      const type = Phaser.Utils.Array.GetRandom(allTypes);
+      const isFlying = flyingTypes.includes(type);
+      const x = Phaser.Math.Between(minX, maxX);
+      const y = isFlying ? flyingY : groundY;
+      
+      enemies.push({
+        type,
+        x,
+        y,
+        behavior: 'patrol',
+        guaranteed: true
+      });
+    }
+    
+    return enemies;
   }
 }

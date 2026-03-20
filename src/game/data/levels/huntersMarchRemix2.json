@@ -12,12 +12,8 @@
     { "x": 0, "y": 30, "width": 30, "height": 420, "type": "wall" },
     { "x": 1170, "y": 30, "width": 30, "height": 420, "type": "wall" }
   ],
-  "enemies": [
-    { "type": "frontierScout", "x": 300, "y": 400, "behavior": "patrol" },
-    { "type": "frontierScout", "x": 600, "y": 400, "behavior": "patrol" },
-    { "type": "frontierScout", "x": 900, "y": 400, "behavior": "patrol" },
-    { "type": "wingedWarrior", "x": 500, "y": 300, "behavior": "patrol", "guaranteed": true }
-  ],
+  "enemies": [],
+  "isRemix": true,
   "pickups": [],
   "triggers": [
     {
