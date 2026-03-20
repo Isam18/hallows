@@ -26,6 +26,7 @@ import { ColonyVanguard } from '../entities/ColonyVanguard';
 import { WingedCommander } from '../entities/WingedCommander';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
+import { AntElder } from '../entities/AntElder';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
 import { Portal } from '../entities/Portal';
