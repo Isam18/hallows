@@ -10,7 +10,7 @@ import { Pickup } from './Pickup';
  * Command Shout: Buffs nearby allies' speed.
  * Defensive Stance: Plants scythe to block.
  */
-type VanguardAIState = 'idle' | 'march' | 'telegraph' | 'sweep' | 'leapUp' | 'leapSlam' | 'shout' | 'defensiveStance' | 'burrowDown' | 'burrowMove' | 'burrowErupt' | 'jumpAttack' | 'jumpFall' | 'hurt' | 'dead';
+type VanguardAIState = 'idle' | 'march' | 'telegraph' | 'sweep' | 'leapWindup' | 'leapUp' | 'leapSlam' | 'shout' | 'defensiveStance' | 'burrowDown' | 'burrowMove' | 'burrowErupt' | 'jumpAttack' | 'jumpFall' | 'hurt' | 'dead';
 
 export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private cfg: EnemyCombatConfig;
@@ -51,6 +51,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private leapTarget = { x: 0, y: 0 };
   private leapPhase: 'rising' | 'hanging' | 'falling' = 'rising';
   private leapHangTimer = 0;
+  private leapWindupTimer = 0;
 
   // Jump Attack (both phases - like Failed Knight)
   private jumpAttackTimer = 0;
@@ -161,7 +162,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       return;
     }
     if (this.aiState === 'dead') return;
-    if (['telegraph', 'sweep', 'leapUp', 'leapSlam', 'shout', 'defensiveStance', 'burrowDown', 'burrowMove', 'burrowErupt', 'jumpAttack', 'jumpFall'].includes(this.aiState)) return;
+    if (['telegraph', 'sweep', 'leapWindup', 'leapUp', 'leapSlam', 'shout', 'defensiveStance', 'burrowDown', 'burrowMove', 'burrowErupt', 'jumpAttack', 'jumpFall'].includes(this.aiState)) return;
 
     const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
 
@@ -222,14 +223,53 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   }
 
   private startLeap(player: Player): void {
-    this.aiState = 'leapUp';
+    this.aiState = 'leapWindup';
+    this.leapWindupTimer = 500; // 0.5 second crouch animation
     this.leapTarget = { x: player.x, y: player.y };
-    this.leapPhase = 'rising';
-    this.leapTimer = 500; // Longer rise time
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0, -700); // Much higher jump
-    body.setAllowGravity(false);
+    body.setVelocityX(0);
+
+    // Crouch down visual - squash effect
+    this.setScale(1.4, 0.9);
+
+    // Ground dust during crouch
+    for (let i = 0; i < 4; i++) {
+      const side = i < 2 ? -1 : 1;
+      const dust = this.scene.add.circle(
+        this.x + side * Phaser.Math.Between(8, 20),
+        this.y + 25,
+        Phaser.Math.Between(2, 4),
+        0x8a6644, 0.5
+      );
+      this.scene.tweens.add({
+        targets: dust,
+        x: dust.x + side * Phaser.Math.Between(10, 25),
+        y: dust.y - Phaser.Math.Between(5, 15),
+        alpha: 0,
+        duration: 400,
+        onComplete: () => dust.destroy()
+      });
+    }
+
     this.actionCooldown = 2200;
+  }
+
+  private executeLeap(): void {
+    this.aiState = 'leapUp';
+    this.leapPhase = 'rising';
+    this.leapTimer = 500;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0, -700);
+    body.setAllowGravity(false);
+
+    // Stretch effect on launch
+    this.setScale(1.0, 1.4);
+    this.scene.tweens.add({
+      targets: this,
+      scaleX: 1.2,
+      scaleY: 1.2,
+      duration: 200,
+    });
   }
 
   // Jump Attack - like Failed Knight: quick leap forward and slam down
@@ -578,6 +618,16 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
         this.scytheAngle = 0;
         this.actionCooldown = this.enraged ? 900 : 1400;
         this.aiState = 'march';
+      }
+    }
+
+    // Leap Windup
+    if (this.aiState === 'leapWindup') {
+      this.leapWindupTimer -= delta;
+      // Shake/vibrate during crouch
+      this.x += (Math.random() - 0.5) * 2;
+      if (this.leapWindupTimer <= 0) {
+        this.executeLeap();
       }
     }
 
