@@ -493,6 +493,11 @@ export class GameScene extends Phaser.Scene {
       }
     });
     
+    // Setup boss arena background fauna if applicable
+    if ((this.currentLevel as any).isBossArena && (this.currentLevel as any).backgroundFauna) {
+      this.setupHunterBossArena((this.currentLevel as any).backgroundFauna);
+    }
+    
     // Initialize flying enemy spawner
     this.flyingSpawner = new FlyingEnemySpawner(this, this.enemies);
     
