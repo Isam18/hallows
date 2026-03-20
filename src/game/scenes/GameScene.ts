@@ -222,6 +222,11 @@ export class GameScene extends Phaser.Scene {
       this.currentLevel = LEVELS.fadingTown;
     }
     
+    // Randomize enemies for remix rooms
+    if ((this.currentLevel as any).isRemix) {
+      this.currentLevel = { ...this.currentLevel, enemies: this.generateRemixEnemies() };
+    }
+    
     // Set up world bounds
     this.physics.world.setBounds(0, 0, this.currentLevel.width, this.currentLevel.height);
     
