@@ -3002,11 +3002,18 @@ export class GameScene extends Phaser.Scene {
       this.hunterArenaFauna = [];
     });
 
-    // After fauna disappear, this is where the boss would spawn
-    // For now, just leave the empty arena
+    // After fauna disappear, spawn the Ant Elder boss
     this.time.delayedCall(2000, () => {
-      // TODO: Spawn Hunter's March boss here
-      console.log('Hunter Boss Arena sealed - boss spawn placeholder');
+      const antElder = new AntElder(this, 700, 550);
+      this.boss = antElder as any;
+      this.inBossArena = true;
+      gameState.setState('boss');
+
+      this.physics.add.collider(this.boss, this.platforms);
+      this.physics.add.collider(this.boss, this.walls);
+      this.physics.add.overlap(this.player, this.boss,
+        () => this.handlePlayerBossContact()
+      );
     });
   }
 }
