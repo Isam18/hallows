@@ -51,6 +51,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private leapTarget = { x: 0, y: 0 };
   private leapPhase: 'rising' | 'hanging' | 'falling' = 'rising';
   private leapHangTimer = 0;
+  private leapWindupTimer = 0;
 
   // Jump Attack (both phases - like Failed Knight)
   private jumpAttackTimer = 0;
