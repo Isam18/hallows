@@ -472,6 +472,9 @@ export class GameScene extends Phaser.Scene {
       } else if (t.type === 'verdantDoor') {
         // Light green plant door (unopenable for now)
         this.createVerdantDoor(t.x, t.y, t.width, t.height);
+      } else if (t.type === 'fungusDoor') {
+        // Fungus yellow/black door (unopenable for now)
+        this.createFungusDoor(t.x, t.y, t.width, t.height);
       } else if (t.type === 'bossExitTransition') {
         // Hidden exit that appears after boss is defeated
         this.createBossExitDoor(t.x, t.y, t.width, t.height, t.target, t.targetSpawn);
