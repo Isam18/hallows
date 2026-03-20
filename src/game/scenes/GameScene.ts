@@ -86,6 +86,7 @@ import huntersMarchRemix3Data from '../data/levels/huntersMarchRemix3.json';
 import huntersMarchRemix4Data from '../data/levels/huntersMarchRemix4.json';
 import huntersMarchBenchRoomData from '../data/levels/huntersMarchBenchRoom.json';
 import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json';
+import chainRoomPostAntElderData from '../data/levels/chainRoomPostAntElder.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
