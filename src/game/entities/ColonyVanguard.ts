@@ -621,6 +621,16 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
+    // Leap Windup
+    if (this.aiState === 'leapWindup') {
+      this.leapWindupTimer -= delta;
+      // Shake/vibrate during crouch
+      this.x += (Math.random() - 0.5) * 2;
+      if (this.leapWindupTimer <= 0) {
+        this.executeLeap();
+      }
+    }
+
     // Leap
     if (this.aiState === 'leapUp') {
       this.leapTimer -= delta;
