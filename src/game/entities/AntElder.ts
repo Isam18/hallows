@@ -755,10 +755,11 @@ export class AntElder extends Phaser.Physics.Arcade.Sprite {
 
     if (this.phase === 1) {
       this.phase1Hp -= finalDamage;
+      if (this.phase1Hp < 0) this.phase1Hp = 0;
       this.bossHp = this.phase1Hp;
 
-      // Check phase transition at 40%
-      if (this.phase1Hp <= this.phase1MaxHp * 0.4 && this.phase === 1) {
+      // Phase transition when phase 1 HP is depleted
+      if (this.phase1Hp <= 0) {
         this.startShedding();
         return;
       }
