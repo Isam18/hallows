@@ -162,7 +162,7 @@ export interface PickupConfig {
 
 export interface TriggerConfig {
   id: string;
-  type: 'bench' | 'transition' | 'bossGate' | 'gate' | 'decoration' | 'chain' | 'shop' | 'endDoor' | 'greenwayDoor' | 'skeleton' | 'lavaDoor' | 'verdantDoor' | 'bossExitTransition' | 'verdainaDoor' | 'fakeBench' | 'lockedVerdainaDoor' | 'waveArena' | 'campfire';
+  type: 'bench' | 'transition' | 'bossGate' | 'gate' | 'decoration' | 'chain' | 'shop' | 'endDoor' | 'greenwayDoor' | 'skeleton' | 'lavaDoor' | 'verdantDoor' | 'bossExitTransition' | 'verdainaDoor' | 'fakeBench' | 'lockedVerdainaDoor' | 'waveArena' | 'campfire' | 'crimsonKeyDoor';
   x: number;
   y: number;
   width: number;
