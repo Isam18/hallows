@@ -2293,6 +2293,11 @@ export class BootScene extends Phaser.Scene {
     this.createMossTitanSprite('mossTitan');
     this.createMossTitanStaggeredSprite('mossTitan_staggered');
     
+    // Ant Elder - Phase 1 (cloaked tank) and Phase 2 (agile predator)
+    this.createAntElderPhase1Sprite('antElder_phase1_idle');
+    this.createAntElderPhase1HideSprite('antElder_phase1_hide');
+    this.createAntElderPhase2Sprite('antElder_phase2_idle');
+    
     // Boss projectile spike / falling rock
     const spikeGraphics = this.make.graphics({ x: 0, y: 0 });
     spikeGraphics.fillStyle(0x555566);

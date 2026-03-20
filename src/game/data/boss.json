@@ -92,5 +92,69 @@
       "shells": 250,
       "charm": "mossStrength"
     }
+  },
+  "antElder": {
+    "id": "antElder",
+    "name": "Ant Elder",
+    "subtitle": "Elder of the Colony",
+    "nameColor": "#cc2222",
+    "phase1": {
+      "maxHp": 280,
+      "width": 90,
+      "height": 80,
+      "scale": 1.6,
+      "moveSpeed": 40,
+      "contactDamage": 2,
+      "attacks": {
+        "hide": {
+          "duration": 3000
+        },
+        "sporeMines": {
+          "damage": 1,
+          "cooldown": 2500
+        },
+        "cloakSlam": {
+          "windupMs": 600,
+          "slamSpeed": 600,
+          "shockwaveWidth": 140,
+          "shockwaveDamage": 2,
+          "cooldown": 2200
+        },
+        "hiddenBlade": {
+          "proximityTriggerMs": 2000,
+          "windupMs": 250,
+          "range": 90,
+          "damage": 2,
+          "cooldown": 3000
+        }
+      }
+    },
+    "phase2": {
+      "maxHp": 160,
+      "width": 40,
+      "height": 50,
+      "scale": 1.2,
+      "moveSpeed": 250,
+      "contactDamage": 1,
+      "damageMultiplier": 1.5,
+      "attacks": {
+        "furySwipes": {
+          "swipeCount": 3,
+          "swipeDelay": 250,
+          "forwardMove": 200,
+          "damage": 1,
+          "cooldown": 1200
+        },
+        "leapingStrike": {
+          "diveSpeed": 500,
+          "damage": 2,
+          "cooldown": 1800
+        }
+      }
+    },
+    "reward": {
+      "shells": 300,
+      "charm": "elderStrength"
+    }
   }
 }
