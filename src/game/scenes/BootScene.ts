@@ -2293,6 +2293,11 @@ export class BootScene extends Phaser.Scene {
     this.createMossTitanSprite('mossTitan');
     this.createMossTitanStaggeredSprite('mossTitan_staggered');
     
+    // Ant Elder - Phase 1 (cloaked tank) and Phase 2 (agile predator)
+    this.createAntElderPhase1Sprite('antElder_phase1_idle');
+    this.createAntElderPhase1HideSprite('antElder_phase1_hide');
+    this.createAntElderPhase2Sprite('antElder_phase2_idle');
+    
     // Boss projectile spike / falling rock
     const spikeGraphics = this.make.graphics({ x: 0, y: 0 });
     spikeGraphics.fillStyle(0x555566);
@@ -2993,6 +2998,149 @@ export class BootScene extends Phaser.Scene {
     }
     
     g.generateTexture('spike', totalWidth, 20);
+    g.destroy();
+  }
+
+  private createAntElderPhase1Sprite(key: string): void {
+    // Phase 1: Large bulky insect covered in dark-olive shaggy moss cloak
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 60;
+    const cy = 50;
+
+    // Massive moss cloak body - dark olive
+    g.fillStyle(0x3a4a2a);
+    g.fillEllipse(cx, cy + 15, 100, 70);
+
+    // Shaggy moss layers
+    g.fillStyle(0x4a5a3a);
+    for (let i = 0; i < 12; i++) {
+      const bx = cx - 45 + i * 9 + Math.sin(i * 1.5) * 5;
+      const by = cy + 5 + Math.cos(i * 2) * 10;
+      g.fillEllipse(bx, by, 22, 18);
+    }
+
+    // Darker outer layer - gritty texture
+    g.fillStyle(0x2a3a1a);
+    for (let i = 0; i < 8; i++) {
+      const bx = cx - 40 + i * 12;
+      const by = cy + 20 + Math.sin(i) * 8;
+      g.fillEllipse(bx, by, 18, 14);
+    }
+
+    // Top tufts of moss
+    g.fillStyle(0x3a4a2a);
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI;
+      const px = cx + Math.cos(angle) * 40;
+      const py = cy - 15 + Math.sin(angle) * 10;
+      g.beginPath();
+      g.moveTo(px, py - 10);
+      g.lineTo(px - 5, py + 5);
+      g.lineTo(px + 5, py + 5);
+      g.closePath();
+      g.fillPath();
+    }
+
+    // Small crimson-red head peeking out top
+    g.fillStyle(0xaa2222);
+    g.fillEllipse(cx, cy - 25, 22, 18);
+
+    // Bone-white flat mask
+    g.fillStyle(0xddddcc);
+    g.fillRect(cx - 12, cy - 30, 24, 10);
+
+    // Two horizontal black eye slits
+    g.fillStyle(0x111111);
+    g.fillRect(cx - 9, cy - 28, 7, 3);
+    g.fillRect(cx + 2, cy - 28, 7, 3);
+
+    // Tiny spindly legs below cloak
+    g.lineStyle(2, 0x111111);
+    g.lineBetween(cx - 20, cy + 45, cx - 25, cy + 58);
+    g.lineBetween(cx - 10, cy + 45, cx - 12, cy + 58);
+    g.lineBetween(cx + 10, cy + 45, cx + 12, cy + 58);
+    g.lineBetween(cx + 20, cy + 45, cx + 25, cy + 58);
+
+    // Thick dark outline
+    g.lineStyle(3, 0x1a2a10);
+    g.strokeEllipse(cx, cy + 15, 102, 72);
+
+    g.generateTexture(key, 120, 100);
+    g.destroy();
+  }
+
+  private createAntElderPhase1HideSprite(key: string): void {
+    // Hidden under cloak - just a mound of moss
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 60;
+    const cy = 55;
+
+    // Flattened cloak mound
+    g.fillStyle(0x2a3a1a);
+    g.fillEllipse(cx, cy + 10, 110, 50);
+
+    // Moss texture
+    g.fillStyle(0x3a4a2a);
+    for (let i = 0; i < 14; i++) {
+      const bx = cx - 50 + i * 8;
+      const by = cy + 5 + Math.sin(i * 1.8) * 8;
+      g.fillEllipse(bx, by, 16, 12);
+    }
+
+    // No head visible - fully hidden
+    g.lineStyle(3, 0x1a2a10);
+    g.strokeEllipse(cx, cy + 10, 112, 52);
+
+    g.generateTexture(key, 120, 100);
+    g.destroy();
+  }
+
+  private createAntElderPhase2Sprite(key: string): void {
+    // Phase 2: Sleek, agile crimson insect - thin warrior aesthetic
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const cx = 30;
+    const cy = 35;
+
+    // Sleek body - crimson red
+    g.fillStyle(0xaa2222);
+    g.fillEllipse(cx, cy + 5, 30, 40);
+
+    // Darker red segments
+    g.fillStyle(0x881818);
+    g.fillEllipse(cx, cy - 5, 24, 14);
+    g.fillEllipse(cx, cy + 15, 24, 14);
+
+    // Head with mask remnants
+    g.fillStyle(0xcc3333);
+    g.fillEllipse(cx, cy - 22, 18, 14);
+
+    // Cracked mask fragments
+    g.fillStyle(0xccccbb, 0.6);
+    g.fillRect(cx - 6, cy - 26, 12, 5);
+
+    // Fierce eyes
+    g.fillStyle(0xff4444);
+    g.fillCircle(cx - 4, cy - 22, 3);
+    g.fillCircle(cx + 4, cy - 22, 3);
+    g.fillStyle(0xffaa44);
+    g.fillCircle(cx - 4, cy - 23, 1.5);
+    g.fillCircle(cx + 4, cy - 23, 1.5);
+
+    // Thin needle-like limbs (claws)
+    g.lineStyle(2, 0xdddddd);
+    g.lineBetween(cx + 15, cy - 5, cx + 28, cy - 15);
+    g.lineBetween(cx - 15, cy - 5, cx - 28, cy - 15);
+
+    // Legs
+    g.lineStyle(2, 0x661111);
+    g.lineBetween(cx - 8, cy + 22, cx - 14, cy + 38);
+    g.lineBetween(cx + 8, cy + 22, cx + 14, cy + 38);
+
+    // Outline
+    g.lineStyle(2, 0x550000);
+    g.strokeEllipse(cx, cy + 5, 32, 42);
+
+    g.generateTexture(key, 60, 70);
     g.destroy();
   }
 
