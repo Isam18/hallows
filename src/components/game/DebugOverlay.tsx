@@ -185,6 +185,9 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           <button onClick={() => handleTeleport('huntersMarchRoom4')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors">HM Room 4</button>
           <button onClick={() => handleTeleport('huntersMarchRoom5')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold">⚔️ HM Gauntlet</button>
           <button onClick={() => handleTeleport('huntersMarchRoom6')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold">🏕️ HM Camp</button>
+          <button onClick={() => handleTeleport('huntersMarchBenchRoom')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors">🪑 HM Respite</button>
+          <button onClick={() => handleTeleport('huntersMarchBossArena')} className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors font-bold">👑 Colosseum</button>
+          <button onClick={() => handleTeleport('chainRoomPostAntElder')} className="px-2 py-1 text-xs bg-yellow-600/20 hover:bg-yellow-600/40 border border-yellow-600/30 rounded transition-colors">🍄 Post-Boss Chain</button>
           <button onClick={() => handleTeleport('mossTitanArena')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Moss Titan Arena</button>
         </div>
       </div>
