@@ -10,7 +10,7 @@ import { Pickup } from './Pickup';
  * Command Shout: Buffs nearby allies' speed.
  * Defensive Stance: Plants scythe to block.
  */
-type VanguardAIState = 'idle' | 'march' | 'telegraph' | 'sweep' | 'leapUp' | 'leapSlam' | 'shout' | 'defensiveStance' | 'burrowDown' | 'burrowMove' | 'burrowErupt' | 'jumpAttack' | 'jumpFall' | 'hurt' | 'dead';
+type VanguardAIState = 'idle' | 'march' | 'telegraph' | 'sweep' | 'leapWindup' | 'leapUp' | 'leapSlam' | 'shout' | 'defensiveStance' | 'burrowDown' | 'burrowMove' | 'burrowErupt' | 'jumpAttack' | 'jumpFall' | 'hurt' | 'dead';
 
 export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   private cfg: EnemyCombatConfig;
