@@ -2556,7 +2556,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.overlap(this.player, zone, () => {
           lockedText.setVisible(true);
           if (this.input.keyboard && Phaser.Input.Keyboard.JustDown(this.input.keyboard.addKey('E'))) {
-            this.scene.start('GameScene', { levelId: target, spawnId: targetSpawn });
+            this.transitionToLevel(target, targetSpawn);
           }
         });
 
