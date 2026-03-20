@@ -131,6 +131,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRemix4: huntersMarchRemix4Data as unknown as LevelConfig,
   huntersMarchBenchRoom: huntersMarchBenchRoomData as unknown as LevelConfig,
   huntersMarchBossArena: huntersMarchBossArenaData as unknown as LevelConfig,
+  chainRoomPostAntElder: chainRoomPostAntElderData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
