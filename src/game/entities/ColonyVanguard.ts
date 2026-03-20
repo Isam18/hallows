@@ -223,14 +223,53 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
   }
 
   private startLeap(player: Player): void {
-    this.aiState = 'leapUp';
+    this.aiState = 'leapWindup';
+    this.leapWindupTimer = 500; // 0.5 second crouch animation
     this.leapTarget = { x: player.x, y: player.y };
-    this.leapPhase = 'rising';
-    this.leapTimer = 500; // Longer rise time
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocity(0, -700); // Much higher jump
-    body.setAllowGravity(false);
+    body.setVelocityX(0);
+
+    // Crouch down visual - squash effect
+    this.setScale(1.4, 0.9);
+
+    // Ground dust during crouch
+    for (let i = 0; i < 4; i++) {
+      const side = i < 2 ? -1 : 1;
+      const dust = this.scene.add.circle(
+        this.x + side * Phaser.Math.Between(8, 20),
+        this.y + 25,
+        Phaser.Math.Between(2, 4),
+        0x8a6644, 0.5
+      );
+      this.scene.tweens.add({
+        targets: dust,
+        x: dust.x + side * Phaser.Math.Between(10, 25),
+        y: dust.y - Phaser.Math.Between(5, 15),
+        alpha: 0,
+        duration: 400,
+        onComplete: () => dust.destroy()
+      });
+    }
+
     this.actionCooldown = 2200;
+  }
+
+  private executeLeap(): void {
+    this.aiState = 'leapUp';
+    this.leapPhase = 'rising';
+    this.leapTimer = 500;
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0, -700);
+    body.setAllowGravity(false);
+
+    // Stretch effect on launch
+    this.setScale(1.0, 1.4);
+    this.scene.tweens.add({
+      targets: this,
+      scaleX: 1.2,
+      scaleY: 1.2,
+      duration: 200,
+    });
   }
 
   // Jump Attack - like Failed Knight: quick leap forward and slam down
