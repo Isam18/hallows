@@ -1,0 +1,45 @@
+{
+  "id": "huntersMarchBossArena",
+  "name": "Hunter's March - The Colosseum",
+  "biome": "huntersMarch",
+  "width": 1400,
+  "height": 700,
+  "backgroundColor": "#120808",
+  "spawnPoint": { "x": 100, "y": 600 },
+  "platforms": [
+    { "x": 0, "y": 650, "width": 1400, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1400, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 1370, "y": 30, "width": 30, "height": 620, "type": "wall" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "isBossArena": true,
+  "bossArenaType": "huntersMarch",
+  "triggers": [
+    {
+      "id": "arenaEntrance",
+      "type": "verdainaDoor",
+      "x": 40,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchBenchRoom",
+      "targetSpawn": "fromBossArena"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 600 }
+  },
+  "backgroundFauna": [
+    { "type": "frontierScout", "x": 300, "y": 580 },
+    { "type": "frontierScout", "x": 500, "y": 590 },
+    { "type": "frontierWarrior", "x": 700, "y": 570 },
+    { "type": "frontierWarrior", "x": 900, "y": 580 },
+    { "type": "wingedWarrior", "x": 400, "y": 300 },
+    { "type": "wingedWarrior", "x": 800, "y": 250 },
+    { "type": "wingedWarrior", "x": 1100, "y": 280 },
+    { "type": "colonyVanguard", "x": 1000, "y": 560 },
+    { "type": "wingedCommander", "x": 650, "y": 200 }
+  ]
+}

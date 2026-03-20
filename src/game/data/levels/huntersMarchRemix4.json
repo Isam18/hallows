@@ -25,10 +25,21 @@
       "height": 100,
       "target": "huntersMarchRemix3",
       "targetSpawn": "fromRemix4"
+    },
+    {
+      "id": "remix4Forward",
+      "type": "verdainaDoor",
+      "x": 910,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchBenchRoom",
+      "targetSpawn": "fromRemix4"
     }
   ],
   "spawns": {
     "default": { "x": 100, "y": 500 },
-    "fromRemix3": { "x": 100, "y": 500 }
+    "fromRemix3": { "x": 100, "y": 500 },
+    "fromBenchRoom": { "x": 880, "y": 500 }
   }
 }
