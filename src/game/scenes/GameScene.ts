@@ -83,6 +83,8 @@ import huntersMarchRemix1Data from '../data/levels/huntersMarchRemix1.json';
 import huntersMarchRemix2Data from '../data/levels/huntersMarchRemix2.json';
 import huntersMarchRemix3Data from '../data/levels/huntersMarchRemix3.json';
 import huntersMarchRemix4Data from '../data/levels/huntersMarchRemix4.json';
+import huntersMarchBenchRoomData from '../data/levels/huntersMarchBenchRoom.json';
+import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -125,6 +127,8 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchRemix2: huntersMarchRemix2Data as unknown as LevelConfig,
   huntersMarchRemix3: huntersMarchRemix3Data as unknown as LevelConfig,
   huntersMarchRemix4: huntersMarchRemix4Data as unknown as LevelConfig,
+  huntersMarchBenchRoom: huntersMarchBenchRoomData as unknown as LevelConfig,
+  huntersMarchBossArena: huntersMarchBossArenaData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -488,6 +492,11 @@ export class GameScene extends Phaser.Scene {
         this.createCrimsonKeyDoor(t.x, t.y, t.width, t.height);
       }
     });
+    
+    // Setup boss arena background fauna if applicable
+    if ((this.currentLevel as any).isBossArena && (this.currentLevel as any).backgroundFauna) {
+      this.setupHunterBossArena((this.currentLevel as any).backgroundFauna);
+    }
     
     // Initialize flying enemy spawner
     this.flyingSpawner = new FlyingEnemySpawner(this, this.enemies);
@@ -2902,5 +2911,101 @@ export class GameScene extends Phaser.Scene {
     }
     
     return enemies;
+  }
+
+  private hunterArenaFauna: Phaser.GameObjects.GameObject[] = [];
+  private hunterArenaSealed = false;
+  private hunterArenaEntranceDoor: Phaser.GameObjects.Rectangle | null = null;
+
+  private setupHunterBossArena(fauna: Array<{ type: string; x: number; y: number }>): void {
+    // Create decorative background creatures (non-interactive)
+    fauna.forEach(f => {
+      const colors: Record<string, number> = {
+        frontierScout: 0xcc4444,
+        frontierWarrior: 0xaa2222,
+        wingedWarrior: 0xdd5555,
+        colonyVanguard: 0x991111,
+        wingedCommander: 0xff3333,
+      };
+      const sizes: Record<string, { w: number; h: number }> = {
+        frontierScout: { w: 30, h: 40 },
+        frontierWarrior: { w: 40, h: 50 },
+        wingedWarrior: { w: 35, h: 35 },
+        colonyVanguard: { w: 50, h: 60 },
+        wingedCommander: { w: 55, h: 50 },
+      };
+      const color = colors[f.type] || 0xcc4444;
+      const size = sizes[f.type] || { w: 30, h: 40 };
+      
+      // Silhouette in background - darker, slightly transparent
+      const creature = this.add.rectangle(f.x, f.y, size.w, size.h, color, 0.4);
+      creature.setDepth(-2);
+      
+      // Idle sway animation
+      this.tweens.add({
+        targets: creature,
+        y: f.y + Phaser.Math.Between(-5, 5),
+        x: f.x + Phaser.Math.Between(-3, 3),
+        duration: Phaser.Math.Between(1500, 2500),
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+      
+      this.hunterArenaFauna.push(creature);
+    });
+
+    // Set up entry trigger - when player walks past x=200, seal the arena
+    this.time.addEvent({
+      delay: 100,
+      callback: () => {
+        if (!this.hunterArenaSealed && this.player && this.player.x > 200) {
+          this.sealHunterBossArena();
+        }
+      },
+      loop: true
+    });
+  }
+
+  private sealHunterBossArena(): void {
+    this.hunterArenaSealed = true;
+
+    // Seal entrance door - find and block it
+    // Create a solid gate over the entrance
+    const gate = this.add.rectangle(65, 600, 60, 120, 0x3a1a1a);
+    gate.setStrokeStyle(3, 0x661111);
+    gate.setDepth(5);
+    this.hunterArenaEntranceDoor = gate;
+    
+    // Add physics body so player can't walk through
+    this.physics.add.existing(gate, true);
+    this.physics.add.collider(this.player, gate);
+
+    // Dramatic gate slam
+    this.cameras.main.shake(200, 0.02);
+
+    // Fade out all background fauna with a dramatic effect
+    this.time.delayedCall(500, () => {
+      this.hunterArenaFauna.forEach((creature, i) => {
+        this.time.delayedCall(i * 80, () => {
+          this.tweens.add({
+            targets: creature,
+            alpha: 0,
+            scale: 0.5,
+            duration: 400,
+            ease: 'Power2',
+            onComplete: () => (creature as Phaser.GameObjects.Rectangle).destroy()
+          });
+        });
+      });
+      this.hunterArenaFauna = [];
+    });
+
+    // After fauna disappear, this is where the boss would spawn
+    // For now, just leave the empty arena
+    this.time.delayedCall(2000, () => {
+      // TODO: Spawn Hunter's March boss here
+      console.log('Hunter Boss Arena sealed - boss spawn placeholder');
+    });
   }
 }

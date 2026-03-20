@@ -1,0 +1,53 @@
+{
+  "id": "huntersMarchBenchRoom",
+  "name": "Hunter's March - Respite",
+  "biome": "huntersMarch",
+  "width": 600,
+  "height": 500,
+  "backgroundColor": "#1a0a0a",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 450, "width": 600, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 600, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 420, "type": "wall" },
+    { "x": 570, "y": 30, "width": 30, "height": 420, "type": "wall" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "benchRespite",
+      "type": "bench",
+      "benchTypeId": "safe_bench",
+      "x": 280,
+      "y": 410,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "id": "benchRoomBack",
+      "type": "verdainaDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchRemix4",
+      "targetSpawn": "fromBenchRoom"
+    },
+    {
+      "id": "benchRoomForward",
+      "type": "verdainaDoor",
+      "x": 510,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "huntersMarchBossArena",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromRemix4": { "x": 100, "y": 400 },
+    "fromBossArena": { "x": 500, "y": 400 }
+  }
+}
