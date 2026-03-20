@@ -471,6 +471,8 @@ export class GameScene extends Phaser.Scene {
         this.setupWaveArena();
       } else if (t.type === 'campfire') {
         this.createCampfire(t.x, t.y);
+      } else if (t.type === 'crimsonKeyDoor') {
+        this.createCrimsonKeyDoor(t.x, t.y, t.width, t.height);
       }
     });
     
@@ -2497,6 +2499,96 @@ export class GameScene extends Phaser.Scene {
         // Flicker glow
         glow.setAlpha(Phaser.Math.FloatBetween(0.06, 0.12));
       },
+    });
+  }
+
+  private createCrimsonKeyDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Door is hidden initially — only appears after all enemies are dead
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 10, height + 10, 0x3a0a0a);
+    doorFrame.setStrokeStyle(3, 0x5a1515);
+    doorFrame.setDepth(5);
+    doorFrame.setVisible(false);
+
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x6a1a1a);
+    doorSurface.setStrokeStyle(2, 0x8a2a2a);
+    doorSurface.setDepth(6);
+    doorSurface.setVisible(false);
+
+    // Crimson rune markings
+    const rune1 = this.add.circle(doorX, doorY - 20, 6, 0xcc3333, 0.8);
+    rune1.setDepth(7).setVisible(false);
+    const rune2 = this.add.circle(doorX, doorY + 20, 6, 0xcc3333, 0.8);
+    rune2.setDepth(7).setVisible(false);
+    const runeCenter = this.add.circle(doorX, doorY, 10, 0xff4444, 0.6);
+    runeCenter.setDepth(7).setVisible(false);
+
+    // Lock symbol
+    const lockIcon = this.add.text(doorX, doorY, '🔒', { fontSize: '20px' });
+    lockIcon.setOrigin(0.5).setDepth(8).setVisible(false);
+
+    // Prompt text
+    const promptText = this.add.text(doorX, doorY - 65, 'This door requires a Crimson Key', {
+      fontSize: '10px', color: '#cc4444', fontFamily: 'Georgia, serif', fontStyle: 'italic'
+    });
+    promptText.setOrigin(0.5).setDepth(100).setVisible(false);
+
+    const doorParts = [doorFrame, doorSurface, rune1, rune2, runeCenter, lockIcon];
+
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    let doorRevealed = false;
+
+    // Check for all enemies dead, then reveal door and hide campfire
+    const checkReveal = this.time.addEvent({
+      delay: 500,
+      loop: true,
+      callback: () => {
+        if (doorRevealed) return;
+        const aliveEnemies = this.enemies.getChildren().filter(e => {
+          const enemy = e as any;
+          return enemy.active && !enemy.isDying?.();
+        });
+        if (aliveEnemies.length === 0) {
+          doorRevealed = true;
+          checkReveal.remove();
+
+          // Show door with fade-in
+          doorParts.forEach(p => {
+            p.setVisible(true);
+            p.setAlpha(0);
+            this.tweens.add({ targets: p, alpha: 1, duration: 600 });
+          });
+
+          // Pulse the runes
+          this.tweens.add({
+            targets: [rune1, rune2, runeCenter],
+            alpha: { from: 0.4, to: 1 },
+            duration: 1200,
+            yoyo: true,
+            repeat: -1
+          });
+
+          // Set up interaction
+          this.physics.add.overlap(this.player, zone, () => {
+            promptText.setVisible(true);
+          });
+        }
+      }
+    });
+
+    // Hide prompt when not overlapping (checked in update via a flag)
+    this.time.addEvent({
+      delay: 100,
+      loop: true,
+      callback: () => {
+        if (!doorRevealed) return;
+        const inRange = this.physics.overlap(this.player, zone);
+        if (!inRange) promptText.setVisible(false);
+      }
     });
   }
 
