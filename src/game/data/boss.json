@@ -99,7 +99,7 @@
     "subtitle": "Elder of the Colony",
     "nameColor": "#cc2222",
     "phase1": {
-      "maxHp": 280,
+      "maxHp": 25,
       "width": 90,
       "height": 80,
       "scale": 1.6,
