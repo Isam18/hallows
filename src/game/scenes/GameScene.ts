@@ -1223,6 +1223,11 @@ export class GameScene extends Phaser.Scene {
       reward: 100,
     });
     this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+
+    // Determine which boss was defeated and show appropriate victory
+    if (this.levelId === 'huntersMarchBossArena') {
+      this.showAntElderVictory();
+    }
   }
   
   showMossTitanVictory(): void {
