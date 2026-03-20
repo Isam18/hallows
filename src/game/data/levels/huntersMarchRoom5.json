@@ -102,7 +102,7 @@
       {
         "wave": 5,
         "enemies": [
-          { "type": "wingedCommander", "x": 600, "y": 300 }
+          { "type": "wingedCommander", "x": 600, "y": 600 }
         ]
       }
     ]
