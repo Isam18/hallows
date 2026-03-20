@@ -2016,6 +2016,7 @@ export class GameScene extends Phaser.Scene {
 
     (this as any)._fungusDoorZone = zone;
     (this as any)._fungusDoorText = sealedText;
+  }
 
   private bossExitDoorVisuals: Phaser.GameObjects.GameObject[] = [];
   private bossExitZone: Phaser.GameObjects.Zone | null = null;
