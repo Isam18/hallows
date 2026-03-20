@@ -161,7 +161,7 @@ export class ColonyVanguard extends Phaser.Physics.Arcade.Sprite {
       return;
     }
     if (this.aiState === 'dead') return;
-    if (['telegraph', 'sweep', 'leapUp', 'leapSlam', 'shout', 'defensiveStance', 'burrowDown', 'burrowMove', 'burrowErupt', 'jumpAttack', 'jumpFall'].includes(this.aiState)) return;
+    if (['telegraph', 'sweep', 'leapWindup', 'leapUp', 'leapSlam', 'shout', 'defensiveStance', 'burrowDown', 'burrowMove', 'burrowErupt', 'jumpAttack', 'jumpFall'].includes(this.aiState)) return;
 
     const dist = Phaser.Math.Distance.Between(this.x, this.y, player.x, player.y);
 
