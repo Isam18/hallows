@@ -471,6 +471,8 @@ export class GameScene extends Phaser.Scene {
         this.setupWaveArena();
       } else if (t.type === 'campfire') {
         this.createCampfire(t.x, t.y);
+      } else if (t.type === 'crimsonKeyDoor') {
+        this.createCrimsonKeyDoor(t.x, t.y, t.width, t.height);
       }
     });
     
