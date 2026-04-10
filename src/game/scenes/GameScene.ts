@@ -2318,6 +2318,77 @@ export class GameScene extends Phaser.Scene {
       crystal.setRotation(Math.random() * Math.PI * 0.3);
     }
 
+    // Freezing flowers - icy blue/white flowers along the ground
+    const flowerPositions = [120, 350, 580, 850, 1100, 1350, 1600, 1900, 2150];
+    for (const fx of flowerPositions) {
+      const fy = groundY - 2;
+      const flowerContainer = this.add.container(fx, fy);
+      flowerContainer.setDepth(3);
+
+      // Stem - thin icy blue
+      const stem = this.add.rectangle(0, -12, 2, 18, 0x6699aa, 0.7);
+      flowerContainer.add(stem);
+
+      // Petals - 5 icy petals in a circle
+      const petalCount = 5;
+      const petalColors = [0xaaddff, 0x88ccee, 0xbbddff, 0x99ccff, 0xcceeFF];
+      for (let p = 0; p < petalCount; p++) {
+        const angle = (p / petalCount) * Math.PI * 2 - Math.PI / 2;
+        const px = Math.cos(angle) * 6;
+        const py = -22 + Math.sin(angle) * 6;
+        const petal = this.add.ellipse(px, py, 5, 8, petalColors[p], 0.6);
+        petal.setRotation(angle + Math.PI / 2);
+        flowerContainer.add(petal);
+      }
+
+      // Center - frosty white
+      const center = this.add.circle(0, -22, 3, 0xeeffff, 0.8);
+      flowerContainer.add(center);
+
+      // Frost sparkle on flower
+      const sparkle = this.add.circle(Phaser.Math.Between(-3, 3), -24, 1.5, 0xffffff, 0);
+      flowerContainer.add(sparkle);
+      this.tweens.add({
+        targets: sparkle,
+        alpha: { from: 0, to: 0.8 },
+        duration: 1200 + Math.random() * 800,
+        yoyo: true,
+        repeat: -1,
+        delay: Math.random() * 2000
+      });
+
+      // Gentle sway
+      this.tweens.add({
+        targets: flowerContainer,
+        rotation: { from: -0.06, to: 0.06 },
+        duration: 2000 + Math.random() * 1000,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+
+      // Ice particles around some flowers
+      if (Math.random() > 0.5) {
+        for (let s = 0; s < 3; s++) {
+          const sp = this.add.circle(
+            fx + Phaser.Math.Between(-10, 10),
+            fy - Phaser.Math.Between(15, 30),
+            1, 0xaaddff, 0
+          );
+          sp.setDepth(3);
+          this.tweens.add({
+            targets: sp,
+            alpha: { from: 0, to: 0.5 },
+            y: sp.y - 15,
+            duration: 2000 + Math.random() * 1500,
+            yoyo: true,
+            repeat: -1,
+            delay: Math.random() * 3000
+          });
+        }
+      }
+    }
+
     // Floating snow particles
     for (let i = 0; i < 25; i++) {
       const snowX = Phaser.Math.Between(0, w);
