@@ -1218,6 +1218,7 @@ export class GameScene extends Phaser.Scene {
     
     gameState.addShells(100);
     gameState.setState('victory');
+    this.player.jumpMultiplier = 1;
     
     this.emitUIEvent('bossDefeated', {
       reward: 100,
@@ -3148,6 +3149,7 @@ export class GameScene extends Phaser.Scene {
       const antElder = new AntElder(this, 700, 550);
       this.boss = antElder as any;
       this.inBossArena = true;
+      this.player.jumpMultiplier = 2;
       gameState.setState('boss');
 
       this.physics.add.collider(this.boss, this.platforms);
