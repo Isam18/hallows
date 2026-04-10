@@ -1382,13 +1382,13 @@ export class GameScene extends Phaser.Scene {
    * Handle player death - drop currency, show death screen
    */
   handlePlayerDeath(): void {
-    // Guard against multiple death calls
-    if (gameState.getState() === 'death') return;
-    
-    // Track if died in shroomial lands
+    // Track if died in shroomial lands (before guard, since setHp(0) may already set death state)
     if (this.levelId === 'shroomialLands') {
       gameState.setDiedInShroomialLands();
     }
+    
+    // Guard against multiple death calls
+    if (gameState.getState() === 'death') return;
     
     const playerData = gameState.getPlayerData();
     
