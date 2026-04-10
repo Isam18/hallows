@@ -3513,8 +3513,8 @@ export class GameScene extends Phaser.Scene {
                         targets: container,
                         x: 60,
                         y: groundY - 40,
-                        scaleX: 8,
-                        scaleY: 8,
+                        scaleX: 4,
+                        scaleY: 4,
                         duration: 0, // instant reposition
                       });
 
@@ -3551,8 +3551,8 @@ export class GameScene extends Phaser.Scene {
                       // Menacing slow pulse
                       this.tweens.add({
                         targets: container,
-                        scaleX: 8.3,
-                        scaleY: 8.3,
+                        scaleX: 4.15,
+                        scaleY: 4.15,
                         duration: 1500,
                         yoyo: true,
                         repeat: -1,
