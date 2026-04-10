@@ -1617,6 +1617,15 @@ export class GameScene extends Phaser.Scene {
       }
     }
 
+    // Check ice door proximity and interaction
+    if ((this as any)._iceDoorZone && (this as any)._iceDoorText) {
+      const inRange = this.physics.overlap(this.player, (this as any)._iceDoorZone);
+      (this as any)._iceDoorText.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.enterFreezingPlains();
+      }
+    }
+
     // Check verdaina door proximity
     if ((this as any)._verdainaDoorZone && (this as any)._verdainaDoorText) {
       const inRange = this.physics.overlap(this.player, (this as any)._verdainaDoorZone);
