@@ -27,6 +27,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private visualState: VisualState = 'idle';
   private facing: 1 | -1 = 1;
   public jumpMultiplier: number = 1;
+  public onIce: boolean = false;
   
   // Ground/wall detection
   private isGrounded = false;
