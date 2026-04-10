@@ -1382,13 +1382,13 @@ export class GameScene extends Phaser.Scene {
    * Handle player death - drop currency, show death screen
    */
   handlePlayerDeath(): void {
-    // Guard against multiple death calls
-    if (gameState.getState() === 'death') return;
-    
-    // Track if died in shroomial lands
+    // Track if died in shroomial lands (before guard, since setHp(0) may already set death state)
     if (this.levelId === 'shroomialLands') {
       gameState.setDiedInShroomialLands();
     }
+    
+    // Guard against multiple death calls
+    if (gameState.getState() === 'death') return;
     
     const playerData = gameState.getPlayerData();
     
@@ -2193,7 +2193,10 @@ export class GameScene extends Phaser.Scene {
     (this as any)._iceDoorText = promptText;
   }
 
+  private _enteringFreezingPlains = false;
   private enterFreezingPlains(): void {
+    if (this._enteringFreezingPlains) return;
+    this._enteringFreezingPlains = true;
     // Freeze player
     this.player.setVelocity(0, 0);
     (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
@@ -3470,7 +3473,10 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private _enteringShroomialLands = false;
   private enterShroomialLands(): void {
+    if (this._enteringShroomialLands) return;
+    this._enteringShroomialLands = true;
     // Freeze player
     this.player.setVelocity(0, 0);
     (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
@@ -4032,8 +4038,7 @@ export class GameScene extends Phaser.Scene {
                           // Instakill on overlap
                           this.physics.add.overlap(this.player, proj, () => {
                             proj.destroy();
-                            const pd = gameState.getPlayerData();
-                            pd.hp = 0;
+                            gameState.setHp(0);
                             this.handlePlayerDeath();
                           });
 
