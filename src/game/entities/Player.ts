@@ -27,6 +27,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private visualState: VisualState = 'idle';
   private facing: 1 | -1 = 1;
   public jumpMultiplier: number = 1;
+  public onIce: boolean = false;
   
   // Ground/wall detection
   private isGrounded = false;
@@ -447,20 +448,25 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private applyGroundMovement(body: Phaser.Physics.Arcade.Body, horizontal: number, delta: number): void {
     const tuning = MOVEMENT_TUNING;
-    const targetVelX = horizontal * tuning.maxRunSpeed;
+    const speedMultiplier = this.onIce ? 1.5 : 1;
+    const targetVelX = horizontal * tuning.maxRunSpeed * speedMultiplier;
     const currentVelX = body.velocity.x;
+    
+    // Ice: much lower deceleration for sliding feel
+    const iceDecelFactor = this.onIce ? 0.15 : 1;
+    const iceAccelFactor = this.onIce ? 0.4 : 1;
     
     if (horizontal !== 0) {
       // Accelerating
-      const accel = tuning.runAcceleration * (delta / 1000);
+      const accel = tuning.runAcceleration * iceAccelFactor * (delta / 1000);
       if (Math.abs(targetVelX - currentVelX) < accel) {
         body.setVelocityX(targetVelX);
       } else {
         body.setVelocityX(currentVelX + Math.sign(targetVelX - currentVelX) * accel);
       }
     } else {
-      // Decelerating
-      const decel = tuning.runDeceleration * (delta / 1000);
+      // Decelerating - on ice this takes ~0.5s to stop
+      const decel = tuning.runDeceleration * iceDecelFactor * (delta / 1000);
       if (Math.abs(currentVelX) < decel) {
         body.setVelocityX(0);
       } else {

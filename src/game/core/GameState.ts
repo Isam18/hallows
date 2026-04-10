@@ -28,6 +28,9 @@ class GameStateManager {
   // Boss defeated flag
   private bossDefeated = false;
   
+  // Shroomial death flag - tracks if player died in Shroomial Lands
+  private _diedInShroomialLands = false;
+  
   // Death drop record (more detailed than droppedShells)
   private deathDropRecord: DeathDropRecord | null = null;
   
@@ -410,6 +413,16 @@ class GameStateManager {
   
   isBossDefeated(): boolean {
     return this.bossDefeated;
+  }
+  
+  // Shroomial death tracking
+  get diedInShroomialLands(): boolean {
+    return this._diedInShroomialLands;
+  }
+  
+  setDiedInShroomialLands(): void {
+    this._diedInShroomialLands = true;
+    this.emit('diedInShroomialLands', true);
   }
   
   // Door state
