@@ -2193,7 +2193,10 @@ export class GameScene extends Phaser.Scene {
     (this as any)._iceDoorText = promptText;
   }
 
+  private _enteringFreezingPlains = false;
   private enterFreezingPlains(): void {
+    if (this._enteringFreezingPlains) return;
+    this._enteringFreezingPlains = true;
     // Freeze player
     this.player.setVelocity(0, 0);
     (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
