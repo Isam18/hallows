@@ -3420,6 +3420,151 @@ export class GameScene extends Phaser.Scene {
           this.tweens.add({ targets: dStem, alpha: 0.7, duration: 400, delay: i * 40 });
           this.tweens.add({ targets: dCap, alpha: 0.7, duration: 400, delay: i * 40 });
         }
+        // Phase 5: After dead mushrooms finish spawning - dialogue + boss intro
+        const dialogueDelay = 60 * 40 + 1000; // wait for all mushrooms to fade in + 1s
+        this.time.delayedCall(dialogueDelay, () => {
+          // Dialogue at top of screen - typed out slowly
+          const cam = this.cameras.main;
+          const dialogueLines = [
+            { text: 'The last.....', delay: 0 },
+            { text: 'one......', delay: 1200 },
+            { text: 'of...', delay: 2200 },
+            { text: 'my..kind...', delay: 3000 },
+            { text: 'gone', delay: 4200 },
+          ];
+
+          const dialogueTexts: Phaser.GameObjects.Text[] = [];
+          let fullText = '';
+
+          dialogueLines.forEach(line => {
+            this.time.delayedCall(line.delay, () => {
+              fullText += line.text;
+              // Remove old texts
+              dialogueTexts.forEach(t => t.destroy());
+              dialogueTexts.length = 0;
+
+              const dt = this.add.text(cam.width / 2, 60, fullText, {
+                fontSize: '20px',
+                color: '#ccaa22',
+                fontFamily: 'Georgia, serif',
+                fontStyle: 'italic',
+                wordWrap: { width: 600 },
+                align: 'center',
+              });
+              dt.setOrigin(0.5);
+              dt.setScrollFactor(0);
+              dt.setDepth(2000);
+              dialogueTexts.push(dt);
+            });
+          });
+
+          // After dialogue finishes - yellow flash + boss title
+          this.time.delayedCall(6000, () => {
+            // Clean up dialogue
+            dialogueTexts.forEach(t => t.destroy());
+
+            // Yellow flash
+            const flash = this.add.rectangle(cam.width / 2, cam.height / 2, cam.width, cam.height, 0xddcc22, 0);
+            flash.setScrollFactor(0);
+            flash.setDepth(3000);
+
+            this.tweens.add({
+              targets: flash,
+              alpha: 1,
+              duration: 200,
+              onComplete: () => {
+                // Boss title - black text on yellow
+                const bossTitle = this.add.text(cam.width / 2, cam.height / 2 - 30, 'Shroomial Overlord', {
+                  fontSize: '52px',
+                  color: '#111100',
+                  fontFamily: 'Georgia, serif',
+                  fontStyle: 'bold',
+                  align: 'center',
+                });
+                bossTitle.setOrigin(0.5);
+                bossTitle.setScrollFactor(0);
+                bossTitle.setDepth(3001);
+
+                const bossSubtitle = this.add.text(cam.width / 2, cam.height / 2 + 25, 'The Last Shroom', {
+                  fontSize: '22px',
+                  color: '#222200',
+                  fontFamily: 'Georgia, serif',
+                  fontStyle: 'italic',
+                  align: 'center',
+                });
+                bossSubtitle.setOrigin(0.5);
+                bossSubtitle.setScrollFactor(0);
+                bossSubtitle.setDepth(3001);
+
+                // Hold title for 3 seconds, then fade to normal with repositioned shroom
+                this.time.delayedCall(3000, () => {
+                  this.tweens.add({
+                    targets: [flash, bossTitle, bossSubtitle],
+                    alpha: 0,
+                    duration: 800,
+                    onComplete: () => {
+                      flash.destroy();
+                      bossTitle.destroy();
+                      bossSubtitle.destroy();
+
+                      // Move mushroom to left wall, 2x bigger, creepy face
+                      this.tweens.killTweensOf(container);
+                      this.tweens.add({
+                        targets: container,
+                        x: 60,
+                        y: groundY - 40,
+                        scaleX: 8,
+                        scaleY: 8,
+                        duration: 0, // instant reposition
+                      });
+
+                      // Distorted creepy face
+                      leftEye.setPosition(-12, -85);
+                      leftEye.setScale(1.5, 0.4);
+                      rightEye.setPosition(18, -82);
+                      rightEye.setScale(0.8, 1.6);
+
+                      // Creepy uneven pupils
+                      leftHighlight.setAlpha(0.8);
+                      leftHighlight.setPosition(-14, -86);
+                      leftHighlight.setScale(0.5);
+                      rightHighlight.setAlpha(0.8);
+                      rightHighlight.setPosition(20, -84);
+                      rightHighlight.setScale(1.5);
+
+                      // Jagged creepy mouth
+                      mouth.clear();
+                      mouth.lineStyle(3, 0x111100);
+                      mouth.beginPath();
+                      mouth.moveTo(-20, -52);
+                      mouth.lineTo(-12, -58);
+                      mouth.lineTo(-5, -48);
+                      mouth.lineTo(3, -57);
+                      mouth.lineTo(10, -46);
+                      mouth.lineTo(18, -55);
+                      mouth.lineTo(22, -50);
+                      mouth.strokePath();
+
+                      // Dark angry/creepy cap
+                      cap.setFillStyle(0x882211);
+
+                      // Menacing slow pulse
+                      this.tweens.add({
+                        targets: container,
+                        scaleX: 8.3,
+                        scaleY: 8.3,
+                        duration: 1500,
+                        yoyo: true,
+                        repeat: -1,
+                        ease: 'Sine.easeInOut',
+                      });
+                    }
+                  });
+                });
+              }
+            });
+          });
+        });
       });
     });
   }
