@@ -3507,56 +3507,184 @@ export class GameScene extends Phaser.Scene {
                       bossTitle.destroy();
                       bossSubtitle.destroy();
 
-                      // Move mushroom to left wall, 2x bigger, creepy face
+                      // Move mushroom to left wall, horrifying final form
                       this.tweens.killTweensOf(container);
-                      this.tweens.add({
-                        targets: container,
-                        x: 60,
-                        y: groundY - 40,
-                        scaleX: 4,
-                        scaleY: 4,
-                        duration: 0, // instant reposition
-                      });
+                      container.setPosition(60, groundY - 40);
+                      container.setScale(4, 4);
 
-                      // Distorted creepy face
+                      // === HORRIFYING FACE ===
+                      // Glitchy asymmetric eyes
                       leftEye.setPosition(-12, -85);
-                      leftEye.setScale(1.5, 0.4);
-                      rightEye.setPosition(18, -82);
-                      rightEye.setScale(0.8, 1.6);
+                      leftEye.setScale(2.0, 0.3);
+                      rightEye.setPosition(18, -80);
+                      rightEye.setScale(0.5, 2.2);
 
-                      // Creepy uneven pupils
-                      leftHighlight.setAlpha(0.8);
+                      // Creepy uneven pupils - one tiny, one huge
+                      leftHighlight.setAlpha(1);
                       leftHighlight.setPosition(-14, -86);
-                      leftHighlight.setScale(0.5);
-                      rightHighlight.setAlpha(0.8);
-                      rightHighlight.setPosition(20, -84);
-                      rightHighlight.setScale(1.5);
+                      leftHighlight.setScale(0.3);
+                      rightHighlight.setAlpha(1);
+                      rightHighlight.setPosition(20, -82);
+                      rightHighlight.setScale(2.5);
 
-                      // Jagged creepy mouth
+                      // Third eye on forehead
+                      const thirdEye = this.add.ellipse(0, -105, 12, 14, 0x660000);
+                      const thirdPupil = this.add.circle(0, -105, 3, 0xffff00);
+                      container.add([thirdEye, thirdPupil]);
+
+                      // Jagged gaping mouth with teeth
                       mouth.clear();
-                      mouth.lineStyle(3, 0x111100);
+                      mouth.lineStyle(3, 0x110000);
+                      mouth.fillStyle(0x110000, 1);
                       mouth.beginPath();
-                      mouth.moveTo(-20, -52);
-                      mouth.lineTo(-12, -58);
-                      mouth.lineTo(-5, -48);
-                      mouth.lineTo(3, -57);
-                      mouth.lineTo(10, -46);
-                      mouth.lineTo(18, -55);
-                      mouth.lineTo(22, -50);
+                      mouth.moveTo(-22, -55);
+                      mouth.lineTo(-15, -62);
+                      mouth.lineTo(-8, -45);
+                      mouth.lineTo(-2, -60);
+                      mouth.lineTo(5, -42);
+                      mouth.lineTo(12, -58);
+                      mouth.lineTo(20, -44);
+                      mouth.lineTo(24, -52);
+                      mouth.lineTo(24, -42);
+                      mouth.lineTo(-22, -42);
+                      mouth.closePath();
+                      mouth.fillPath();
                       mouth.strokePath();
 
-                      // Dark angry/creepy cap
-                      cap.setFillStyle(0x882211);
+                      // Teeth
+                      const teethGfx = this.add.graphics();
+                      teethGfx.fillStyle(0xddddaa, 0.9);
+                      for (let t = -18; t < 20; t += 7) {
+                        teethGfx.fillTriangle(t, -45, t + 3, -38, t + 6, -45);
+                      }
+                      container.add(teethGfx);
 
-                      // Menacing slow pulse
+                      // Dripping ooze from cap
+                      for (let d = 0; d < 5; d++) {
+                        const drip = this.add.ellipse(
+                          Phaser.Math.Between(-40, 40),
+                          -115 + Phaser.Math.Between(0, 10),
+                          3, 8 + Math.random() * 10, 0x442200, 0.8
+                        );
+                        container.add(drip);
+                        this.tweens.add({
+                          targets: drip,
+                          y: drip.y + 20,
+                          alpha: 0,
+                          duration: 2000 + Math.random() * 1000,
+                          repeat: -1,
+                          delay: d * 400,
+                        });
+                      }
+
+                      // Dark blood-red cap with pulsing veins
+                      cap.setFillStyle(0x661111);
+                      stem.setFillStyle(0x776655);
+
+                      // Menacing pulse
                       this.tweens.add({
                         targets: container,
-                        scaleX: 4.15,
-                        scaleY: 4.15,
-                        duration: 1500,
+                        scaleX: 4.2,
+                        scaleY: 4.2,
+                        duration: 800,
                         yoyo: true,
                         repeat: -1,
                         ease: 'Sine.easeInOut',
+                      });
+
+                      // Glitch effect on third eye
+                      this.tweens.add({
+                        targets: thirdPupil,
+                        scaleX: 2,
+                        scaleY: 0.3,
+                        duration: 150,
+                        yoyo: true,
+                        repeat: -1,
+                        repeatDelay: 2000,
+                      });
+
+                      // === FAKE HEALTH BAR (doesn't decrease) ===
+                      const hpBarBg = this.add.rectangle(cam.width / 2, 30, 300, 16, 0x222222, 0.9);
+                      hpBarBg.setScrollFactor(0);
+                      hpBarBg.setDepth(2000);
+                      hpBarBg.setStrokeStyle(2, 0x444444);
+
+                      const hpBarFill = this.add.rectangle(cam.width / 2, 30, 296, 12, 0xcc2222, 1);
+                      hpBarFill.setScrollFactor(0);
+                      hpBarFill.setDepth(2001);
+
+                      const hpLabel = this.add.text(cam.width / 2, 12, 'SHROOMIAL OVERLORD', {
+                        fontSize: '10px',
+                        color: '#ccaa22',
+                        fontFamily: 'Georgia, serif',
+                        fontStyle: 'bold',
+                      });
+                      hpLabel.setOrigin(0.5);
+                      hpLabel.setScrollFactor(0);
+                      hpLabel.setDepth(2002);
+
+                      // Set respawn to chain room for this fight
+                      gameState.setLastBench('chainRoomPostAntElder', 'default');
+
+                      // === PROJECTILE ATTACK - every 1 second ===
+                      const playerSpeed = MOVEMENT_TUNING.maxRunSpeed;
+                      const projectileSpeed = playerSpeed * 0.9; // 10% slower
+
+                      const projectileTimer = this.time.addEvent({
+                        delay: 1000,
+                        loop: true,
+                        callback: () => {
+                          if (!this.player || !this.player.active) return;
+
+                          // Spawn from mushroom head (third eye position in world coords)
+                          const spawnX = container.x + 0 * container.scaleX;
+                          const spawnY = container.y + (-105) * container.scaleY;
+
+                          const proj = this.add.circle(spawnX, spawnY, 6, 0xffcc00);
+                          proj.setDepth(100);
+                          this.physics.add.existing(proj);
+                          const projBody = proj.body as Phaser.Physics.Arcade.Body;
+
+                          // Aim at player
+                          const angle = Phaser.Math.Angle.Between(
+                            spawnX, spawnY, this.player.x, this.player.y
+                          );
+                          projBody.setVelocity(
+                            Math.cos(angle) * projectileSpeed,
+                            Math.sin(angle) * projectileSpeed
+                          );
+
+                          // Glow trail
+                          const trail = this.add.circle(spawnX, spawnY, 10, 0xffcc00, 0.3);
+                          trail.setDepth(99);
+                          this.tweens.add({
+                            targets: trail,
+                            alpha: 0,
+                            scaleX: 0,
+                            scaleY: 0,
+                            duration: 400,
+                            onComplete: () => trail.destroy(),
+                          });
+
+                          // Instakill on overlap with player
+                          this.physics.add.overlap(this.player, proj, () => {
+                            proj.destroy();
+                            // Set HP to 0 and kill
+                            const pd = gameState.getPlayerData();
+                            pd.hp = 0;
+                            this.handlePlayerDeath();
+                          });
+
+                          // Destroy after 5 seconds
+                          this.time.delayedCall(5000, () => {
+                            if (proj && proj.active) proj.destroy();
+                          });
+                        },
+                      });
+
+                      // Store ref to clean up on scene shutdown
+                      this.events.once('shutdown', () => {
+                        projectileTimer.destroy();
                       });
                     }
                   });
