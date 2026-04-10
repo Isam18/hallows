@@ -1,0 +1,22 @@
+{
+  "id": "shroomialLands",
+  "name": "Shroomial Lands",
+  "width": 800,
+  "height": 600,
+  "backgroundColor": "#2a2200",
+  "spawnPoint": { "x": 400, "y": 500 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 800, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 800, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall" },
+    { "x": 770, "y": 30, "width": 30, "height": 520, "type": "wall" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [],
+  "spawns": {
+    "default": { "x": 400, "y": 500 },
+    "fromFungusDoor": { "x": 400, "y": 500 }
+  },
+  "biome": "fungus"
+}
