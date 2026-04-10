@@ -28,8 +28,8 @@
     {
       "id": "fungusDoor",
       "type": "fungusDoor",
-      "x": 375,
-      "y": 450,
+      "x": 50,
+      "y": 750,
       "width": 50,
       "height": 100
     }
