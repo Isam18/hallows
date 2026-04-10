@@ -3464,7 +3464,7 @@ export class GameScene extends Phaser.Scene {
             dialogueTexts.forEach(t => t.destroy());
 
             // Yellow flash
-            const flash = this.add.rectangle(cam.width / 2, cam.height / 2, cam.width, cam.height, 0xddcc22, 0);
+            const flash = this.add.rectangle(cam.width / 2, cam.height / 2, cam.width, cam.height, 0x887711, 0);
             flash.setScrollFactor(0);
             flash.setDepth(3000);
 
