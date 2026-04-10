@@ -1218,6 +1218,7 @@ export class GameScene extends Phaser.Scene {
     
     gameState.addShells(100);
     gameState.setState('victory');
+    this.player.jumpMultiplier = 1;
     
     this.emitUIEvent('bossDefeated', {
       reward: 100,
