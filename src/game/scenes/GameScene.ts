@@ -505,6 +505,11 @@ export class GameScene extends Phaser.Scene {
     if ((this.currentLevel as any).isBossArena && (this.currentLevel as any).backgroundFauna) {
       this.setupHunterBossArena((this.currentLevel as any).backgroundFauna);
     }
+
+    // Draw mushroom in Shroomial Lands
+    if (this.levelId === 'shroomialLands') {
+      this.drawShroomialLandsMushroom();
+    }
     
     // Initialize flying enemy spawner
     this.flyingSpawner = new FlyingEnemySpawner(this, this.enemies);
