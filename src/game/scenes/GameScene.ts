@@ -3231,54 +3231,144 @@ export class GameScene extends Phaser.Scene {
     const cx = 400;
     const groundY = 550;
 
+    // Container for all mushroom parts so we can scale together
+    const container = this.add.container(cx, groundY);
+    container.setDepth(3);
+
     // Mushroom stem
-    const stem = this.add.rectangle(cx, groundY - 60, 30, 120, 0xddcc88);
-    stem.setDepth(3);
+    const stem = this.add.rectangle(0, -60, 30, 120, 0xddcc88);
 
     // Mushroom cap (large dome)
-    const cap = this.add.ellipse(cx, groundY - 130, 120, 70, 0xccaa22);
-    cap.setDepth(4);
+    const cap = this.add.ellipse(0, -130, 120, 70, 0xccaa22);
 
     // Cap spots
-    const spots = [
-      { x: cx - 30, y: groundY - 140, r: 8 },
-      { x: cx + 20, y: groundY - 145, r: 6 },
-      { x: cx - 10, y: groundY - 125, r: 7 },
-      { x: cx + 35, y: groundY - 130, r: 5 },
+    const spotObjects: Phaser.GameObjects.Arc[] = [];
+    const spotsData = [
+      { x: -30, y: -140, r: 8 },
+      { x: 20, y: -145, r: 6 },
+      { x: -10, y: -125, r: 7 },
+      { x: 35, y: -130, r: 5 },
     ];
-    spots.forEach(s => {
+    spotsData.forEach(s => {
       const dot = this.add.circle(s.x, s.y, s.r, 0x1a1800, 0.6);
-      dot.setDepth(5);
+      spotObjects.push(dot);
     });
 
     // Face - eyes
-    const leftEye = this.add.ellipse(cx - 15, groundY - 80, 8, 10, 0x111100);
-    leftEye.setDepth(5);
-    const rightEye = this.add.ellipse(cx + 15, groundY - 80, 8, 10, 0x111100);
-    rightEye.setDepth(5);
+    const leftEye = this.add.ellipse(-15, -80, 8, 10, 0x111100);
+    const rightEye = this.add.ellipse(15, -80, 8, 10, 0x111100);
 
     // Eye highlights
-    const leftHighlight = this.add.circle(cx - 13, groundY - 83, 2, 0xffffcc);
-    leftHighlight.setDepth(6);
-    const rightHighlight = this.add.circle(cx + 17, groundY - 83, 2, 0xffffcc);
-    rightHighlight.setDepth(6);
+    const leftHighlight = this.add.circle(-13, -83, 2, 0xffffcc);
+    const rightHighlight = this.add.circle(17, -83, 2, 0xffffcc);
 
     // Mouth - friendly smile
     const mouth = this.add.graphics();
     mouth.lineStyle(2, 0x111100);
     mouth.beginPath();
-    mouth.arc(cx, groundY - 60, 12, 0.2, Math.PI - 0.2, false);
+    mouth.arc(0, -60, 12, 0.2, Math.PI - 0.2, false);
     mouth.strokePath();
-    mouth.setDepth(5);
 
-    // Gentle idle animation - bob up and down
+    container.add([stem, cap, ...spotObjects, leftEye, rightEye, leftHighlight, rightHighlight, mouth]);
+
+    // Gentle idle bob
     this.tweens.add({
-      targets: [cap, ...spots.map(() => null).filter(() => false)],
-      y: cap.y - 3,
+      targets: container,
+      y: groundY - 3,
       duration: 2000,
       yoyo: true,
       repeat: -1,
       ease: 'Sine.easeInOut',
+    });
+
+    // Phase 2: After 2 seconds - become SAD and smaller
+    this.time.delayedCall(2000, () => {
+      // Shrink
+      this.tweens.add({
+        targets: container,
+        scaleX: 0.7,
+        scaleY: 0.7,
+        duration: 800,
+        ease: 'Sine.easeInOut',
+      });
+
+      // Sad eyes - droop down
+      this.tweens.add({ targets: leftEye, y: -75, scaleY: 0.7, duration: 600 });
+      this.tweens.add({ targets: rightEye, y: -75, scaleY: 0.7, duration: 600 });
+      this.tweens.add({ targets: leftHighlight, y: -78, duration: 600 });
+      this.tweens.add({ targets: rightHighlight, y: -78, duration: 600 });
+
+      // Replace smile with frown
+      this.tweens.add({
+        targets: mouth,
+        alpha: 0,
+        duration: 300,
+        onComplete: () => {
+          mouth.clear();
+          mouth.lineStyle(2, 0x111100);
+          mouth.beginPath();
+          // Frown (inverted arc)
+          mouth.arc(0, -50, 10, Math.PI + 0.3, -0.3, false);
+          mouth.strokePath();
+          mouth.setAlpha(1);
+        }
+      });
+
+      // Change cap color to a more muted/blue-ish sad tone
+      cap.setFillStyle(0x999955);
+    });
+
+    // Phase 3: After 12 seconds total (10 more) - become ANGRY and bigger
+    this.time.delayedCall(12000, () => {
+      // Grow big
+      this.tweens.add({
+        targets: container,
+        scaleX: 1.5,
+        scaleY: 1.5,
+        duration: 1000,
+        ease: 'Back.easeOut',
+      });
+
+      // Angry eyes - sharp and angled
+      this.tweens.add({ targets: leftEye, y: -85, scaleX: 1.3, scaleY: 0.6, duration: 500 });
+      this.tweens.add({ targets: rightEye, y: -85, scaleX: 1.3, scaleY: 0.6, duration: 500 });
+      this.tweens.add({ targets: leftHighlight, alpha: 0, duration: 300 });
+      this.tweens.add({ targets: rightHighlight, alpha: 0, duration: 300 });
+
+      // Angry eyebrows
+      const leftBrow = this.add.rectangle(-18, -95, 16, 3, 0x111100);
+      leftBrow.setRotation(-0.4);
+      const rightBrow = this.add.rectangle(18, -95, 16, 3, 0x111100);
+      rightBrow.setRotation(0.4);
+      container.add([leftBrow, rightBrow]);
+
+      // Angry mouth - jagged snarl
+      mouth.clear();
+      mouth.lineStyle(3, 0x111100);
+      mouth.beginPath();
+      mouth.moveTo(-15, -55);
+      mouth.lineTo(-8, -50);
+      mouth.lineTo(0, -55);
+      mouth.lineTo(8, -50);
+      mouth.lineTo(15, -55);
+      mouth.strokePath();
+
+      // Turn cap red/angry
+      cap.setFillStyle(0xcc4422);
+
+      // Screen shake
+      this.cameras.main.shake(500, 0.01);
+
+      // Aggressive bob
+      this.tweens.killTweensOf(container);
+      this.tweens.add({
+        targets: container,
+        y: groundY - 8,
+        duration: 300,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
     });
   }
 }
