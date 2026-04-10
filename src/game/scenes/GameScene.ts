@@ -89,6 +89,7 @@ import huntersMarchBenchRoomData from '../data/levels/huntersMarchBenchRoom.json
 import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json';
 import chainRoomPostAntElderData from '../data/levels/chainRoomPostAntElder.json';
 import shroomialLandsData from '../data/levels/shroomialLands.json';
+import freezingPlainsData from '../data/levels/freezingPlains.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -135,6 +136,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchBossArena: huntersMarchBossArenaData as unknown as LevelConfig,
   chainRoomPostAntElder: chainRoomPostAntElderData as unknown as LevelConfig,
   shroomialLands: shroomialLandsData as unknown as LevelConfig,
+  freezingPlains: freezingPlainsData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -273,6 +275,8 @@ export class GameScene extends Phaser.Scene {
       this.createMedullaEnvironment();
     } else if (biome === 'huntersMarch') {
       this.createHuntersMarchEnvironment(biome !== GameScene.lastEnteredBiome);
+    } else if (biome === 'ice') {
+      this.createIceEnvironment();
     }
     GameScene.lastEnteredBiome = biome;
     
