@@ -480,8 +480,17 @@ export class GameScene extends Phaser.Scene {
         // Light green plant door (unopenable for now)
         this.createVerdantDoor(t.x, t.y, t.width, t.height);
       } else if (t.type === 'fungusDoor') {
-        // Fungus yellow/black door (unopenable for now)
-        this.createFungusDoor(t.x, t.y, t.width, t.height);
+        // Fungus door - disintegrates if player died in shroomial lands
+        if (gameState.diedInShroomialLands) {
+          this.createDisintegratingFungusDoor(t.x, t.y, t.width, t.height);
+        } else {
+          this.createFungusDoor(t.x, t.y, t.width, t.height);
+        }
+      } else if (t.type === 'iceDoor') {
+        // Ice door only appears after dying in shroomial lands
+        if (gameState.diedInShroomialLands) {
+          this.createIceDoor(t.x, t.y, t.width, t.height);
+        }
       } else if (t.type === 'bossExitTransition') {
         // Hidden exit that appears after boss is defeated
         this.createBossExitDoor(t.x, t.y, t.width, t.height, t.target, t.targetSpawn);
