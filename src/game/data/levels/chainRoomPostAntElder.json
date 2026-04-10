@@ -32,6 +32,14 @@
       "y": 750,
       "width": 50,
       "height": 100
+    },
+    {
+      "id": "iceDoor",
+      "type": "iceDoor",
+      "x": 700,
+      "y": 750,
+      "width": 50,
+      "height": 100
     }
   ],
   "spawns": {
