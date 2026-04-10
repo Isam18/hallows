@@ -26,6 +26,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
   private movementState: MovementState = 'grounded';
   private visualState: VisualState = 'idle';
   private facing: 1 | -1 = 1;
+  public jumpMultiplier: number = 1;
   
   // Ground/wall detection
   private isGrounded = false;
@@ -341,7 +342,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   private executeJump(): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setVelocityY(-MOVEMENT_TUNING.jumpVelocity);
+    body.setVelocityY(-MOVEMENT_TUNING.jumpVelocity * this.jumpMultiplier);
     
     this.jumpBufferTimer = 0;
     this.coyoteTimer = 0;
