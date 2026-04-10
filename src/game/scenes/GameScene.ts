@@ -3323,8 +3323,8 @@ export class GameScene extends Phaser.Scene {
       // Grow big
       this.tweens.add({
         targets: container,
-        scaleX: 1.5,
-        scaleY: 1.5,
+        scaleX: 4,
+        scaleY: 4,
         duration: 1000,
         ease: 'Back.easeOut',
       });
