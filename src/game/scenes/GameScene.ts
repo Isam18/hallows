@@ -4032,8 +4032,7 @@ export class GameScene extends Phaser.Scene {
                           // Instakill on overlap
                           this.physics.add.overlap(this.player, proj, () => {
                             proj.destroy();
-                            const pd = gameState.getPlayerData();
-                            pd.hp = 0;
+                            gameState.setHp(0);
                             this.handlePlayerDeath();
                           });
 
