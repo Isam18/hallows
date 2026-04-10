@@ -3369,6 +3369,32 @@ export class GameScene extends Phaser.Scene {
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
+      // Phase 4: After 5 more seconds of anger - dead mushrooms fill background
+      this.time.delayedCall(5000, () => {
+        this.cameras.main.shake(300, 0.008);
+        const deadColors = [0x554422, 0x443311, 0x665533, 0x332211];
+        for (let i = 0; i < 30; i++) {
+          const mx = Phaser.Math.Between(40, 760);
+          const my = Phaser.Math.Between(200, 540);
+          const scale = 0.3 + Math.random() * 0.7;
+          const color = Phaser.Utils.Array.GetRandom(deadColors);
+
+          // Dead stem
+          const dStem = this.add.rectangle(mx, my, 8 * scale, 30 * scale, 0x443322, 0.7);
+          dStem.setDepth(1);
+
+          // Dead cap - wilted
+          const dCap = this.add.ellipse(mx, my - 18 * scale, 30 * scale, 16 * scale, color, 0.7);
+          dCap.setDepth(1);
+          dCap.setRotation(Phaser.Math.Between(-3, 3) * 0.15);
+
+          // Fade them in
+          dStem.setAlpha(0);
+          dCap.setAlpha(0);
+          this.tweens.add({ targets: dStem, alpha: 0.7, duration: 300, delay: i * 50 });
+          this.tweens.add({ targets: dCap, alpha: 0.7, duration: 300, delay: i * 50 });
+        }
+      });
     });
   }
 }
