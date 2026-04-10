@@ -1385,6 +1385,11 @@ export class GameScene extends Phaser.Scene {
     // Guard against multiple death calls
     if (gameState.getState() === 'death') return;
     
+    // Track if died in shroomial lands
+    if (this.levelId === 'shroomialLands') {
+      gameState.setDiedInShroomialLands();
+    }
+    
     const playerData = gameState.getPlayerData();
     
     // Drop shells at death location with room ID
