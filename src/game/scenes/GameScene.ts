@@ -2063,6 +2063,278 @@ export class GameScene extends Phaser.Scene {
     (this as any)._fungusDoorText = sealedText;
   }
 
+  private createDisintegratingFungusDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Create the door visuals but immediately start disintegrating
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 12, height + 12, 0x1a1a0a);
+    doorFrame.setStrokeStyle(3, 0x0a0a00);
+    doorFrame.setDepth(5);
+
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x2a2a1a);
+    doorSurface.setStrokeStyle(2, 0x1a1a0a);
+    doorSurface.setDepth(6);
+
+    // Fungus blobs
+    const blobs: Phaser.GameObjects.Ellipse[] = [];
+    const fungusColors = [0xccaa22, 0xddbb33, 0x998811, 0x111100];
+    for (let i = 0; i < 8; i++) {
+      const fx = doorX + Phaser.Math.Between(-18, 18);
+      const fy = doorY + Phaser.Math.Between(-40, 40);
+      const color = Phaser.Utils.Array.GetRandom(fungusColors);
+      const blob = this.add.ellipse(fx, fy, 6 + Math.random() * 8, 8 + Math.random() * 10, color, 0.8);
+      blob.setDepth(7);
+      blobs.push(blob);
+    }
+
+    // Disintegration: after 0.5s, particles fly off and door fades
+    this.time.delayedCall(500, () => {
+      // Scatter blobs
+      blobs.forEach((blob, i) => {
+        this.tweens.add({
+          targets: blob,
+          x: blob.x + Phaser.Math.Between(-80, 80),
+          y: blob.y + Phaser.Math.Between(-60, -120),
+          alpha: 0,
+          scaleX: 0.2,
+          scaleY: 0.2,
+          duration: 600 + i * 100,
+          ease: 'Power2',
+          onComplete: () => blob.destroy()
+        });
+      });
+
+      // Fade door
+      this.tweens.add({
+        targets: [doorFrame, doorSurface],
+        alpha: 0,
+        duration: 1200,
+        ease: 'Power2',
+        onComplete: () => {
+          doorFrame.destroy();
+          doorSurface.destroy();
+        }
+      });
+
+      // Dust particles where the door was
+      for (let i = 0; i < 12; i++) {
+        const p = this.add.circle(
+          doorX + Phaser.Math.Between(-20, 20),
+          doorY + Phaser.Math.Between(-40, 40),
+          2 + Math.random() * 3,
+          0x998811, 0.6
+        );
+        p.setDepth(8);
+        this.tweens.add({
+          targets: p,
+          y: p.y - 40 - Math.random() * 40,
+          alpha: 0,
+          duration: 800 + Math.random() * 400,
+          onComplete: () => p.destroy()
+        });
+      }
+    });
+  }
+
+  private createIceDoor(x: number, y: number, width: number, height: number): void {
+    const doorX = x + width / 2;
+    const doorY = y + height / 2;
+
+    // Icy blue door frame
+    const doorFrame = this.add.rectangle(doorX, doorY, width + 12, height + 12, 0x1a2a3a);
+    doorFrame.setStrokeStyle(3, 0x4488cc);
+    doorFrame.setDepth(5);
+
+    // Door surface - icy blue
+    const doorSurface = this.add.rectangle(doorX, doorY, width, height, 0x2a4a6a);
+    doorSurface.setStrokeStyle(2, 0x5599dd);
+    doorSurface.setDepth(6);
+
+    // Ice crystals on door
+    for (let i = 0; i < 6; i++) {
+      const cx2 = doorX + Phaser.Math.Between(-15, 15);
+      const cy2 = doorY + Phaser.Math.Between(-35, 35);
+      const crystal = this.add.polygon(cx2, cy2, [
+        [0, -8], [4, 0], [0, 8], [-4, 0]
+      ], 0x88ccff, 0.6);
+      crystal.setDepth(7);
+      crystal.setScale(0.5 + Math.random() * 0.8);
+      crystal.setRotation(Math.random() * Math.PI);
+    }
+
+    // Frost glow
+    const glow = this.add.rectangle(doorX, doorY, width + 25, height + 20, 0x4488cc, 0.08);
+    glow.setDepth(4);
+    this.tweens.add({
+      targets: glow,
+      alpha: { from: 0.04, to: 0.15 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1
+    });
+
+    // Prompt text
+    const promptText = this.add.text(doorX, doorY - 60, 'Press UP to enter', {
+      fontSize: '12px',
+      color: '#88ccff',
+      fontFamily: 'Georgia, serif',
+      fontStyle: 'italic',
+    });
+    promptText.setOrigin(0.5);
+    promptText.setDepth(100);
+    promptText.setVisible(false);
+
+    // Interaction zone
+    const zone = this.add.zone(doorX, doorY, width + 40, height + 40);
+    this.physics.add.existing(zone, true);
+
+    (this as any)._iceDoorZone = zone;
+    (this as any)._iceDoorText = promptText;
+  }
+
+  private enterFreezingPlains(): void {
+    // Freeze player
+    this.player.setVelocity(0, 0);
+    (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
+    const cam = this.cameras.main;
+    const cx = cam.width / 2;
+    const cy = cam.height / 2;
+
+    // Black overlay
+    const overlay = this.add.rectangle(cx, cy, cam.width, cam.height, 0x000000, 0);
+    overlay.setScrollFactor(0);
+    overlay.setDepth(2000);
+
+    // Fade to black
+    this.tweens.add({
+      targets: overlay,
+      alpha: 1,
+      duration: 800,
+      onComplete: () => {
+        // Show "Freezing Plains" in icy letters
+        const title = this.add.text(cx, cy, 'Freezing Plains', {
+          fontSize: '56px',
+          color: '#aaddff',
+          fontFamily: 'Georgia, serif',
+          fontStyle: 'bold',
+        });
+        title.setOrigin(0.5);
+        title.setScrollFactor(0);
+        title.setDepth(2001);
+        title.setAlpha(0);
+
+        // Add icy shimmer effect with stroke
+        title.setStroke('#4488cc', 3);
+        title.setShadow(0, 0, '#4488ff', 12, true, true);
+
+        // Frost particles around title
+        const frostParticles: Phaser.GameObjects.Arc[] = [];
+        for (let i = 0; i < 20; i++) {
+          const p = this.add.circle(
+            cx + Phaser.Math.Between(-200, 200),
+            cy + Phaser.Math.Between(-60, 60),
+            1 + Math.random() * 2,
+            0xaaddff, 0
+          );
+          p.setScrollFactor(0);
+          p.setDepth(2001);
+          frostParticles.push(p);
+          this.tweens.add({
+            targets: p,
+            alpha: { from: 0, to: 0.6 },
+            y: p.y - 20 - Math.random() * 30,
+            duration: 1500 + Math.random() * 1000,
+            yoyo: true,
+            repeat: -1,
+          });
+        }
+
+        // Fade in title
+        this.tweens.add({
+          targets: title,
+          alpha: 1,
+          duration: 1200,
+          onComplete: () => {
+            this.time.delayedCall(2000, () => {
+              this.tweens.add({
+                targets: [title, ...frostParticles],
+                alpha: 0,
+                duration: 800,
+                onComplete: () => {
+                  title.destroy();
+                  frostParticles.forEach(p => p.destroy());
+                  overlay.destroy();
+                  this.transitionToLevel('freezingPlains', 'fromIceDoor');
+                }
+              });
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private createIceEnvironment(): void {
+    const w = this.currentLevel.width;
+    const h = this.currentLevel.height;
+    const groundY = h - 50;
+
+    // Set player ice flag
+    this.player.onIce = true;
+
+    // Dark blue gradient background
+    const bgTop = this.add.rectangle(w / 2, 0, w, h / 2, 0x0a1428);
+    bgTop.setOrigin(0.5, 0);
+    bgTop.setDepth(-10);
+    const bgBot = this.add.rectangle(w / 2, h / 2, w, h / 2, 0x0d1a30);
+    bgBot.setOrigin(0.5, 0);
+    bgBot.setDepth(-10);
+
+    // Ice sheen on the ground
+    const iceSheen = this.add.rectangle(w / 2, groundY - 2, w, 6, 0x88ccff, 0.25);
+    iceSheen.setDepth(1);
+    this.tweens.add({
+      targets: iceSheen,
+      alpha: { from: 0.15, to: 0.35 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1
+    });
+
+    // Scattered ice crystal decorations
+    for (let i = 0; i < 15; i++) {
+      const cx2 = Phaser.Math.Between(50, w - 50);
+      const cy2 = groundY - Phaser.Math.Between(5, 15);
+      const crystal = this.add.polygon(cx2, cy2, [
+        [0, -6], [3, 0], [0, 6], [-3, 0]
+      ], 0x88ccff, 0.3 + Math.random() * 0.2);
+      crystal.setDepth(2);
+      crystal.setScale(0.6 + Math.random() * 1.2);
+      crystal.setRotation(Math.random() * Math.PI * 0.3);
+    }
+
+    // Floating snow particles
+    for (let i = 0; i < 25; i++) {
+      const snowX = Phaser.Math.Between(0, w);
+      const snowY = Phaser.Math.Between(0, h);
+      const flake = this.add.circle(snowX, snowY, 1 + Math.random() * 1.5, 0xffffff, 0.3 + Math.random() * 0.3);
+      flake.setDepth(0);
+      this.tweens.add({
+        targets: flake,
+        y: h + 10,
+        x: flake.x + Phaser.Math.Between(-30, 30),
+        duration: 4000 + Math.random() * 4000,
+        repeat: -1,
+        onRepeat: () => {
+          flake.y = -10;
+          flake.x = Phaser.Math.Between(0, w);
+        }
+      });
+    }
+  }
+
   private bossExitDoorVisuals: Phaser.GameObjects.GameObject[] = [];
   private bossExitZone: Phaser.GameObjects.Zone | null = null;
   private bossExitTarget: string = '';
