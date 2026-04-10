@@ -3508,81 +3508,127 @@ export class GameScene extends Phaser.Scene {
                       bossTitle.destroy();
                       bossSubtitle.destroy();
 
-                      // Move mushroom to left wall, horrifying final form
+                      // Move mushroom to CENTER, horrifying final form
                       this.tweens.killTweensOf(container);
-                      container.setPosition(60, groundY - 40);
+                      container.setPosition(400, groundY - 80);
                       container.setScale(4, 4);
 
-                      // === HORRIFYING FACE ===
-                      // Glitchy asymmetric eyes
-                      leftEye.setPosition(-12, -85);
-                      leftEye.setScale(2.0, 0.3);
-                      rightEye.setPosition(18, -80);
-                      rightEye.setScale(0.5, 2.2);
+                      // === DISTORTED HORROR FACE ===
+                      // Eyes - one melting down, one bulging out
+                      leftEye.setPosition(-14, -82);
+                      leftEye.setScale(2.5, 0.2); // stretched horizontal slit
+                      rightEye.setPosition(16, -78);
+                      rightEye.setScale(0.4, 2.8); // tall vertical slit
 
-                      // Creepy uneven pupils - one tiny, one huge
+                      // Pupils - twitching, wrong sizes
                       leftHighlight.setAlpha(1);
-                      leftHighlight.setPosition(-14, -86);
-                      leftHighlight.setScale(0.3);
+                      leftHighlight.setPosition(-10, -83);
+                      leftHighlight.setScale(0.2);
                       rightHighlight.setAlpha(1);
-                      rightHighlight.setPosition(20, -82);
-                      rightHighlight.setScale(2.5);
+                      rightHighlight.setPosition(18, -80);
+                      rightHighlight.setScale(3);
 
-                      // Third eye on forehead
-                      const thirdEye = this.add.ellipse(0, -105, 12, 14, 0x660000);
-                      const thirdPupil = this.add.circle(0, -105, 3, 0xffff00);
-                      container.add([thirdEye, thirdPupil]);
+                      // Third eye - bloodshot, on forehead
+                      const thirdEye = this.add.ellipse(3, -108, 14, 16, 0x330000);
+                      const thirdEyeInner = this.add.ellipse(3, -108, 10, 12, 0x660000);
+                      const thirdPupil = this.add.circle(3, -108, 3, 0xffff00);
+                      container.add([thirdEye, thirdEyeInner, thirdPupil]);
 
-                      // Jagged gaping mouth with teeth
+                      // Bloodshot veins from third eye
+                      const veinGfx = this.add.graphics();
+                      veinGfx.lineStyle(1, 0x880000, 0.7);
+                      for (let v = 0; v < 6; v++) {
+                        const angle = (v / 6) * Math.PI * 2;
+                        veinGfx.beginPath();
+                        veinGfx.moveTo(3, -108);
+                        const endX = 3 + Math.cos(angle) * (12 + Math.random() * 8);
+                        const endY = -108 + Math.sin(angle) * (12 + Math.random() * 8);
+                        const midX = (3 + endX) / 2 + (Math.random() - 0.5) * 6;
+                        const midY = (-108 + endY) / 2 + (Math.random() - 0.5) * 6;
+                        veinGfx.lineTo(midX, midY);
+                        veinGfx.lineTo(endX, endY);
+                        veinGfx.strokePath();
+                      }
+                      container.add(veinGfx);
+
+                      // Gaping distorted mouth - asymmetric hole
                       mouth.clear();
-                      mouth.lineStyle(3, 0x110000);
-                      mouth.fillStyle(0x110000, 1);
+                      mouth.fillStyle(0x0a0000, 1);
                       mouth.beginPath();
-                      mouth.moveTo(-22, -55);
-                      mouth.lineTo(-15, -62);
-                      mouth.lineTo(-8, -45);
-                      mouth.lineTo(-2, -60);
-                      mouth.lineTo(5, -42);
-                      mouth.lineTo(12, -58);
-                      mouth.lineTo(20, -44);
-                      mouth.lineTo(24, -52);
-                      mouth.lineTo(24, -42);
-                      mouth.lineTo(-22, -42);
+                      mouth.moveTo(-25, -55);
+                      mouth.lineTo(-18, -65);
+                      mouth.lineTo(-10, -48);
+                      mouth.lineTo(-3, -63);
+                      mouth.lineTo(6, -40);
+                      mouth.lineTo(14, -60);
+                      mouth.lineTo(22, -42);
+                      mouth.lineTo(28, -53);
+                      mouth.lineTo(28, -35);
+                      mouth.lineTo(-25, -38);
                       mouth.closePath();
                       mouth.fillPath();
+                      // Mouth outline - uneven strokes
+                      mouth.lineStyle(2, 0x330000);
                       mouth.strokePath();
 
-                      // Teeth
+                      // Crooked teeth - different sizes, some broken
                       const teethGfx = this.add.graphics();
-                      teethGfx.fillStyle(0xddddaa, 0.9);
-                      for (let t = -18; t < 20; t += 7) {
-                        teethGfx.fillTriangle(t, -45, t + 3, -38, t + 6, -45);
-                      }
+                      teethGfx.fillStyle(0xbbbb88, 0.9);
+                      const teethData = [
+                        { x: -20, w: 5, h: 8 }, { x: -12, w: 4, h: 11 },
+                        { x: -6, w: 6, h: 6 }, { x: 2, w: 3, h: 13 },
+                        { x: 8, w: 7, h: 7 }, { x: 16, w: 4, h: 10 },
+                        { x: 22, w: 5, h: 5 },
+                      ];
+                      teethData.forEach(t => {
+                        teethGfx.fillTriangle(t.x, -42, t.x + t.w / 2, -42 + t.h, t.x + t.w, -42);
+                      });
+                      // Bottom teeth
+                      teethGfx.fillStyle(0xaaaa77, 0.8);
+                      [{ x: -16, w: 6, h: -7 }, { x: -4, w: 5, h: -9 }, { x: 10, w: 7, h: -6 }, { x: 20, w: 4, h: -8 }]
+                        .forEach(t => {
+                          teethGfx.fillTriangle(t.x, -55, t.x + t.w / 2, -55 + t.h, t.x + t.w, -55);
+                        });
                       container.add(teethGfx);
 
-                      // Dripping ooze from cap
-                      for (let d = 0; d < 5; d++) {
+                      // Dripping ooze/gore from cap and mouth
+                      for (let d = 0; d < 8; d++) {
                         const drip = this.add.ellipse(
-                          Phaser.Math.Between(-40, 40),
-                          -115 + Phaser.Math.Between(0, 10),
-                          3, 8 + Math.random() * 10, 0x442200, 0.8
+                          Phaser.Math.Between(-45, 45),
+                          -120 + Phaser.Math.Between(0, 15),
+                          2 + Math.random() * 3,
+                          6 + Math.random() * 15,
+                          d < 4 ? 0x442200 : 0x550000, 0.8
                         );
                         container.add(drip);
                         this.tweens.add({
                           targets: drip,
-                          y: drip.y + 20,
+                          y: drip.y + 30,
                           alpha: 0,
-                          duration: 2000 + Math.random() * 1000,
+                          duration: 1500 + Math.random() * 1500,
                           repeat: -1,
-                          delay: d * 400,
+                          delay: d * 300,
                         });
                       }
 
-                      // Dark blood-red cap with pulsing veins
-                      cap.setFillStyle(0x661111);
-                      stem.setFillStyle(0x776655);
+                      // Cracks/fissures on stem
+                      const crackGfx = this.add.graphics();
+                      crackGfx.lineStyle(1, 0x331100, 0.6);
+                      for (let c = 0; c < 4; c++) {
+                        const cy = -20 - c * 25;
+                        crackGfx.beginPath();
+                        crackGfx.moveTo(-8 + Math.random() * 16, cy);
+                        crackGfx.lineTo(-5 + Math.random() * 10, cy + 10);
+                        crackGfx.lineTo(-3 + Math.random() * 6, cy + 20);
+                        crackGfx.strokePath();
+                      }
+                      container.add(crackGfx);
 
-                      // Menacing pulse
+                      // Dark blood-red cap, rotting stem
+                      cap.setFillStyle(0x551111);
+                      stem.setFillStyle(0x554433);
+
+                      // Menacing pulse with slight rotation glitch
                       this.tweens.add({
                         targets: container,
                         scaleX: 4.2,
@@ -3593,15 +3639,40 @@ export class GameScene extends Phaser.Scene {
                         ease: 'Sine.easeInOut',
                       });
 
-                      // Glitch effect on third eye
+                      // Random rotation twitching
+                      this.time.addEvent({
+                        delay: 1500,
+                        loop: true,
+                        callback: () => {
+                          const twitch = (Math.random() - 0.5) * 0.06;
+                          this.tweens.add({
+                            targets: container,
+                            rotation: twitch,
+                            duration: 100,
+                            yoyo: true,
+                          });
+                        },
+                      });
+
+                      // Third eye glitch
                       this.tweens.add({
                         targets: thirdPupil,
-                        scaleX: 2,
-                        scaleY: 0.3,
-                        duration: 150,
+                        scaleX: 2.5,
+                        scaleY: 0.2,
+                        duration: 100,
                         yoyo: true,
                         repeat: -1,
-                        repeatDelay: 2000,
+                        repeatDelay: 1500,
+                      });
+
+                      // Eye twitching
+                      this.time.addEvent({
+                        delay: 2000,
+                        loop: true,
+                        callback: () => {
+                          this.tweens.add({ targets: leftEye, x: leftEye.x + Phaser.Math.Between(-3, 3), duration: 80, yoyo: true });
+                          this.tweens.add({ targets: rightEye, y: rightEye.y + Phaser.Math.Between(-4, 4), duration: 80, yoyo: true });
+                        },
                       });
 
                       // === FAKE HEALTH BAR (doesn't decrease) ===
@@ -3627,9 +3698,10 @@ export class GameScene extends Phaser.Scene {
                       // Set respawn to chain room for this fight
                       gameState.setLastBench('chainRoomPostAntElder', 'default');
 
-                      // === PROJECTILE ATTACK - every 1 second ===
+                      // === HEATSEAKING PROJECTILES - every 1 second ===
                       const playerSpeed = MOVEMENT_TUNING.maxRunSpeed;
-                      const projectileSpeed = playerSpeed * 0.9; // 10% slower
+                      const projectileSpeed = playerSpeed * 0.9;
+                      const activeProjectiles: Phaser.GameObjects.Arc[] = [];
 
                       const projectileTimer = this.time.addEvent({
                         delay: 1000,
@@ -3637,55 +3709,71 @@ export class GameScene extends Phaser.Scene {
                         callback: () => {
                           if (!this.player || !this.player.active) return;
 
-                          // Spawn from mushroom head (third eye position in world coords)
-                          const spawnX = container.x + 0 * container.scaleX;
-                          const spawnY = container.y + (-105) * container.scaleY;
+                          // Spawn from third eye
+                          const spawnX = container.x;
+                          const spawnY = container.y + (-108) * container.scaleY;
 
                           const proj = this.add.circle(spawnX, spawnY, 6, 0xffcc00);
                           proj.setDepth(100);
                           this.physics.add.existing(proj);
                           const projBody = proj.body as Phaser.Physics.Arcade.Body;
+                          projBody.setAllowGravity(false);
 
-                          // Aim at player
-                          const angle = Phaser.Math.Angle.Between(
-                            spawnX, spawnY, this.player.x, this.player.y
-                          );
-                          projBody.setVelocity(
-                            Math.cos(angle) * projectileSpeed,
-                            Math.sin(angle) * projectileSpeed
-                          );
+                          // Initial direction toward player
+                          const angle = Phaser.Math.Angle.Between(spawnX, spawnY, this.player.x, this.player.y);
+                          projBody.setVelocity(Math.cos(angle) * projectileSpeed, Math.sin(angle) * projectileSpeed);
 
-                          // Glow trail
-                          const trail = this.add.circle(spawnX, spawnY, 10, 0xffcc00, 0.3);
-                          trail.setDepth(99);
-                          this.tweens.add({
-                            targets: trail,
-                            alpha: 0,
-                            scaleX: 0,
-                            scaleY: 0,
-                            duration: 400,
-                            onComplete: () => trail.destroy(),
-                          });
+                          activeProjectiles.push(proj);
 
-                          // Instakill on overlap with player
+                          // Eerie glow
+                          const glow = this.add.circle(spawnX, spawnY, 12, 0xffcc00, 0.2);
+                          glow.setDepth(99);
+                          this.tweens.add({ targets: glow, alpha: 0, scaleX: 0, scaleY: 0, duration: 300, onComplete: () => glow.destroy() });
+
+                          // Instakill on overlap
                           this.physics.add.overlap(this.player, proj, () => {
                             proj.destroy();
-                            // Set HP to 0 and kill
                             const pd = gameState.getPlayerData();
                             pd.hp = 0;
                             this.handlePlayerDeath();
                           });
 
-                          // Destroy after 5 seconds
-                          this.time.delayedCall(5000, () => {
+                          // Destroy after 8 seconds
+                          this.time.delayedCall(8000, () => {
                             if (proj && proj.active) proj.destroy();
                           });
                         },
                       });
 
-                      // Store ref to clean up on scene shutdown
+                      // Heatseaking update - steer projectiles toward player each frame
+                      const heatseekEvent = this.time.addEvent({
+                        delay: 50,
+                        loop: true,
+                        callback: () => {
+                          if (!this.player || !this.player.active) return;
+                          for (let i = activeProjectiles.length - 1; i >= 0; i--) {
+                            const p = activeProjectiles[i];
+                            if (!p || !p.active) {
+                              activeProjectiles.splice(i, 1);
+                              continue;
+                            }
+                            const pb = p.body as Phaser.Physics.Arcade.Body;
+                            const desired = Phaser.Math.Angle.Between(p.x, p.y, this.player.x, this.player.y);
+                            const current = Math.atan2(pb.velocity.y, pb.velocity.x);
+                            // Smooth turning - steer toward player
+                            const turnRate = 0.08;
+                            let diff = desired - current;
+                            if (diff > Math.PI) diff -= Math.PI * 2;
+                            if (diff < -Math.PI) diff += Math.PI * 2;
+                            const newAngle = current + diff * turnRate;
+                            pb.setVelocity(Math.cos(newAngle) * projectileSpeed, Math.sin(newAngle) * projectileSpeed);
+                          }
+                        },
+                      });
+
                       this.events.once('shutdown', () => {
                         projectileTimer.destroy();
+                        heatseekEvent.destroy();
                       });
                     }
                   });
