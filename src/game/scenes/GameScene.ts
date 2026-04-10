@@ -3164,4 +3164,116 @@ export class GameScene extends Phaser.Scene {
       );
     });
   }
+
+  private enterShroomialLands(): void {
+    // Freeze player
+    this.player.setVelocity(0, 0);
+    (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
+
+    const cam = this.cameras.main;
+    const cx = cam.width / 2;
+    const cy = cam.height / 2;
+
+    // Black overlay
+    const overlay = this.add.rectangle(cx, cy, cam.width, cam.height, 0x000000, 0);
+    overlay.setScrollFactor(0);
+    overlay.setDepth(2000);
+
+    // Fade to black
+    this.tweens.add({
+      targets: overlay,
+      alpha: 1,
+      duration: 800,
+      onComplete: () => {
+        // Show "Shroomial Lands" title in yellow
+        const title = this.add.text(cx, cy, 'Shroomial Lands', {
+          fontSize: '48px',
+          color: '#ddcc22',
+          fontFamily: 'Georgia, serif',
+          fontStyle: 'bold',
+        });
+        title.setOrigin(0.5);
+        title.setScrollFactor(0);
+        title.setDepth(2001);
+        title.setAlpha(0);
+
+        // Fade in title
+        this.tweens.add({
+          targets: title,
+          alpha: 1,
+          duration: 1000,
+          onComplete: () => {
+            // Hold, then fade out
+            this.time.delayedCall(2000, () => {
+              this.tweens.add({
+                targets: title,
+                alpha: 0,
+                duration: 800,
+                onComplete: () => {
+                  title.destroy();
+                  overlay.destroy();
+                  this.transitionToLevel('shroomialLands', 'fromFungusDoor');
+                }
+              });
+            });
+          }
+        });
+      }
+    });
+  }
+
+  private drawShroomialLandsMushroom(): void {
+    const cx = 400;
+    const groundY = 550;
+
+    // Mushroom stem
+    const stem = this.add.rectangle(cx, groundY - 60, 30, 120, 0xddcc88);
+    stem.setDepth(3);
+
+    // Mushroom cap (large dome)
+    const cap = this.add.ellipse(cx, groundY - 130, 120, 70, 0xccaa22);
+    cap.setDepth(4);
+
+    // Cap spots
+    const spots = [
+      { x: cx - 30, y: groundY - 140, r: 8 },
+      { x: cx + 20, y: groundY - 145, r: 6 },
+      { x: cx - 10, y: groundY - 125, r: 7 },
+      { x: cx + 35, y: groundY - 130, r: 5 },
+    ];
+    spots.forEach(s => {
+      const dot = this.add.circle(s.x, s.y, s.r, 0x1a1800, 0.6);
+      dot.setDepth(5);
+    });
+
+    // Face - eyes
+    const leftEye = this.add.ellipse(cx - 15, groundY - 80, 8, 10, 0x111100);
+    leftEye.setDepth(5);
+    const rightEye = this.add.ellipse(cx + 15, groundY - 80, 8, 10, 0x111100);
+    rightEye.setDepth(5);
+
+    // Eye highlights
+    const leftHighlight = this.add.circle(cx - 13, groundY - 83, 2, 0xffffcc);
+    leftHighlight.setDepth(6);
+    const rightHighlight = this.add.circle(cx + 17, groundY - 83, 2, 0xffffcc);
+    rightHighlight.setDepth(6);
+
+    // Mouth - friendly smile
+    const mouth = this.add.graphics();
+    mouth.lineStyle(2, 0x111100);
+    mouth.beginPath();
+    mouth.arc(cx, groundY - 60, 12, 0.2, Math.PI - 0.2, false);
+    mouth.strokePath();
+    mouth.setDepth(5);
+
+    // Gentle idle animation - bob up and down
+    this.tweens.add({
+      targets: [cap, ...spots.map(() => null).filter(() => false)],
+      y: cap.y - 3,
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+  }
 }
