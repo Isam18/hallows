@@ -3470,7 +3470,10 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private _enteringShroomialLands = false;
   private enterShroomialLands(): void {
+    if (this._enteringShroomialLands) return;
+    this._enteringShroomialLands = true;
     // Freeze player
     this.player.setVelocity(0, 0);
     (this.player.body as Phaser.Physics.Arcade.Body).setAllowGravity(false);
