@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { COLORS, PLAYER_CONFIG, LevelConfig } from '../core/GameConfig';
 import { COMBAT_TUNING, EnemyCombatConfig } from '../core/CombatConfig';
+import { MOVEMENT_TUNING } from '../core/MovementConfig';
 import { DEATH_CONFIG } from '../core/DeathConfig';
 import gameState from '../core/GameState';
 import inputManager from '../core/InputManager';
