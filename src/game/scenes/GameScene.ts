@@ -87,6 +87,7 @@ import huntersMarchRemix4Data from '../data/levels/huntersMarchRemix4.json';
 import huntersMarchBenchRoomData from '../data/levels/huntersMarchBenchRoom.json';
 import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json';
 import chainRoomPostAntElderData from '../data/levels/chainRoomPostAntElder.json';
+import shroomialLandsData from '../data/levels/shroomialLands.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -132,6 +133,7 @@ const LEVELS: Record<string, LevelConfig> = {
   huntersMarchBenchRoom: huntersMarchBenchRoomData as unknown as LevelConfig,
   huntersMarchBossArena: huntersMarchBossArenaData as unknown as LevelConfig,
   chainRoomPostAntElder: chainRoomPostAntElderData as unknown as LevelConfig,
+  shroomialLands: shroomialLandsData as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -1582,10 +1584,13 @@ export class GameScene extends Phaser.Scene {
       (this as any)._verdantDoorText.setVisible(inRange);
     }
 
-    // Check fungus door proximity
+    // Check fungus door proximity and interaction
     if ((this as any)._fungusDoorZone && (this as any)._fungusDoorText) {
       const inRange = this.physics.overlap(this.player, (this as any)._fungusDoorZone);
       (this as any)._fungusDoorText.setVisible(inRange);
+      if (inRange && inputManager.justPressed('interact')) {
+        this.enterShroomialLands();
+      }
     }
 
     // Check verdaina door proximity
@@ -2007,7 +2012,7 @@ export class GameScene extends Phaser.Scene {
     });
 
     // "Sealed" text
-    const sealedText = this.add.text(doorX, doorY - 60, 'A strange fungal growth blocks the way...', {
+    const sealedText = this.add.text(doorX, doorY - 60, 'Press UP to enter', {
       fontSize: '12px',
       color: '#ccaa22',
       fontFamily: 'Georgia, serif',
