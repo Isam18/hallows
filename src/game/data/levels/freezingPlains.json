@@ -11,7 +11,10 @@
     { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall" },
     { "x": 2370, "y": 30, "width": 30, "height": 520, "type": "wall" }
   ],
-  "enemies": [],
+  "enemies": [
+    { "type": "frostCharger", "x": 600, "y": 480, "patrolStart": 550, "patrolEnd": 800 },
+    { "type": "frostCharger", "x": 1400, "y": 480, "patrolStart": 1300, "patrolEnd": 1600 }
+  ],
   "pickups": [],
   "triggers": [],
   "spawns": {
