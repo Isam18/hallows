@@ -815,6 +815,7 @@ export class BootScene extends Phaser.Scene {
     // Frost Charger - icy beetle for Freezing Plains
     this.createFrostChargerSprites();
     this.createFrostShardSprites();
+    this.createGlacialSentinelSprites();
   }
 
   private createVengeflySprite(): void {
@@ -3289,6 +3290,76 @@ export class BootScene extends Phaser.Scene {
     hg.fillTriangle(cx - 2, cy - 14, cx, cy - 22, cx + 2, cy - 14);
     hg.fillTriangle(cx + 4, cy - 14, cx + 8, cy - 20, cx + 10, cy - 14);
     hg.generateTexture('frostShard_hurt', w, h);
+    hg.destroy();
+  }
+
+  private createGlacialSentinelSprites(): void {
+    const w = 64, h = 64;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Central cyan core glow
+    g.fillStyle(0x44ddff, 0.3);
+    g.fillCircle(cx, cy, 18);
+    g.fillStyle(0x66eeff, 0.6);
+    g.fillCircle(cx, cy, 10);
+    g.fillStyle(0xccffff, 0.9);
+    g.fillCircle(cx, cy, 5);
+
+    // Dark-grey diamond permafrost plates
+    const plateColor = 0x445566;
+    // Top plate
+    g.fillStyle(plateColor);
+    g.fillTriangle(cx, cy - 28, cx - 12, cy - 12, cx + 12, cy - 12);
+    // Bottom plate
+    g.fillTriangle(cx, cy + 28, cx - 12, cy + 12, cx + 12, cy + 12);
+    // Left plate
+    g.fillTriangle(cx - 28, cy, cx - 12, cy - 10, cx - 12, cy + 10);
+    // Right plate
+    g.fillTriangle(cx + 28, cy, cx + 12, cy - 10, cx + 12, cy + 10);
+
+    // Plate outlines
+    g.lineStyle(2, 0x1a1a25);
+    g.strokeTriangle(cx, cy - 28, cx - 12, cy - 12, cx + 12, cy - 12);
+    g.strokeTriangle(cx, cy + 28, cx - 12, cy + 12, cx + 12, cy + 12);
+    g.strokeTriangle(cx - 28, cy, cx - 12, cy - 10, cx - 12, cy + 10);
+    g.strokeTriangle(cx + 28, cy, cx + 12, cy - 10, cx + 12, cy + 10);
+
+    // Frozen vine connections (blue pulsing lines between plates)
+    g.lineStyle(1.5, 0x3399cc, 0.7);
+    g.lineBetween(cx - 12, cy - 10, cx - 10, cy - 12);
+    g.lineBetween(cx + 12, cy - 10, cx + 10, cy - 12);
+    g.lineBetween(cx - 12, cy + 10, cx - 10, cy + 12);
+    g.lineBetween(cx + 12, cy + 10, cx + 10, cy + 12);
+
+    // Rune markings on plates
+    g.lineStyle(1, 0x6699bb, 0.5);
+    g.lineBetween(cx - 2, cy - 22, cx + 2, cy - 16);
+    g.lineBetween(cx - 22, cy - 2, cx - 16, cy + 2);
+    g.lineBetween(cx + 16, cy - 2, cx + 22, cy + 2);
+    g.lineBetween(cx - 2, cy + 16, cx + 2, cy + 22);
+
+    // Small orbiting shard dots
+    for (let i = 0; i < 6; i++) {
+      const angle = (i / 6) * Math.PI * 2;
+      const ox = cx + Math.cos(angle) * 24;
+      const oy = cy + Math.sin(angle) * 24;
+      g.fillStyle(0xaaddff, 0.7);
+      g.fillTriangle(ox, oy - 3, ox - 2, oy + 2, ox + 2, oy + 2);
+    }
+
+    g.generateTexture('glacialSentinel', w, h);
+    g.destroy();
+
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillCircle(cx, cy, 10);
+    hg.fillTriangle(cx, cy - 28, cx - 12, cy - 12, cx + 12, cy - 12);
+    hg.fillTriangle(cx, cy + 28, cx - 12, cy + 12, cx + 12, cy + 12);
+    hg.fillTriangle(cx - 28, cy, cx - 12, cy - 10, cx - 12, cy + 10);
+    hg.fillTriangle(cx + 28, cy, cx + 12, cy - 10, cx + 12, cy + 10);
+    hg.generateTexture('glacialSentinel_hurt', w, h);
     hg.destroy();
   }
 

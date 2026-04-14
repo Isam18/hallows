@@ -471,5 +471,26 @@
     "width": 36,
     "height": 36,
     "isIce": true
+  },
+  "glacialSentinel": {
+    "id": "glacialSentinel",
+    "displayName": "Glacial Sentinel",
+    "hp": 20,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 300,
+    "deaggroRangePx": 400,
+    "knockbackOnHit": { "x": 25, "y": 12 },
+    "hitstunMs": 100,
+    "invulnOnHitMs": 180,
+    "dropShells": { "min": 30, "max": 50 },
+    "hurtFlashMs": 120,
+    "spriteKey": "glacialSentinel",
+    "width": 56,
+    "height": 56,
+    "isIce": true,
+    "isFlying": true,
+    "isElite": true
   }
 }
