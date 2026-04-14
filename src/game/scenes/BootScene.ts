@@ -3602,7 +3602,7 @@ export class BootScene extends Phaser.Scene {
     g.destroy();
   }
 
-
+  create(): void {
     gameState.resetRun();
     this.scene.start('MenuScene');
   }
