@@ -28,6 +28,7 @@ import { WingedCommander } from '../entities/WingedCommander';
 import { FrostCharger } from '../entities/FrostCharger';
 import { FrostShard } from '../entities/FrostShard';
 import { GlacialSentinel } from '../entities/GlacialSentinel';
+import { FrozenGatekeeper } from '../entities/FrozenGatekeeper';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -93,6 +94,10 @@ import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json
 import chainRoomPostAntElderData from '../data/levels/chainRoomPostAntElder.json';
 import shroomialLandsData from '../data/levels/shroomialLands.json';
 import freezingPlainsData from '../data/levels/freezingPlains.json';
+import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
+import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
+import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
+import gatekeeperArena4Data from '../data/levels/gatekeeperArena4.json';
 
 // Generate procedural levels
 const forgottenCrossroadsData = generateForgottenCrossroads();
@@ -140,6 +145,10 @@ const LEVELS: Record<string, LevelConfig> = {
   chainRoomPostAntElder: chainRoomPostAntElderData as unknown as LevelConfig,
   shroomialLands: shroomialLandsData as unknown as LevelConfig,
   freezingPlains: freezingPlainsData as unknown as LevelConfig,
+  gatekeeperArena1: gatekeeperArena1Data as unknown as LevelConfig,
+  gatekeeperArena2: gatekeeperArena2Data as unknown as LevelConfig,
+  gatekeeperArena3: gatekeeperArena3Data as unknown as LevelConfig,
+  gatekeeperArena4: gatekeeperArena4Data as unknown as LevelConfig,
 };
 
 export class GameScene extends Phaser.Scene {
@@ -599,6 +608,10 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'glacialSentinel') {
           const sentinel = new GlacialSentinel(this, e.x, e.y, config);
           this.enemies.add(sentinel);
+        } else if (e.type === 'frozenGatekeeper') {
+          const stage = (e as any).stage || 1;
+          const gatekeeper = new FrozenGatekeeper(this, e.x, e.y, config, stage);
+          this.enemies.add(gatekeeper);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
