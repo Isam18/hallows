@@ -1,0 +1,31 @@
+{
+  "id": "gatekeeperArena3",
+  "name": "Frozen Gate - Third Warden",
+  "width": 1400,
+  "height": 600,
+  "backgroundColor": "#040a18",
+  "spawnPoint": { "x": 100, "y": 500 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 1400, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1400, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall" },
+    { "x": 1370, "y": 30, "width": 30, "height": 520, "type": "wall" },
+    { "x": 200, "y": 420, "width": 120, "height": 16, "type": "platform" },
+    { "x": 550, "y": 350, "width": 140, "height": 16, "type": "platform" },
+    { "x": 900, "y": 420, "width": 120, "height": 16, "type": "platform" },
+    { "x": 350, "y": 270, "width": 100, "height": 16, "type": "platform" },
+    { "x": 700, "y": 200, "width": 120, "height": 16, "type": "platform" },
+    { "x": 1050, "y": 270, "width": 100, "height": 16, "type": "platform" }
+  ],
+  "enemies": [
+    { "type": "frozenGatekeeper", "x": 700, "y": 360, "stage": 3, "guaranteed": true },
+    { "type": "frostShard", "x": 300, "y": 510 },
+    { "type": "frostShard", "x": 1100, "y": 510 }
+  ],
+  "pickups": [],
+  "triggers": [],
+  "spawns": {
+    "default": { "x": 100, "y": 500 }
+  },
+  "biome": "ice"
+}

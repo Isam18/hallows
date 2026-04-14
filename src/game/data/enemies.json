@@ -492,5 +492,27 @@
     "isIce": true,
     "isFlying": true,
     "isElite": true
+  },
+  "frozenGatekeeper": {
+    "id": "frozenGatekeeper",
+    "displayName": "Frozen Gatekeeper",
+    "hp": 35,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 30,
+    "aggroRangePx": 350,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": { "x": 15, "y": 8 },
+    "hitstunMs": 80,
+    "invulnOnHitMs": 200,
+    "dropShells": { "min": 60, "max": 100 },
+    "hurtFlashMs": 100,
+    "spriteKey": "frozenGatekeeper",
+    "width": 50,
+    "height": 80,
+    "isIce": true,
+    "isFlying": true,
+    "isElite": true,
+    "isBoss": true
   }
 }

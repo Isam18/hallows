@@ -816,6 +816,7 @@ export class BootScene extends Phaser.Scene {
     this.createFrostChargerSprites();
     this.createFrostShardSprites();
     this.createGlacialSentinelSprites();
+    this.createFrozenGatekeeperSprites();
   }
 
   private createVengeflySprite(): void {
@@ -3360,6 +3361,97 @@ export class BootScene extends Phaser.Scene {
     hg.fillTriangle(cx - 28, cy, cx - 12, cy - 10, cx - 12, cy + 10);
     hg.fillTriangle(cx + 28, cy, cx + 12, cy - 10, cx + 12, cy + 10);
     hg.generateTexture('glacialSentinel_hurt', w, h);
+    hg.destroy();
+  }
+
+  private createFrozenGatekeeperSprites(): void {
+    const w = 56, h = 90;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Tattered obsidian robes
+    g.fillStyle(0x1a1e2a, 0.9);
+    g.beginPath();
+    g.moveTo(cx - 18, cy - 10);
+    g.lineTo(cx - 24, cy + 38);
+    g.lineTo(cx - 8, cy + 42);
+    g.lineTo(cx, cy + 35);
+    g.lineTo(cx + 8, cy + 42);
+    g.lineTo(cx + 24, cy + 38);
+    g.lineTo(cx + 18, cy - 10);
+    g.closePath();
+    g.fillPath();
+
+    // Cyan energy glow from within robes
+    g.fillStyle(0x44ddff, 0.15);
+    g.fillEllipse(cx, cy + 10, 20, 40);
+    g.fillStyle(0x44ddff, 0.3);
+    g.fillEllipse(cx, cy + 5, 10, 20);
+
+    // Robe edges with cyan highlights
+    g.lineStyle(1, 0x2288cc, 0.5);
+    g.lineBetween(cx - 20, cy, cx - 22, cy + 35);
+    g.lineBetween(cx + 20, cy, cx + 22, cy + 35);
+
+    // Ice crown (head) - crystalline shards floating around hollow center
+    g.fillStyle(0x0a0a15, 0.8);
+    g.fillCircle(cx, cy - 20, 10); // Hollow dark center
+
+    // Crown shards
+    g.fillStyle(0x88ccff, 0.9);
+    g.fillTriangle(cx - 6, cy - 18, cx - 10, cy - 40, cx - 2, cy - 22);
+    g.fillTriangle(cx + 6, cy - 18, cx + 10, cy - 40, cx + 2, cy - 22);
+    g.fillTriangle(cx, cy - 22, cx - 4, cy - 45, cx + 4, cy - 45);
+    // Side crown pieces
+    g.fillStyle(0x66aadd, 0.8);
+    g.fillTriangle(cx - 14, cy - 14, cx - 20, cy - 32, cx - 8, cy - 16);
+    g.fillTriangle(cx + 14, cy - 14, cx + 20, cy - 32, cx + 8, cy - 16);
+
+    // Crown outlines
+    g.lineStyle(1.5, 0x1a2a3a);
+    g.lineBetween(cx - 10, cy - 40, cx - 6, cy - 18);
+    g.lineBetween(cx + 10, cy - 40, cx + 6, cy - 18);
+    g.lineBetween(cx - 4, cy - 45, cx, cy - 22);
+    g.lineBetween(cx + 4, cy - 45, cx, cy - 22);
+
+    // Energy limbs (ethereal, crackling)
+    g.lineStyle(2, 0x44ddff, 0.6);
+    // Left limb
+    g.lineBetween(cx - 18, cy, cx - 26, cy + 15);
+    g.lineBetween(cx - 26, cy + 15, cx - 22, cy + 25);
+    // Right limb
+    g.lineBetween(cx + 18, cy, cx + 26, cy + 15);
+    g.lineBetween(cx + 26, cy + 15, cx + 22, cy + 25);
+
+    // Frost crackling on limbs
+    g.lineStyle(1, 0xaaddff, 0.4);
+    g.lineBetween(cx - 24, cy + 10, cx - 28, cy + 8);
+    g.lineBetween(cx + 24, cy + 10, cx + 28, cy + 8);
+    g.lineBetween(cx - 22, cy + 20, cx - 26, cy + 22);
+    g.lineBetween(cx + 22, cy + 20, cx + 26, cy + 22);
+
+    // Main outline
+    g.lineStyle(1.5, 0x2a3a4a);
+    g.strokeEllipse(cx, cy + 10, 36, 55);
+
+    g.generateTexture('frozenGatekeeper', w, h);
+    g.destroy();
+
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.beginPath();
+    hg.moveTo(cx - 18, cy - 10);
+    hg.lineTo(cx - 24, cy + 38);
+    hg.lineTo(cx + 24, cy + 38);
+    hg.lineTo(cx + 18, cy - 10);
+    hg.closePath();
+    hg.fillPath();
+    hg.fillCircle(cx, cy - 20, 10);
+    hg.fillTriangle(cx - 6, cy - 18, cx - 10, cy - 40, cx - 2, cy - 22);
+    hg.fillTriangle(cx + 6, cy - 18, cx + 10, cy - 40, cx + 2, cy - 22);
+    hg.fillTriangle(cx, cy - 22, cx - 4, cy - 45, cx + 4, cy - 45);
+    hg.generateTexture('frozenGatekeeper_hurt', w, h);
     hg.destroy();
   }
 
