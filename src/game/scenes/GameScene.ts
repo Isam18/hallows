@@ -117,6 +117,7 @@ import freezingPlainsRoom15Data from '../data/levels/freezingPlainsRoom15.json';
 import freezingPlainsRoom16Data from '../data/levels/freezingPlainsRoom16.json';
 import glacialTitanArenaData from '../data/levels/glacialTitanArena.json';
 import forgottenBattlefieldData from '../data/levels/forgottenBattlefield.json';
+import endlessArenaData from '../data/levels/endlessArena.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -186,6 +187,7 @@ const LEVELS: Record<string, LevelConfig> = {
   freezingPlainsRoom16: freezingPlainsRoom16Data as unknown as LevelConfig,
   glacialTitanArena: glacialTitanArenaData as unknown as LevelConfig,
   forgottenBattlefield: forgottenBattlefieldData as unknown as LevelConfig,
+  endlessArena: endlessArenaData as unknown as LevelConfig,
   gatekeeperArena1: gatekeeperArena1Data as unknown as LevelConfig,
   gatekeeperArena2: gatekeeperArena2Data as unknown as LevelConfig,
   gatekeeperArena3: gatekeeperArena3Data as unknown as LevelConfig,
@@ -254,15 +256,23 @@ export class GameScene extends Phaser.Scene {
   // Boss summon tracking
   private bossSummoned = false;
 
+  // Endless mode
+  private endlessMode = false;
+  private endlessKills = 0;
+  private endlessWave = 1;
+  private endlessSpawnTimer = 0;
+  private endlessActiveEnemies = 0;
+
   constructor() {
     super({ key: 'GameScene' });
   }
 
-  init(data: { levelId: string; spawnId: string; respawning?: boolean; debugMode?: boolean }): void {
+  init(data: { levelId: string; spawnId: string; respawning?: boolean; debugMode?: boolean; endlessMode?: boolean }): void {
     this.levelId = data.levelId || 'fadingTown';
     this.spawnId = data.spawnId || 'default';
     this.isRespawning = data.respawning || false;
     this.debugModeEnabled = data.debugMode || this.registry.get('debugMode') || false;
+    this.endlessMode = data.endlessMode || false;
     this.inBossArena = false;
     this.bossGateClosed = false;
     this.fakeBenchTriggered = false;
