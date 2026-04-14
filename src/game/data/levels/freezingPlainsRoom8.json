@@ -1,0 +1,74 @@
+{
+  "id": "freezingPlainsRoom8",
+  "name": "The Echoing Chasm",
+  "width": 3500,
+  "height": 700,
+  "backgroundColor": "#030818",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 0, "width": 3500, "height": 30, "type": "wall", "color": "#0a0e18" },
+    { "x": 0, "y": 30, "width": 30, "height": 670, "type": "wall", "color": "#0a0e18" },
+    { "x": 3470, "y": 30, "width": 30, "height": 670, "type": "wall", "color": "#0a0e18" },
+
+    { "x": 0, "y": 450, "width": 200, "height": 20, "type": "ground", "color": "#0a0e18" },
+    { "x": 3300, "y": 450, "width": 200, "height": 20, "type": "ground", "color": "#0a0e18" },
+
+    { "x": 300, "y": 420, "width": 120, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 520, "y": 360, "width": 100, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 720, "y": 300, "width": 130, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 950, "y": 380, "width": 110, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 1150, "y": 320, "width": 100, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 1350, "y": 260, "width": 120, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 1570, "y": 340, "width": 110, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 1780, "y": 400, "width": 130, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2000, "y": 300, "width": 100, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2200, "y": 360, "width": 120, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2420, "y": 280, "width": 110, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2640, "y": 350, "width": 100, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2850, "y": 420, "width": 130, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 3080, "y": 360, "width": 120, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+
+    { "x": 600, "y": 200, "width": 90, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 1000, "y": 180, "width": 100, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 1500, "y": 160, "width": 90, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2100, "y": 180, "width": 100, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+    { "x": 2700, "y": 200, "width": 90, "height": 16, "type": "floatingPlatform", "color": "#1a1a2a" },
+
+    { "x": 0, "y": 650, "width": 3500, "height": 50, "type": "deathPlane", "color": "#0040ff" }
+  ],
+  "enemies": [
+    { "type": "frostShard", "x": 500, "y": 300, "patrolStart": 400, "patrolEnd": 700 },
+    { "type": "frostShard", "x": 1100, "y": 260, "patrolStart": 1000, "patrolEnd": 1400 },
+    { "type": "frostShard", "x": 1700, "y": 280, "patrolStart": 1500, "patrolEnd": 1900 },
+    { "type": "frostShard", "x": 2300, "y": 300, "patrolStart": 2100, "patrolEnd": 2500 },
+    { "type": "frostShard", "x": 2900, "y": 320, "patrolStart": 2700, "patrolEnd": 3100 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room8Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsBench",
+      "targetSpawn": "fromRoom8"
+    },
+    {
+      "id": "room8Exit",
+      "type": "iceDoor",
+      "x": 3410,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromBench": { "x": 100, "y": 400 }
+  },
+  "biome": "ice"
+}
