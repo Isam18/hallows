@@ -2514,70 +2514,64 @@ export class GameScene extends Phaser.Scene {
     for (let pi = 0; pi < pilePositions.length; pi++) {
       const px = pilePositions[pi];
       const hasFlowers = pi % 2 === 1;
-      const pileSize = Phaser.Math.Between(3, 6);
+      const pileSize = Phaser.Math.Between(7, 13);
       
       for (let b = 0; b < pileSize; b++) {
-        const bx = px + Phaser.Math.Between(-25, 25);
-        const by = groundY - b * 8 - Phaser.Math.Between(0, 5);
-        const bodyAngle = Phaser.Math.Between(-40, 40);
+        const bx = px + Phaser.Math.Between(-45, 45);
+        const by = groundY - b * 7 - Phaser.Math.Between(0, 6);
+        const bodyAngle = Phaser.Math.Between(-50, 50);
         
-        // Body (like the player sprite - small dark figure)
-        const body = this.add.rectangle(bx, by, 14, 18, 0x222222, 0.7);
+        const body = this.add.rectangle(bx, by, 16, 20, 0x222222, 0.7);
         body.setAngle(bodyAngle);
         body.setDepth(2);
         
-        // Head
-        const headX = bx + Math.sin(bodyAngle * Math.PI / 180) * 8;
-        const headY = by - 10 - Math.abs(Math.cos(bodyAngle * Math.PI / 180)) * 3;
+        const headX = bx + Math.sin(bodyAngle * Math.PI / 180) * 9;
+        const headY = by - 11 - Math.abs(Math.cos(bodyAngle * Math.PI / 180)) * 3;
         const head = this.add.circle(headX, headY, 5, 0x1a1a1a, 0.7);
         head.setDepth(2);
         
-        // Tattered cloak detail
-        const cloak = this.add.rectangle(bx, by + 5, 16, 6, 0x111111, 0.5);
+        const cloak = this.add.rectangle(bx, by + 5, 18, 7, 0x111111, 0.5);
         cloak.setAngle(bodyAngle + Phaser.Math.Between(-10, 10));
         cloak.setDepth(1.9);
+
+        if (b % 2 === 0) {
+          const arm = this.add.rectangle(bx + Phaser.Math.Between(-12, 12), by + Phaser.Math.Between(-3, 3), 10, 3, 0x1a1a1a, 0.5);
+          arm.setAngle(bodyAngle + Phaser.Math.Between(-30, 30));
+          arm.setDepth(1.8);
+        }
       }
       
-      // Flowers growing from the pile
-      if (hasFlowers) {
-        const flowerCount = Phaser.Math.Between(2, 5);
-        for (let f = 0; f < flowerCount; f++) {
-          const fx = px + Phaser.Math.Between(-20, 20);
-          const fy = groundY - pileSize * 8 - Phaser.Math.Between(5, 15);
-          const container = this.add.container(fx, fy);
-          container.setDepth(3);
-          
-          // Stem
-          const stemH = Phaser.Math.Between(12, 22);
-          const stem = this.add.rectangle(0, -stemH / 2, 2, stemH, 0x556633, 0.8);
-          container.add(stem);
-          
-          // Petals - warm autumn colors
-          const petalColors = [0xcc4422, 0xdd6633, 0xee8844, 0xffaa55, 0xcc3355];
-          const petalCount = Phaser.Math.Between(4, 6);
-          for (let p = 0; p < petalCount; p++) {
-            const angle = (p / petalCount) * Math.PI * 2;
-            const petalX = Math.cos(angle) * 5;
-            const petalY = -stemH + Math.sin(angle) * 5;
-            const petal = this.add.ellipse(petalX, petalY, 4, 7, petalColors[p % petalColors.length], 0.7);
-            petal.setRotation(angle + Math.PI / 2);
-            container.add(petal);
-          }
-          
-          // Center
-          const center = this.add.circle(0, -stemH, 2.5, 0xffdd88, 0.8);
-          container.add(center);
-          
-          // Gentle sway
-          this.tweens.add({
-            targets: container,
-            rotation: { from: -0.05, to: 0.05 },
-            duration: 2500 + Math.random() * 1500,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut'
-          });
+      // Flowers on every pile
+      const flowerCount = hasFlowers ? Phaser.Math.Between(9, 15) : Phaser.Math.Between(5, 8);
+      for (let f = 0; f < flowerCount; f++) {
+        const fx = px + Phaser.Math.Between(-40, 40);
+        const fy = groundY - pileSize * 5 - Phaser.Math.Between(3, 22);
+        const container = this.add.container(fx, fy);
+        container.setDepth(3);
+        
+        const stemH = Phaser.Math.Between(10, 28);
+        const stem = this.add.rectangle(0, -stemH / 2, 2, stemH, 0x556633, 0.8);
+        container.add(stem);
+        
+        const petalColors = [0xcc4422, 0xdd6633, 0xee8844, 0xffaa55, 0xcc3355, 0xbb2244, 0xff7733];
+        const petalCount = Phaser.Math.Between(4, 7);
+        for (let p = 0; p < petalCount; p++) {
+          const angle = (p / petalCount) * Math.PI * 2;
+          const petal = this.add.ellipse(Math.cos(angle) * 5, -stemH + Math.sin(angle) * 5, 4, 7, petalColors[p % petalColors.length], 0.7);
+          petal.setRotation(angle + Math.PI / 2);
+          container.add(petal);
         }
+        
+        container.add(this.add.circle(0, -stemH, 2.5, 0xffdd88, 0.8));
+        
+        this.tweens.add({
+          targets: container,
+          rotation: { from: -0.05, to: 0.05 },
+          duration: 2500 + Math.random() * 1500,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
       }
     }
 
