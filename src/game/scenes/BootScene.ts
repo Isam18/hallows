@@ -2300,6 +2300,9 @@ export class BootScene extends Phaser.Scene {
     this.createMossTitanSprite('mossTitan');
     this.createMossTitanStaggeredSprite('mossTitan_staggered');
     
+    // Glacial Titan - massive ice monument boss
+    this.createGlacialTitanSprite('glacialTitan');
+    
     // Ant Elder - Phase 1 (cloaked tank) and Phase 2 (agile predator)
     this.createAntElderPhase1Sprite('antElder_phase1_idle');
     this.createAntElderPhase1HideSprite('antElder_phase1_hide');
