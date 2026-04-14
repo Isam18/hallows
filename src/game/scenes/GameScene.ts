@@ -95,6 +95,7 @@ import huntersMarchBossArenaData from '../data/levels/huntersMarchBossArena.json
 import chainRoomPostAntElderData from '../data/levels/chainRoomPostAntElder.json';
 import shroomialLandsData from '../data/levels/shroomialLands.json';
 import freezingPlainsData from '../data/levels/freezingPlains.json';
+import freezingPlainsRoom2Data from '../data/levels/freezingPlainsRoom2.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -146,6 +147,7 @@ const LEVELS: Record<string, LevelConfig> = {
   chainRoomPostAntElder: chainRoomPostAntElderData as unknown as LevelConfig,
   shroomialLands: shroomialLandsData as unknown as LevelConfig,
   freezingPlains: freezingPlainsData as unknown as LevelConfig,
+  freezingPlainsRoom2: freezingPlainsRoom2Data as unknown as LevelConfig,
   gatekeeperArena1: gatekeeperArena1Data as unknown as LevelConfig,
   gatekeeperArena2: gatekeeperArena2Data as unknown as LevelConfig,
   gatekeeperArena3: gatekeeperArena3Data as unknown as LevelConfig,
