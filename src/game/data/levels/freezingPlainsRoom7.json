@@ -1,0 +1,67 @@
+{
+  "id": "freezingPlainsRoom7",
+  "name": "Gatekeeper's Watch",
+  "width": 2200,
+  "height": 600,
+  "backgroundColor": "#060e1e",
+  "spawnPoint": { "x": 100, "y": 500 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 2200, "height": 50, "type": "ground", "color": "#0a0e18" },
+    { "x": 0, "y": 0, "width": 2200, "height": 30, "type": "wall", "color": "#0a0e18" },
+    { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall", "color": "#0a0e18" },
+    { "x": 2170, "y": 30, "width": 30, "height": 520, "type": "wall", "color": "#0a0e18" },
+
+    { "x": 150, "y": 30, "width": 12, "height": 180, "type": "banner", "color": "#3a1010" },
+    { "x": 500, "y": 30, "width": 14, "height": 220, "type": "banner", "color": "#4a1515" },
+    { "x": 510, "y": 200, "width": 8, "height": 60, "type": "banner", "color": "#3a1010" },
+    { "x": 900, "y": 30, "width": 12, "height": 200, "type": "banner", "color": "#3a1010" },
+    { "x": 1300, "y": 30, "width": 14, "height": 240, "type": "banner", "color": "#4a1515" },
+    { "x": 1310, "y": 220, "width": 8, "height": 70, "type": "banner", "color": "#3a1010" },
+    { "x": 1700, "y": 30, "width": 12, "height": 190, "type": "banner", "color": "#3a1010" },
+    { "x": 2050, "y": 30, "width": 14, "height": 210, "type": "banner", "color": "#4a1515" },
+
+    { "x": 300, "y": 430, "width": 140, "height": 20, "type": "platform", "color": "#0e1220" },
+    { "x": 700, "y": 380, "width": 120, "height": 20, "type": "platform", "color": "#0e1220" },
+    { "x": 1100, "y": 350, "width": 140, "height": 20, "type": "platform", "color": "#0e1220" },
+    { "x": 1500, "y": 380, "width": 120, "height": 20, "type": "platform", "color": "#0e1220" },
+    { "x": 1900, "y": 430, "width": 140, "height": 20, "type": "platform", "color": "#0e1220" },
+
+    { "x": 500, "y": 280, "width": 100, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1000, "y": 240, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1600, "y": 280, "width": 100, "height": 18, "type": "platform", "color": "#0e1220" }
+  ],
+  "enemies": [
+    { "type": "frozenGatekeeper", "x": 1100, "y": 300, "guaranteed": true }
+  ],
+  "pickups": [],
+  "lockIn": true,
+  "triggers": [
+    {
+      "id": "room7Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom6",
+      "targetSpawn": "fromRoom7"
+    },
+    {
+      "id": "room7Exit",
+      "type": "iceDoor",
+      "x": 2110,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default",
+      "locked": true,
+      "unlockOnClear": true
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 500 },
+    "fromRoom6": { "x": 100, "y": 500 }
+  },
+  "biome": "ice"
+}
