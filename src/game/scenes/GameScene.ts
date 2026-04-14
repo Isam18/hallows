@@ -30,6 +30,7 @@ import { FrostShard } from '../entities/FrostShard';
 import { GlacialSentinel } from '../entities/GlacialSentinel';
 import { FrozenGatekeeper } from '../entities/FrozenGatekeeper';
 import { SiegeConstruct } from '../entities/SiegeConstruct';
+import { GlacialTitan } from '../entities/GlacialTitan';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -111,6 +112,7 @@ import freezingPlainsRoom13Data from '../data/levels/freezingPlainsRoom13.json';
 import freezingPlainsRoom14Data from '../data/levels/freezingPlainsRoom14.json';
 import freezingPlainsRoom15Data from '../data/levels/freezingPlainsRoom15.json';
 import freezingPlainsRoom16Data from '../data/levels/freezingPlainsRoom16.json';
+import glacialTitanArenaData from '../data/levels/glacialTitanArena.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -178,6 +180,7 @@ const LEVELS: Record<string, LevelConfig> = {
   freezingPlainsRoom14: freezingPlainsRoom14Data as unknown as LevelConfig,
   freezingPlainsRoom15: freezingPlainsRoom15Data as unknown as LevelConfig,
   freezingPlainsRoom16: freezingPlainsRoom16Data as unknown as LevelConfig,
+  glacialTitanArena: glacialTitanArenaData as unknown as LevelConfig,
   gatekeeperArena1: gatekeeperArena1Data as unknown as LevelConfig,
   gatekeeperArena2: gatekeeperArena2Data as unknown as LevelConfig,
   gatekeeperArena3: gatekeeperArena3Data as unknown as LevelConfig,
@@ -372,7 +375,7 @@ export class GameScene extends Phaser.Scene {
     }
     
     // Auto-enter boss arena if loading a dedicated boss arena level
-    if (this.levelId === 'mossTitanArena' && this.currentLevel.bossArena) {
+    if ((this.levelId === 'mossTitanArena' || this.levelId === 'glacialTitanArena') && this.currentLevel.bossArena) {
       this.time.delayedCall(500, () => {
         this.enterBossArena();
       });
@@ -1155,6 +1158,10 @@ export class GameScene extends Phaser.Scene {
       // Spawn Moss Titan
       const mossTitan = new MossTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
       this.boss = mossTitan as any;
+    } else if (this.levelId === 'glacialTitanArena') {
+      // Spawn Glacial Titan
+      const glacialTitan = new GlacialTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
+      this.boss = glacialTitan as any;
     } else {
       // Spawn default boss
       this.boss = new Boss(this, arena.bossSpawn.x, arena.bossSpawn.y);
@@ -1310,6 +1317,8 @@ export class GameScene extends Phaser.Scene {
     // Determine which boss was defeated and show appropriate victory
     if (this.levelId === 'huntersMarchBossArena') {
       this.showAntElderVictory();
+    } else if (this.levelId === 'glacialTitanArena') {
+      this.showGlacialTitanVictory();
     }
   }
 
@@ -1433,6 +1442,46 @@ export class GameScene extends Phaser.Scene {
           victoryText.destroy();
           bgBar.destroy();
           // Transition to Chain Room first
+          this.transitionToLevel('chainRoom', 'fromBoss');
+        }
+      });
+    });
+  }
+
+  showGlacialTitanVictory(): void {
+    const centerX = this.cameras.main.width / 2;
+    const centerY = this.cameras.main.height / 2;
+
+    const bgBar = this.add.rectangle(centerX, centerY, 0, 80, 0x000000, 0.9);
+    bgBar.setScrollFactor(0);
+    bgBar.setDepth(1000);
+
+    const victoryText = this.add.text(centerX, centerY, 'GLACIAL TITAN HAS BEEN DEFEATED', {
+      fontFamily: 'Georgia, serif',
+      fontSize: '36px',
+      color: '#44aaff',
+      fontStyle: 'bold italic',
+      stroke: '#000000',
+      strokeThickness: 6,
+      shadow: { offsetX: 2, offsetY: 2, color: '#003366', blur: 5, fill: true }
+    });
+    victoryText.setOrigin(0.5);
+    victoryText.setScrollFactor(0);
+    victoryText.setDepth(1001);
+    victoryText.setAlpha(0);
+
+    this.tweens.add({ targets: bgBar, width: 700, duration: 400, ease: 'Power2' });
+    this.tweens.add({
+      targets: victoryText, alpha: 1, scale: { from: 0.8, to: 1 },
+      duration: 600, delay: 300, ease: 'Elastic.easeOut'
+    });
+
+    this.time.delayedCall(4000, () => {
+      this.tweens.add({
+        targets: [victoryText, bgBar], alpha: 0, duration: 500, ease: 'Power2',
+        onComplete: () => {
+          victoryText.destroy();
+          bgBar.destroy();
           this.transitionToLevel('chainRoom', 'fromBoss');
         }
       });

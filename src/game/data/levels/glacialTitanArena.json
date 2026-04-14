@@ -1,0 +1,42 @@
+{
+  "id": "glacialTitanArena",
+  "name": "Heart of the Glacial Titan",
+  "width": 1600,
+  "height": 700,
+  "backgroundColor": "#020408",
+  "spawnPoint": { "x": 150, "y": 600 },
+  "platforms": [
+    { "type": "ground", "x": 0, "y": 650, "width": 1600, "height": 50, "color": "#0a0e18" },
+    { "type": "wall", "x": -50, "y": 0, "width": 50, "height": 700 },
+    { "type": "wall", "x": 1600, "y": 0, "width": 50, "height": 700 },
+    { "type": "wall", "x": 0, "y": -50, "width": 1600, "height": 50 },
+
+    { "type": "platform", "x": 200, "y": 480, "width": 160, "height": 18, "color": "#0e1222" },
+    { "type": "platform", "x": 600, "y": 420, "width": 140, "height": 18, "color": "#0e1222" },
+    { "type": "platform", "x": 1000, "y": 420, "width": 140, "height": 18, "color": "#0e1222" },
+    { "type": "platform", "x": 1350, "y": 480, "width": 160, "height": 18, "color": "#0e1222" },
+
+    { "type": "platform", "x": 400, "y": 300, "width": 120, "height": 16, "color": "#0e1222" },
+    { "type": "platform", "x": 750, "y": 260, "width": 130, "height": 16, "color": "#0e1222" },
+    { "type": "platform", "x": 1100, "y": 300, "width": 120, "height": 16, "color": "#0e1222" },
+
+    { "type": "platform", "x": 550, "y": 150, "width": 100, "height": 14, "color": "#0e1222" },
+    { "type": "platform", "x": 950, "y": 150, "width": 100, "height": 14, "color": "#0e1222" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [],
+  "bossArena": {
+    "x": 0,
+    "y": 0,
+    "width": 1600,
+    "height": 700,
+    "bossSpawn": { "x": 800, "y": 550 },
+    "bossType": "glacialTitan"
+  },
+  "biome": "ice",
+  "spawns": {
+    "default": { "x": 150, "y": 600 },
+    "arena": { "x": 150, "y": 600 }
+  }
+}
