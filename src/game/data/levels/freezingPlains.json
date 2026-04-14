@@ -16,10 +16,22 @@
     { "type": "frostCharger", "x": 1400, "y": 480, "patrolStart": 1300, "patrolEnd": 1600 }
   ],
   "pickups": [],
-  "triggers": [],
+  "triggers": [
+    {
+      "id": "toRoom2",
+      "type": "iceDoor",
+      "x": 2300,
+      "y": 400,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom2",
+      "targetSpawn": "default"
+    }
+  ],
   "spawns": {
     "default": { "x": 100, "y": 500 },
-    "fromIceDoor": { "x": 100, "y": 500 }
+    "fromIceDoor": { "x": 100, "y": 500 },
+    "fromRoom2": { "x": 2250, "y": 500 }
   },
   "biome": "ice"
 }

@@ -229,6 +229,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           <button onClick={() => handleTeleport('chainRoomPostAntElder')} className="px-2 py-1 text-xs bg-yellow-600/20 hover:bg-yellow-600/40 border border-yellow-600/30 rounded transition-colors">🍄 Post-Boss Chain</button>
           <button onClick={() => handleTeleport('shroomialLands')} className="px-2 py-1 text-xs bg-yellow-600/20 hover:bg-yellow-600/40 border border-yellow-600/30 rounded transition-colors">🍄 Shroomial Lands</button>
           <button onClick={() => handleTeleport('freezingPlains')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">❄️ Freezing Plains</button>
+          <button onClick={() => handleTeleport('freezingPlainsRoom2')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">❄️ Frozen Canopy</button>
           <button onClick={() => handleTeleport('gatekeeperArena1')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">🧊 Gatekeeper 1</button>
           <button onClick={() => handleTeleport('gatekeeperArena2')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">🧊 Gatekeeper 2</button>
           <button onClick={() => handleTeleport('gatekeeperArena3')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">🧊 Gatekeeper 3</button>
