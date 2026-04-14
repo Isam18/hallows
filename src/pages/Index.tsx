@@ -14,6 +14,7 @@ import { ToBeContinued } from '@/components/game/ToBeContinued';
 import { GreenDoorDialog } from '@/components/game/GreenDoorDialog';
 import { TheMedullaDialog } from '@/components/game/TheMedullaDialog';
 import { ZoneTransition } from '@/components/game/ZoneTransition';
+import { GlacialTitanVictoryDialog } from '@/components/game/GlacialTitanVictoryDialog';
 
 const Index = () => {
   const gameContainer = useRef<HTMLDivElement>(null);
@@ -31,6 +32,7 @@ const Index = () => {
   const [showTheMedullaDialog, setShowTheMedullaDialog] = useState(false);
   const [showZoneTransition, setShowZoneTransition] = useState(false);
   const [transitionZone, setTransitionZone] = useState('');
+  const [showGlacialVictory, setShowGlacialVictory] = useState(false);
 
   // Handle victory continue - transition to Chain Room
   const handleVictoryContinue = useCallback(() => {
@@ -105,14 +107,37 @@ const Index = () => {
     setShowZoneTransition(true);
   }, []);
 
+  // Handle Glacial Titan victory - Yes (continue to Forgotten Battlefield)
+  const handleGlacialVictoryYes = useCallback(() => {
+    setShowGlacialVictory(false);
+    setTransitionZone('FORGOTTEN BATTLEFIELD');
+    setShowZoneTransition(true);
+  }, []);
+
+  // Handle Glacial Titan victory - No (back to title)
+  const handleGlacialVictoryNo = useCallback(() => {
+    setShowGlacialVictory(false);
+    gameState.resetRun();
+    gameRef.current?.scene.stop('GameScene');
+    gameRef.current?.scene.start('MenuScene');
+  }, []);
+
+  // Handle Forgotten Battlefield transition complete
+  const handleForgottenBattlefieldTransitionComplete = useCallback(() => {
+    setShowZoneTransition(false);
+    gameState.setState('playing');
+    const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
+    if (gameScene) {
+      gameScene.transitionToForgottenBattlefield?.();
+    }
+  }, []);
+
   const handleTheMedullaDialogNoTransition = useCallback(() => {
     setShowZoneTransition(false);
     gameState.setState('playing');
     
-    // Get the game scene and move player back away from the door
     const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
     if (gameScene && gameScene.player) {
-      // Move player to the left, away from the lava door
       gameScene.player.x = 100;
     }
   }, []);
@@ -122,7 +147,6 @@ const Index = () => {
     setShowZoneTransition(false);
     gameState.setState('playing');
     
-    // Get the game scene and transition to The Medulla
     const gameScene = gameRef.current?.scene.getScene('GameScene') as any;
     if (gameScene) {
       gameScene.transitionToLevel('theMedulla', 'default');
@@ -165,6 +189,8 @@ const Index = () => {
             } else if (event === 'showTheMedullaDialog') {
               setShowTheMedullaDialog(true);
               gameState.setState('bench');
+            } else if (event === 'showGlacialTitanVictoryDialog') {
+              setShowGlacialVictory(true);
             }
             // Clear the event
             gameRef.current?.registry.set('lastUIEvent', null);
@@ -212,7 +238,17 @@ const Index = () => {
       {showEnding && <ToBeContinued onMainMenu={handleEndingMainMenu} onStay={handleEndingStay} />}
       {showGreenwayDialog && <GreenDoorDialog onYes={handleGreenwayDialogYes} onNo={handleGreenwayDialogNo} />}
       {showTheMedullaDialog && <TheMedullaDialog onYes={handleTheMedullaDialogYes} onNo={handleTheMedullaDialogNo} />}
-      {showZoneTransition && <ZoneTransition zoneName={transitionZone} onComplete={transitionZone.includes('MEDULLA') ? handleMedullaTransitionComplete : handleZoneTransitionComplete} />}
+      {showGlacialVictory && <GlacialTitanVictoryDialog onYes={handleGlacialVictoryYes} onNo={handleGlacialVictoryNo} />}
+      {showZoneTransition && (
+        <ZoneTransition 
+          zoneName={transitionZone} 
+          onComplete={
+            transitionZone.includes('MEDULLA') ? handleMedullaTransitionComplete : 
+            transitionZone.includes('FORGOTTEN') ? handleForgottenBattlefieldTransitionComplete :
+            handleZoneTransitionComplete
+          } 
+        />
+      )}
     </div>
   );
 };
