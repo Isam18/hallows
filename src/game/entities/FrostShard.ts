@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { EnemyCombatConfig, DEFAULT_ENEMY_CONFIG } from '../core/CombatConfig';
 import type { Player } from './Player';
 import { Pickup } from './Pickup';
+import gameState from '../core/GameState';
 
 /**
  * Frost Shard - Glass-cannon ice enemy.
@@ -300,11 +301,11 @@ export class FrostShard extends Phaser.Physics.Arcade.Sprite {
       if (gameScene.player && gameScene.player.active) {
         const playerDist = Phaser.Math.Distance.Between(deathX, deathY, gameScene.player.x, gameScene.player.y);
         if (playerDist < shatterRadius) {
-          // Deal 1 heart damage
-          const { default: gs } = require('../core/GameState');
-          const currentHp = gs.getHp();
-          gs.setHp(currentHp - 1);
-          if (gs.getHp() <= 0) {
+          const currentHp = gameState.getHp();
+          gameState.setHp(currentHp - 1);
+          if (gameState.getHp() <= 0) {
+          gameState.setHp(currentHp - 1);
+          if (gameState.getHp() <= 0) {
             gameScene.handlePlayerDeath();
           } else {
             // Knockback player away from shatter
