@@ -4401,4 +4401,97 @@ export class GameScene extends Phaser.Scene {
       });
     });
   }
+
+
+  // ===================== ENDLESS MODE =====================
+  private readonly ENDLESS_ENEMY_POOL = [
+    'basicHusk', 'spikyGrub', 'crawlingHusk', 'huskGuard',
+    'mosskin', 'mossWarrior', 'frontierScout', 'frontierWarrior',
+    'frostCharger', 'autumnWraith', 'ossuarySentinel', 'warfieldReaper',
+    'colonyVanguard', 'glacialSentinel',
+  ];
+
+  private updateEndlessMode(delta: number): void {
+    // Count alive enemies
+    const aliveCount = this.enemies.getChildren().filter(
+      (e: any) => e.active && !e.isDying?.()
+    ).length;
+
+    // Track kills
+    const prevAlive = this.endlessActiveEnemies;
+    if (aliveCount < prevAlive) {
+      const killed = prevAlive - aliveCount;
+      this.endlessKills += killed;
+      this.registry.set('endlessKills', this.endlessKills);
+    }
+    this.endlessActiveEnemies = aliveCount;
+
+    // If all enemies dead, start spawn timer for next wave
+    if (aliveCount === 0) {
+      this.endlessSpawnTimer -= delta;
+      if (this.endlessSpawnTimer <= 0) {
+        this.spawnEndlessWave();
+        this.endlessWave++;
+        this.registry.set('endlessWave', this.endlessWave);
+        this.endlessSpawnTimer = 1500; // 1.5s between waves
+      }
+    }
+  }
+
+  private spawnEndlessWave(): void {
+    const spawnCount = 4;
+    const arenaWidth = this.currentLevel.width;
+    const groundY = 520; // above ground platform
+
+    for (let i = 0; i < spawnCount; i++) {
+      const typeId = Phaser.Math.RND.pick(this.ENDLESS_ENEMY_POOL);
+      const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
+      if (!config) continue;
+
+      const spawnX = 100 + Math.random() * (arenaWidth - 200);
+      const spawnY = (config as any).isFlying ? Phaser.Math.Between(150, 300) : groundY;
+
+      // Spawn using the same logic as buildLevel
+      if (typeId === 'huskGuard' || typeId === 'colonyVanguard') {
+        const guard = new HuskGuard(this, spawnX, spawnY, config);
+        this.enemies.add(guard);
+      } else if (typeId === 'mosskin') {
+        const mosskin = new Mosskin(this, spawnX, spawnY, config);
+        this.enemies.add(mosskin);
+      } else if (typeId === 'mossWarrior') {
+        const warrior = new MossWarrior(this, spawnX, spawnY, config);
+        this.enemies.add(warrior);
+      } else if (typeId === 'frontierScout') {
+        const scout = new FrontierScout(this, spawnX, spawnY, config);
+        this.enemies.add(scout);
+      } else if (typeId === 'frontierWarrior') {
+        const warrior = new FrontierWarrior(this, spawnX, spawnY, config);
+        this.enemies.add(warrior);
+      } else if (typeId === 'frostCharger') {
+        const charger = new FrostCharger(this, spawnX, spawnY, config);
+        this.enemies.add(charger);
+      } else if (typeId === 'glacialSentinel') {
+        const sentinel = new GlacialSentinel(this, spawnX, spawnY, config);
+        this.enemies.add(sentinel);
+      } else if (typeId === 'autumnWraith') {
+        const wraith = new AutumnWraith(this, spawnX, spawnY, config);
+        this.enemies.add(wraith);
+      } else if (typeId === 'ossuarySentinel') {
+        const sentinel = new OssuarySentinel(this, spawnX, spawnY, config);
+        this.enemies.add(sentinel);
+      } else if (typeId === 'warfieldReaper') {
+        const reaper = new WarfieldReaper(this, spawnX, spawnY, config);
+        this.enemies.add(reaper);
+      } else {
+        // Default ground enemy
+        const enemy = new Enemy(this, spawnX, spawnY, config);
+        this.enemies.add(enemy);
+      }
+    }
+
+    this.endlessActiveEnemies = 4;
+
+    // Spawn flash effect
+    this.cameras.main.flash(200, 60, 0, 0);
+  }
 }
