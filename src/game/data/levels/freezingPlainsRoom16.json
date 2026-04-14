@@ -1,0 +1,70 @@
+{
+  "id": "freezingPlainsRoom16",
+  "name": "The Final Rampart",
+  "width": 2400,
+  "height": 500,
+  "backgroundColor": "#030610",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 450, "width": 2400, "height": 50, "type": "ground", "color": "#0a0e18" },
+    { "x": 0, "y": 0, "width": 2400, "height": 30, "type": "wall", "color": "#0a0e18" },
+    { "x": 0, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#0a0e18" },
+    { "x": 2370, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#0a0e18" },
+
+    { "x": 350, "y": 330, "width": 140, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 750, "y": 290, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1100, "y": 320, "width": 130, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1500, "y": 280, "width": 110, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1900, "y": 330, "width": 140, "height": 18, "type": "platform", "color": "#0e1220" },
+
+    { "x": 550, "y": 190, "width": 100, "height": 16, "type": "platform", "color": "#0e1220" },
+    { "x": 1300, "y": 180, "width": 110, "height": 16, "type": "platform", "color": "#0e1220" },
+    { "x": 2050, "y": 200, "width": 100, "height": 16, "type": "platform", "color": "#0e1220" },
+
+    { "x": 400, "y": 380, "width": 50, "height": 70, "type": "explosiveCanister", "color": "#cc4422" },
+    { "x": 900, "y": 380, "width": 50, "height": 70, "type": "explosiveCanister", "color": "#cc4422" },
+    { "x": 1350, "y": 380, "width": 50, "height": 70, "type": "explosiveCanister", "color": "#cc4422" },
+    { "x": 1750, "y": 380, "width": 50, "height": 70, "type": "explosiveCanister", "color": "#cc4422" },
+    { "x": 2100, "y": 380, "width": 50, "height": 70, "type": "explosiveCanister", "color": "#cc4422" },
+
+    { "x": 200, "y": 350, "width": 70, "height": 100, "type": "shatteredRemains", "color": "#0c1020" },
+    { "x": 650, "y": 370, "width": 80, "height": 80, "type": "shatteredRemains", "color": "#0c1020" },
+    { "x": 1050, "y": 360, "width": 60, "height": 90, "type": "shatteredRemains", "color": "#0c1020" },
+    { "x": 1600, "y": 370, "width": 75, "height": 80, "type": "shatteredRemains", "color": "#0c1020" },
+    { "x": 2200, "y": 350, "width": 70, "height": 100, "type": "shatteredRemains", "color": "#0c1020" }
+  ],
+  "enemies": [
+    { "type": "frozenGatekeeper", "x": 1200, "y": 350, "guaranteed": true }
+  ],
+  "lockIn": true,
+  "unlockOnClear": true,
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room16Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom15",
+      "targetSpawn": "fromRoom16"
+    },
+    {
+      "id": "room16Exit",
+      "type": "iceDoor",
+      "x": 2310,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default",
+      "lockIn": true
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromRoom15": { "x": 100, "y": 400 }
+  },
+  "biome": "ice"
+}
