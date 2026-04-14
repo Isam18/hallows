@@ -811,6 +811,9 @@ export class BootScene extends Phaser.Scene {
     
     // Basic Husk - Charging ground enemy with visual variants
     this.createBasicHuskSprites();
+    
+    // Frost Charger - icy beetle for Freezing Plains
+    this.createFrostChargerSprites();
   }
 
   private createVengeflySprite(): void {
@@ -3142,6 +3145,87 @@ export class BootScene extends Phaser.Scene {
 
     g.generateTexture(key, 60, 70);
     g.destroy();
+  }
+
+  private createFrostChargerSprites(): void {
+    const w = 56, h = 52;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Body - segmented frostbitten blue
+    g.fillStyle(0x9ab8d0);
+    g.fillEllipse(cx, cy + 6, 44, 34);
+    // Segments
+    g.lineStyle(1, 0x7a98b0);
+    g.lineBetween(cx - 8, cy - 8, cx - 10, cy + 20);
+    g.lineBetween(cx + 6, cy - 6, cx + 8, cy + 20);
+
+    // Head mask
+    g.fillStyle(0xb0d0e8);
+    g.beginPath();
+    g.moveTo(cx - 14, cy);
+    g.lineTo(cx, cy - 18);
+    g.lineTo(cx + 14, cy);
+    g.lineTo(cx + 10, cy + 6);
+    g.lineTo(cx - 10, cy + 6);
+    g.closePath();
+    g.fillPath();
+
+    // Slanted eyes
+    g.fillStyle(0x0a0a15);
+    g.fillEllipse(cx - 5, cy - 6, 5, 7);
+    g.fillEllipse(cx + 5, cy - 6, 5, 7);
+
+    // Frosted fur mantle
+    g.fillStyle(0xddeeff, 0.7);
+    for (let i = -16; i <= 16; i += 4) {
+      g.fillEllipse(cx + i, cy - 2, 5, 7);
+    }
+
+    // Ice crystal spines on back
+    g.fillStyle(0xaaddff, 0.9);
+    g.fillTriangle(cx - 8, cy - 4, cx - 12, cy - 20, cx - 4, cy - 4);
+    g.fillTriangle(cx, cy - 6, cx - 3, cy - 24, cx + 3, cy - 6);
+    g.fillTriangle(cx + 8, cy - 4, cx + 4, cy - 4, cx + 12, cy - 20);
+    // Crystal highlights
+    g.lineStyle(1, 0xddeeff);
+    g.lineBetween(cx - 10, cy - 12, cx - 8, cy - 4);
+    g.lineBetween(cx, cy - 15, cx, cy - 6);
+    g.lineBetween(cx + 10, cy - 12, cx + 8, cy - 4);
+
+    // Legs
+    g.lineStyle(2, 0x1a1a20);
+    g.lineBetween(cx - 12, cy + 16, cx - 16, cy + 26);
+    g.lineBetween(cx + 12, cy + 16, cx + 16, cy + 26);
+    // Frosted tips
+    g.fillStyle(0xaaddff);
+    g.fillCircle(cx - 16, cy + 26, 2);
+    g.fillCircle(cx + 16, cy + 26, 2);
+
+    // Body outline
+    g.lineStyle(1.5, 0x6688aa);
+    g.strokeEllipse(cx, cy + 6, 44, 34);
+
+    g.generateTexture('frostCharger', w, h);
+    g.destroy();
+
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillEllipse(cx, cy + 6, 44, 34);
+    hg.beginPath();
+    hg.moveTo(cx - 14, cy);
+    hg.lineTo(cx, cy - 18);
+    hg.lineTo(cx + 14, cy);
+    hg.lineTo(cx + 10, cy + 6);
+    hg.lineTo(cx - 10, cy + 6);
+    hg.closePath();
+    hg.fillPath();
+    hg.fillTriangle(cx - 8, cy - 4, cx - 12, cy - 20, cx - 4, cy - 4);
+    hg.fillTriangle(cx, cy - 6, cx - 3, cy - 24, cx + 3, cy - 6);
+    hg.fillTriangle(cx + 8, cy - 4, cx + 4, cy - 4, cx + 12, cy - 20);
+    hg.generateTexture('frostCharger_hurt', w, h);
+    hg.destroy();
   }
 
   create(): void {
