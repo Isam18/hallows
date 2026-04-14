@@ -483,4 +483,6 @@ class GameStateManager {
 }
 
 export const gameState = new GameStateManager();
+(window as any).__gameState = gameState;
+export default gameState;
 export default gameState;
