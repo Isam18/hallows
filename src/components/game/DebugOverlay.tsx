@@ -9,6 +9,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   const [manualToggle, setManualToggle] = useState<boolean | null>(null);
   const [debugMode, setDebugMode] = useState(false);
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
+  const [immortal, setImmortal] = useState(false);
   const prevDebugMode = useRef(false);
 
   // F1 manual override for movement overlay, A to toggle debug mode on/off
@@ -189,6 +190,28 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           Start/enter gameplay so the player debug stats can populate.
         </div>
       )}
+
+      {/* Cheats */}
+      <div className="mt-3 pt-2 border-t border-border">
+        <div className="text-xs font-semibold text-muted-foreground mb-2">Cheats</div>
+        <button
+          onClick={() => {
+            const gameState = (window as any).__gameState;
+            if (gameState) {
+              const next = !immortal;
+              gameState.setImmortalMode(next);
+              setImmortal(next);
+            }
+          }}
+          className={`px-3 py-1.5 text-xs rounded transition-colors font-bold w-full ${
+            immortal
+              ? 'bg-green-600/30 border border-green-500/50 text-green-300'
+              : 'bg-muted/30 border border-border text-muted-foreground'
+          }`}
+        >
+          {immortal ? '🛡️ IMMORTAL: ON' : '💀 Immortality: OFF'}
+        </button>
+      </div>
 
       {/* Teleport Section */}
       <div className="mt-3 pt-2 border-t border-border">
