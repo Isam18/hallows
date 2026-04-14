@@ -4438,7 +4438,19 @@ export class GameScene extends Phaser.Scene {
     'mosskin', 'mossWarrior', 'frontierScout', 'frontierWarrior',
     'frostCharger', 'autumnWraith', 'ossuarySentinel', 'warfieldReaper',
     'colonyVanguard', 'glacialSentinel',
+    'vengefly', 'aspid', 'squit', 'infectedHusk', 'mossCreep',
+    'skullScuttler', 'adaptedSkuller', 'skullRavanger', 'skullBrute',
+    'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
+    'siegeConstruct', 'frostShard', 'megaSkullRavager',
   ];
+
+  private readonly ENDLESS_BOSS_POOL = [
+    'mossTitan', 'antElder', 'glacialTitan', 'falseChampion',
+  ];
+
+  // Track stored platforms for boss wave removal/restoration
+  private endlessStoredPlatforms: any[] | null = null;
+  private endlessBossWaveActive = false;
 
   private updateEndlessMode(delta: number): void {
     // Count alive enemies
@@ -4446,23 +4458,38 @@ export class GameScene extends Phaser.Scene {
       (e: any) => e.active && !e.isDying?.()
     ).length;
 
+    // Also count alive bosses for boss waves
+    const bossAlive = this.boss && (this.boss as any).active && !(this.boss as any).isDying?.();
+    const totalAlive = aliveCount + (bossAlive ? 1 : 0);
+
     // Track kills
     const prevAlive = this.endlessActiveEnemies;
-    if (aliveCount < prevAlive) {
-      const killed = prevAlive - aliveCount;
+    if (totalAlive < prevAlive) {
+      const killed = prevAlive - totalAlive;
       this.endlessKills += killed;
       this.registry.set('endlessKills', this.endlessKills);
     }
-    this.endlessActiveEnemies = aliveCount;
+    this.endlessActiveEnemies = totalAlive;
+
+    // If boss wave just ended, restore platforms
+    if (this.endlessBossWaveActive && totalAlive === 0) {
+      this.endlessBossWaveActive = false;
+      this.restoreEndlessPlatforms();
+    }
 
     // If all enemies dead, start spawn timer for next wave
-    if (aliveCount === 0) {
+    if (totalAlive === 0) {
       this.endlessSpawnTimer -= delta;
       if (this.endlessSpawnTimer <= 0) {
-        this.spawnEndlessWave();
         this.endlessWave++;
         this.registry.set('endlessWave', this.endlessWave);
-        this.endlessSpawnTimer = 1500; // 1.5s between waves
+
+        if (this.endlessWave % 5 === 0) {
+          this.spawnEndlessBossWave();
+        } else {
+          this.spawnEndlessWave();
+        }
+        this.endlessSpawnTimer = 1500;
       }
     }
   }
@@ -4470,58 +4497,164 @@ export class GameScene extends Phaser.Scene {
   private spawnEndlessWave(): void {
     const spawnCount = 4;
     const arenaWidth = this.currentLevel.width;
-    const groundY = 520; // above ground platform
+    const groundY = 520;
 
     for (let i = 0; i < spawnCount; i++) {
       const typeId = Phaser.Math.RND.pick(this.ENDLESS_ENEMY_POOL);
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
       if (!config) continue;
 
-      const spawnX = 80 + Math.random() * (arenaWidth - 160);
+      // Can spawn on top of player
+      const spawnX = this.player
+        ? this.player.x + Phaser.Math.Between(-200, 200)
+        : 80 + Math.random() * (arenaWidth - 160);
+      const clampedX = Phaser.Math.Clamp(spawnX, 60, arenaWidth - 60);
       const spawnY = (config as any).isFlying ? Phaser.Math.Between(350, 450) : groundY;
 
-      // Spawn using the same logic as buildLevel
-      if (typeId === 'huskGuard' || typeId === 'colonyVanguard') {
-        const guard = new HuskGuard(this, spawnX, spawnY, config);
-        this.enemies.add(guard);
-      } else if (typeId === 'mosskin') {
-        const mosskin = new Mosskin(this, spawnX, spawnY, config);
-        this.enemies.add(mosskin);
-      } else if (typeId === 'mossWarrior') {
-        const warrior = new MossWarrior(this, spawnX, spawnY, config);
-        this.enemies.add(warrior);
-      } else if (typeId === 'frontierScout') {
-        const scout = new FrontierScout(this, spawnX, spawnY, config);
-        this.enemies.add(scout);
-      } else if (typeId === 'frontierWarrior') {
-        const warrior = new FrontierWarrior(this, spawnX, spawnY, config);
-        this.enemies.add(warrior);
-      } else if (typeId === 'frostCharger') {
-        const charger = new FrostCharger(this, spawnX, spawnY, config);
-        this.enemies.add(charger);
-      } else if (typeId === 'glacialSentinel') {
-        const sentinel = new GlacialSentinel(this, spawnX, spawnY, config);
-        this.enemies.add(sentinel);
-      } else if (typeId === 'autumnWraith') {
-        const wraith = new AutumnWraith(this, spawnX, spawnY, config);
-        this.enemies.add(wraith);
-      } else if (typeId === 'ossuarySentinel') {
-        const sentinel = new OssuarySentinel(this, spawnX, spawnY, config);
-        this.enemies.add(sentinel);
-      } else if (typeId === 'warfieldReaper') {
-        const reaper = new WarfieldReaper(this, spawnX, spawnY, config);
-        this.enemies.add(reaper);
+      this.spawnEndlessEnemy(typeId, clampedX, spawnY, config);
+    }
+
+    this.endlessActiveEnemies = spawnCount;
+    this.cameras.main.flash(200, 60, 0, 0);
+  }
+
+  private spawnEndlessBossWave(): void {
+    this.endlessBossWaveActive = true;
+
+    // Remove platforms for boss wave
+    this.removeEndlessPlatforms();
+
+    const arenaWidth = this.currentLevel.width;
+    const groundY = 520;
+    const bossCount = 4;
+
+    // Mix bosses and mini-bosses
+    const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
+      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'skullBrute'].includes(e)
+    )];
+
+    let spawned = 0;
+    for (let i = 0; i < bossCount; i++) {
+      const typeId = Phaser.Math.RND.pick(pool);
+      const isBoss = this.ENDLESS_BOSS_POOL.includes(typeId);
+
+      const spawnX = 100 + (i / (bossCount - 1)) * (arenaWidth - 200);
+
+      if (isBoss) {
+        const bossData = (bossesData as any)[typeId];
+        if (!bossData) continue;
+        let bossEntity: any;
+        if (typeId === 'mossTitan') {
+          bossEntity = new MossTitan(this, spawnX, groundY);
+        } else if (typeId === 'glacialTitan') {
+          bossEntity = new GlacialTitan(this, spawnX, groundY);
+        } else if (typeId === 'antElder') {
+          bossEntity = new AntElder(this, spawnX, groundY);
+        } else {
+          bossEntity = new Boss(this, spawnX, groundY);
+        }
+        this.physics.add.collider(bossEntity, this.platforms);
+        this.physics.add.collider(bossEntity, this.walls);
+        this.physics.add.overlap(this.player, bossEntity, () => this.handlePlayerBossContact());
+        // Store as enemies group so they get tracked
+        this.enemies.add(bossEntity);
+        spawned++;
       } else {
-        // Default ground enemy
-        const enemy = new Enemy(this, spawnX, spawnY, config);
-        this.enemies.add(enemy);
+        const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
+        if (!config) continue;
+        const spawnY = (config as any).isFlying ? Phaser.Math.Between(350, 450) : groundY;
+        this.spawnEndlessEnemy(typeId, spawnX, spawnY, config);
+        spawned++;
       }
     }
 
-    this.endlessActiveEnemies = 4;
+    this.endlessActiveEnemies = spawned;
+    this.cameras.main.flash(400, 120, 0, 0);
+  }
 
-    // Spawn flash effect
-    this.cameras.main.flash(200, 60, 0, 0);
+  private removeEndlessPlatforms(): void {
+    // Store current non-ground platforms and destroy them
+    this.endlessStoredPlatforms = [];
+    const toRemove: Phaser.GameObjects.GameObject[] = [];
+    this.platforms.getChildren().forEach((p: any) => {
+      if (p.y < 550) { // Not the ground
+        this.endlessStoredPlatforms!.push({ x: p.x, y: p.y, width: p.displayWidth, height: p.displayHeight });
+        toRemove.push(p);
+      }
+    });
+    toRemove.forEach(p => p.destroy());
+  }
+
+  private restoreEndlessPlatforms(): void {
+    if (!this.endlessStoredPlatforms) return;
+    this.endlessStoredPlatforms.forEach(p => {
+      const plat = this.platforms.create(p.x, p.y, '__WHITE') as Phaser.Physics.Arcade.Sprite;
+      plat.setDisplaySize(p.width, p.height);
+      plat.setImmovable(true);
+      (plat.body as Phaser.Physics.Arcade.Body).allowGravity = false;
+      plat.setTint(0x333333);
+      plat.setAlpha(0.8);
+    });
+    this.endlessStoredPlatforms = null;
+  }
+
+  private spawnEndlessEnemy(typeId: string, x: number, y: number, config: EnemyCombatConfig): void {
+    let entity: any;
+    switch (typeId) {
+      case 'huskGuard': case 'colonyVanguard':
+        entity = new HuskGuard(this, x, y, config); break;
+      case 'mosskin':
+        entity = new Mosskin(this, x, y, config); break;
+      case 'mossWarrior':
+        entity = new MossWarrior(this, x, y, config); break;
+      case 'frontierScout':
+        entity = new FrontierScout(this, x, y, config); break;
+      case 'frontierWarrior':
+        entity = new FrontierWarrior(this, x, y, config); break;
+      case 'frostCharger':
+        entity = new FrostCharger(this, x, y, config); break;
+      case 'glacialSentinel':
+        entity = new GlacialSentinel(this, x, y, config); break;
+      case 'autumnWraith':
+        entity = new AutumnWraith(this, x, y, config); break;
+      case 'ossuarySentinel':
+        entity = new OssuarySentinel(this, x, y, config); break;
+      case 'warfieldReaper':
+        entity = new WarfieldReaper(this, x, y, config); break;
+      case 'vengefly':
+        entity = new Vengefly(this, x, y, config); break;
+      case 'aspid':
+        entity = new Aspid(this, x, y, config); break;
+      case 'squit':
+        entity = new Squit(this, x, y, config); break;
+      case 'infectedHusk':
+        entity = new InfectedHusk(this, x, y, config); break;
+      case 'mossCreep':
+        entity = new MossCreep(this, x, y, config); break;
+      case 'skullScuttler':
+        entity = new SkullScuttler(this, x, y, config); break;
+      case 'adaptedSkuller':
+        entity = new AdaptedSkuller(this, x, y, config); break;
+      case 'skullRavanger':
+        entity = new SkullRavager(this, x, y, config); break;
+      case 'megaSkullRavager':
+        entity = new MegaSkullRavager(this, x, y, config); break;
+      case 'wingedWarrior':
+        entity = new WingedWarrior(this, x, y, config); break;
+      case 'wingedCommander':
+        entity = new WingedCommander(this, x, y, config); break;
+      case 'frozenGatekeeper':
+        entity = new FrozenGatekeeper(this, x, y, config); break;
+      case 'siegeConstruct':
+        entity = new SiegeConstruct(this, x, y, config); break;
+      case 'frostShard':
+        entity = new FrostShard(this, x, y, config); break;
+      case 'basicHusk':
+        entity = new BasicHusk(this, x, y, config); break;
+      default:
+        entity = new Enemy(this, x, y, config); break;
+    }
+    this.enemies.add(entity);
   }
 
   /**
