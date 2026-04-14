@@ -156,5 +156,44 @@
       "shells": 300,
       "charm": "elderStrength"
     }
+  },
+  "glacialTitan": {
+    "id": "glacialTitan",
+    "name": "Glacial Titan",
+    "subtitle": "Heart of the Permafrost",
+    "nameColor": "#44aaff",
+    "maxHp": 400,
+    "staggerThreshold": 25,
+    "staggerDuration": 4500,
+    "staggerRecoveryRageTime": 2500,
+    "attackPatterns": {
+      "frostQuake": {
+        "windupTime": 700,
+        "slamSpeed": 800,
+        "shockwaveDamage": 2,
+        "cooldown": 2000
+      },
+      "crystallineSpikes": {
+        "spikeCount": 6,
+        "warningTime": 1200,
+        "damage": 2,
+        "cooldown": 2800
+      },
+      "glacialBeam": {
+        "chargeTime": 1500,
+        "duration": 1200,
+        "beamWidth": 50,
+        "damage": 2,
+        "cooldown": 3500
+      }
+    },
+    "contactDamage": 2,
+    "width": 200,
+    "height": 140,
+    "scale": 2.2,
+    "reward": {
+      "shells": 350,
+      "charm": "glacialStrength"
+    }
   }
 }
