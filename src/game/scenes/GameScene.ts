@@ -959,6 +959,11 @@ export class GameScene extends Phaser.Scene {
       
       // Check if all enemies are dead in boss arena and summon boss
       this.checkBossSummon();
+
+      // Endless mode wave spawning
+      if (this.endlessMode) {
+        this.updateEndlessMode(delta);
+      }
     }
     
     // Clear just-pressed/released states at END of frame so all systems can read them
