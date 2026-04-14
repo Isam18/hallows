@@ -45,6 +45,7 @@
     { "type": "autumnWraith", "x": 2100, "y": 400, "guaranteed": true }
   ],
   "triggers": [],
+  "pickups": [],
   "portals": [],
   "hazards": [],
   "ambience": {
