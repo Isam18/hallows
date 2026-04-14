@@ -46,7 +46,9 @@
     { "type": "autumnWraith", "x": 2100, "y": 400, "guaranteed": true },
     { "type": "ossuarySentinel", "x": 700, "y": 320, "guaranteed": true },
     { "type": "ossuarySentinel", "x": 1500, "y": 280, "guaranteed": true },
-    { "type": "ossuarySentinel", "x": 2000, "y": 350, "guaranteed": true }
+    { "type": "ossuarySentinel", "x": 2000, "y": 350, "guaranteed": true },
+    { "type": "warfieldReaper", "x": 400, "y": 250, "guaranteed": true },
+    { "type": "warfieldReaper", "x": 1100, "y": 220, "guaranteed": true }
   ],
   "triggers": [],
   "pickups": [],
