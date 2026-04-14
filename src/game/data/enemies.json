@@ -572,5 +572,24 @@
     "width": 40,
     "height": 55,
     "isFlying": true
+  },
+  "warfieldReaper": {
+    "id": "warfieldReaper",
+    "displayName": "Warfield Reaper",
+    "hp": 5,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 350,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": { "x": 80, "y": 50 },
+    "hitstunMs": 160,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 20, "max": 35 },
+    "hurtFlashMs": 140,
+    "spriteKey": "warfieldReaper",
+    "width": 36,
+    "height": 44,
+    "isFlying": true
   }
 }

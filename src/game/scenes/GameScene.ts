@@ -33,6 +33,7 @@ import { SiegeConstruct } from '../entities/SiegeConstruct';
 import { GlacialTitan } from '../entities/GlacialTitan';
 import { AutumnWraith } from '../entities/AutumnWraith';
 import { OssuarySentinel } from '../entities/OssuarySentinel';
+import { WarfieldReaper } from '../entities/WarfieldReaper';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
