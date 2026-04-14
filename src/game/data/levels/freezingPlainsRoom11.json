@@ -1,0 +1,75 @@
+{
+  "id": "freezingPlainsRoom11",
+  "name": "Graveyard of Giants",
+  "width": 2600,
+  "height": 800,
+  "backgroundColor": "#040610",
+  "spawnPoint": { "x": 100, "y": 700 },
+  "platforms": [
+    { "x": 0, "y": 750, "width": 2600, "height": 50, "type": "ground", "color": "#08080f" },
+    { "x": 0, "y": 0, "width": 2600, "height": 30, "type": "wall", "color": "#08080f" },
+    { "x": 0, "y": 30, "width": 30, "height": 720, "type": "wall", "color": "#08080f" },
+    { "x": 2570, "y": 30, "width": 30, "height": 720, "type": "wall", "color": "#08080f" },
+
+    { "x": 200, "y": 300, "width": 60, "height": 450, "type": "monolith", "color": "#0a0e1a" },
+    { "x": 600, "y": 200, "width": 70, "height": 550, "type": "monolith", "color": "#0a0e1a" },
+    { "x": 1000, "y": 250, "width": 65, "height": 500, "type": "monolith", "color": "#0a0e1a" },
+    { "x": 1500, "y": 180, "width": 75, "height": 570, "type": "monolith", "color": "#0a0e1a" },
+    { "x": 1900, "y": 220, "width": 60, "height": 530, "type": "monolith", "color": "#0a0e1a" },
+    { "x": 2300, "y": 280, "width": 70, "height": 470, "type": "monolith", "color": "#0a0e1a" },
+
+    { "x": 150, "y": 620, "width": 160, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 400, "y": 550, "width": 140, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 700, "y": 480, "width": 170, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 950, "y": 560, "width": 130, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1200, "y": 450, "width": 160, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1450, "y": 520, "width": 140, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1700, "y": 430, "width": 170, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1950, "y": 550, "width": 130, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 2200, "y": 480, "width": 150, "height": 20, "type": "corpsePlatform", "color": "#1a1828" },
+
+    { "x": 300, "y": 350, "width": 120, "height": 18, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 800, "y": 300, "width": 130, "height": 18, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1300, "y": 280, "width": 120, "height": 18, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1750, "y": 260, "width": 140, "height": 18, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 2150, "y": 320, "width": 120, "height": 18, "type": "corpsePlatform", "color": "#1a1828" },
+
+    { "x": 550, "y": 180, "width": 100, "height": 16, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1100, "y": 160, "width": 110, "height": 16, "type": "corpsePlatform", "color": "#1a1828" },
+    { "x": 1650, "y": 150, "width": 100, "height": 16, "type": "corpsePlatform", "color": "#1a1828" }
+  ],
+  "enemies": [
+    { "type": "frozenGatekeeper", "x": 1300, "y": 500, "guaranteed": true }
+  ],
+  "pickups": [],
+  "lockIn": true,
+  "triggers": [
+    {
+      "id": "room11Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 650,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom10",
+      "targetSpawn": "fromRoom11"
+    },
+    {
+      "id": "room11Exit",
+      "type": "iceDoor",
+      "x": 2510,
+      "y": 650,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default",
+      "locked": true,
+      "unlockOnClear": true
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 700 },
+    "fromRoom10": { "x": 100, "y": 700 }
+  },
+  "biome": "ice"
+}
