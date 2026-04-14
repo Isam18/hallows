@@ -19,14 +19,10 @@
   "enemies": [
     { "type": "frostCharger", "x": 500, "y": 510 },
     { "type": "frostShard", "x": 800, "y": 510 },
-    { "type": "glacialSentinel", "x": 950, "y": 350 },
-    { "type": "frostCharger", "x": 1100, "y": 510 },
-    { "type": "frostShard", "x": 1350, "y": 510 },
-    { "type": "frostShard", "x": 1600, "y": 510 },
-    { "type": "glacialSentinel", "x": 1650, "y": 320 },
-    { "type": "frostCharger", "x": 1700, "y": 510 },
-    { "type": "frostShard", "x": 2000, "y": 510 },
-    { "type": "frostCharger", "x": 2100, "y": 510 }
+    { "type": "glacialSentinel", "x": 1100, "y": 350 },
+    { "type": "frozenGatekeeper", "x": 1600, "y": 350, "stage": 1, "guaranteed": true },
+    { "type": "frostCharger", "x": 1900, "y": 510 },
+    { "type": "frostShard", "x": 2100, "y": 510 }
   ],
   "pickups": [],
   "triggers": [],
