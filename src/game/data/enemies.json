@@ -553,5 +553,24 @@
     "spriteKey": "autumnWraith",
     "width": 30,
     "height": 42
+  },
+  "ossuarySentinel": {
+    "id": "ossuarySentinel",
+    "displayName": "Ossuary Sentinel",
+    "hp": 6,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 250,
+    "deaggroRangePx": 400,
+    "knockbackOnHit": { "x": 60, "y": 30 },
+    "hitstunMs": 160,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 25, "max": 45 },
+    "hurtFlashMs": 140,
+    "spriteKey": "ossuarySentinel",
+    "width": 40,
+    "height": 55,
+    "isFlying": true
   }
 }
