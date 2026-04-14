@@ -287,6 +287,11 @@ export class GameScene extends Phaser.Scene {
     this.waveArenaWaves = null;
     this.waveArenaText = null;
     this.bossExitDoorOpened = false;
+    
+    // Clear endless mode registry if not in endless
+    if (!this.endlessMode) {
+      this.registry.set('endlessMode', false);
+    }
   }
 
   create(): void {
