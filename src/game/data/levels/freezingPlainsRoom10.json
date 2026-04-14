@@ -1,0 +1,74 @@
+{
+  "id": "freezingPlainsRoom10",
+  "name": "Prism Array",
+  "width": 2400,
+  "height": 600,
+  "backgroundColor": "#050812",
+  "spawnPoint": { "x": 100, "y": 500 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 2400, "height": 50, "type": "ground", "color": "#0a0e18" },
+    { "x": 0, "y": 0, "width": 2400, "height": 30, "type": "wall", "color": "#0a0e18" },
+    { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall", "color": "#0a0e18" },
+    { "x": 2370, "y": 30, "width": 30, "height": 520, "type": "wall", "color": "#0a0e18" },
+
+    { "x": 300, "y": 400, "width": 30, "height": 30, "type": "prism", "color": "#80e0ff", "interactive": true },
+    { "x": 750, "y": 300, "width": 30, "height": 30, "type": "prism", "color": "#80e0ff", "interactive": true },
+    { "x": 1200, "y": 350, "width": 30, "height": 30, "type": "prism", "color": "#80e0ff", "interactive": true },
+    { "x": 1650, "y": 250, "width": 30, "height": 30, "type": "prism", "color": "#80e0ff", "interactive": true },
+    { "x": 2050, "y": 380, "width": 30, "height": 30, "type": "prism", "color": "#80e0ff", "interactive": true },
+
+    { "x": 300, "y": 30, "width": 4, "height": 370, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 300, "y": 400, "width": 450, "height": 4, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 750, "y": 300, "width": 4, "height": 100, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 750, "y": 300, "width": 450, "height": 4, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 1200, "y": 300, "width": 4, "height": 50, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 1200, "y": 350, "width": 450, "height": 4, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 1650, "y": 250, "width": 4, "height": 100, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 1650, "y": 250, "width": 400, "height": 4, "type": "lightBeam", "color": "#40c0ff" },
+    { "x": 2050, "y": 250, "width": 4, "height": 130, "type": "lightBeam", "color": "#40c0ff" },
+
+    { "x": 200, "y": 430, "width": 140, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 500, "y": 350, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 900, "y": 380, "width": 130, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1350, "y": 300, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1800, "y": 350, "width": 140, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 2150, "y": 420, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+
+    { "x": 400, "y": 200, "width": 100, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1000, "y": 180, "width": 110, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1500, "y": 160, "width": 100, "height": 18, "type": "platform", "color": "#0e1220" }
+  ],
+  "enemies": [
+    { "type": "glacialSentinel", "x": 500, "y": 280, "patrolStart": 350, "patrolEnd": 700 },
+    { "type": "glacialSentinel", "x": 1200, "y": 230, "patrolStart": 1000, "patrolEnd": 1400 },
+    { "type": "glacialSentinel", "x": 1900, "y": 300, "patrolStart": 1700, "patrolEnd": 2100 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room10Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom9",
+      "targetSpawn": "fromRoom10"
+    },
+    {
+      "id": "room10Exit",
+      "type": "iceDoor",
+      "x": 2310,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 500 },
+    "fromRoom9": { "x": 100, "y": 500 }
+  },
+  "biome": "ice"
+}
