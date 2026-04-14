@@ -262,7 +262,6 @@ export class AutumnWraith extends Phaser.Physics.Arcade.Sprite {
 
   private createAfterImage(): void {
     const ghost = this.scene.add.rectangle(this.x, this.y, this.cfg.width, this.cfg.height, 0x884422, 0.4);
-    ghost.setFlipX(this.flipX);
     this.scene.tweens.add({
       targets: ghost,
       alpha: 0,
