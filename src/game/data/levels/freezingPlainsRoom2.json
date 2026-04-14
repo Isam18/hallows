@@ -1,0 +1,66 @@
+{
+  "id": "freezingPlainsRoom2",
+  "name": "Frozen Canopy",
+  "width": 2800,
+  "height": 700,
+  "backgroundColor": "#0a1428",
+  "spawnPoint": { "x": 100, "y": 600 },
+  "platforms": [
+    { "x": 0, "y": 650, "width": 400, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 2800, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 2770, "y": 30, "width": 30, "height": 620, "type": "wall" },
+    { "x": 2400, "y": 650, "width": 400, "height": 50, "type": "ground" },
+
+    { "x": 300, "y": 620, "width": 250, "height": 30, "type": "branch", "color": "#2a1a0a" },
+    { "x": 350, "y": 600, "width": 60, "height": 20, "type": "branch", "color": "#3b2510" },
+
+    { "x": 620, "y": 550, "width": 180, "height": 25, "type": "branch", "color": "#2a1a0a" },
+    { "x": 650, "y": 530, "width": 40, "height": 20, "type": "branch", "color": "#3b2510" },
+
+    { "x": 870, "y": 480, "width": 220, "height": 30, "type": "branch", "color": "#2a1a0a" },
+    { "x": 920, "y": 460, "width": 80, "height": 20, "type": "branch", "color": "#3b2510" },
+    { "x": 1020, "y": 460, "width": 50, "height": 20, "type": "branch", "color": "#3b2510" },
+
+    { "x": 1160, "y": 520, "width": 200, "height": 28, "type": "branch", "color": "#2a1a0a" },
+
+    { "x": 1430, "y": 450, "width": 260, "height": 30, "type": "branch", "color": "#2a1a0a" },
+    { "x": 1480, "y": 430, "width": 70, "height": 20, "type": "branch", "color": "#3b2510" },
+    { "x": 1600, "y": 430, "width": 60, "height": 20, "type": "branch", "color": "#3b2510" },
+
+    { "x": 1760, "y": 500, "width": 180, "height": 25, "type": "branch", "color": "#2a1a0a" },
+
+    { "x": 2010, "y": 440, "width": 220, "height": 30, "type": "branch", "color": "#2a1a0a" },
+    { "x": 2060, "y": 420, "width": 90, "height": 20, "type": "branch", "color": "#3b2510" },
+
+    { "x": 2300, "y": 520, "width": 160, "height": 28, "type": "branch", "color": "#2a1a0a" },
+
+    { "x": 500, "y": 650, "width": 300, "height": 50, "type": "ground" },
+    { "x": 1100, "y": 650, "width": 200, "height": 50, "type": "ground" },
+    { "x": 1900, "y": 650, "width": 250, "height": 50, "type": "ground" }
+  ],
+  "enemies": [
+    { "type": "glacialSentinel", "x": 700, "y": 400, "patrolStart": 600, "patrolEnd": 900 },
+    { "type": "glacialSentinel", "x": 1500, "y": 350, "patrolStart": 1400, "patrolEnd": 1700 },
+    { "type": "glacialSentinel", "x": 2100, "y": 380, "patrolStart": 2000, "patrolEnd": 2300 },
+    { "type": "frostShard", "x": 1200, "y": 500, "patrolStart": 1100, "patrolEnd": 1400 }
+  ],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room2Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlains",
+      "targetSpawn": "fromRoom2"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 600 },
+    "fromRoom1": { "x": 100, "y": 600 }
+  },
+  "biome": "ice"
+}
