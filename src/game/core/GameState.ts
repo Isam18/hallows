@@ -40,6 +40,7 @@ class GameStateManager {
   private listeners: Map<string, Set<(data: any) => void>> = new Map();
   private debugMode = false;
   private instakillMode = false;
+  private immortalMode = false;
   
   // State getters
   getState(): GameState {
@@ -74,6 +75,15 @@ class GameStateManager {
     this.instakillMode = enabled;
     this.emit('instakillModeChange', enabled);
   }
+
+  isImmortalMode(): boolean {
+    return this.immortalMode;
+  }
+
+  setImmortalMode(enabled: boolean): void {
+    this.immortalMode = enabled;
+    this.emit('immortalModeChange', enabled);
+  }
   
   // Player data operations
   setHp(hp: number): void {
@@ -87,6 +97,7 @@ class GameStateManager {
   }
   
   damage(amount: number): void {
+    if (this.immortalMode) return;
     this.setHp(this.playerData.hp - amount);
     this.emit('playerDamaged', amount);
   }
@@ -472,4 +483,5 @@ class GameStateManager {
 }
 
 export const gameState = new GameStateManager();
+(window as any).__gameState = gameState;
 export default gameState;
