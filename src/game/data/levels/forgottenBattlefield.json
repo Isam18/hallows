@@ -43,7 +43,10 @@
     { "type": "autumnWraith", "x": 900, "y": 300, "guaranteed": true },
     { "type": "autumnWraith", "x": 1300, "y": 500, "guaranteed": true },
     { "type": "autumnWraith", "x": 1700, "y": 350, "guaranteed": true },
-    { "type": "autumnWraith", "x": 2100, "y": 400, "guaranteed": true }
+    { "type": "autumnWraith", "x": 2100, "y": 400, "guaranteed": true },
+    { "type": "ossuarySentinel", "x": 700, "y": 320, "guaranteed": true },
+    { "type": "ossuarySentinel", "x": 1500, "y": 280, "guaranteed": true },
+    { "type": "ossuarySentinel", "x": 2000, "y": 350, "guaranteed": true }
   ],
   "triggers": [],
   "pickups": [],
