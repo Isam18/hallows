@@ -1,0 +1,69 @@
+{
+  "id": "freezingPlainsRoom15",
+  "name": "Titan's Threshold",
+  "width": 2800,
+  "height": 600,
+  "backgroundColor": "#020308",
+  "spawnPoint": { "x": 100, "y": 500 },
+  "platforms": [
+    { "x": 0, "y": 550, "width": 2800, "height": 50, "type": "ground", "color": "#080c18" },
+    { "x": 0, "y": 0, "width": 2800, "height": 30, "type": "wall", "color": "#080c18" },
+    { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall", "color": "#080c18" },
+    { "x": 2770, "y": 30, "width": 30, "height": 520, "type": "wall", "color": "#080c18" },
+
+    { "x": 300, "y": 420, "width": 130, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 600, "y": 340, "width": 110, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 950, "y": 280, "width": 120, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 1250, "y": 380, "width": 140, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 1550, "y": 300, "width": 110, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 1850, "y": 240, "width": 130, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 2150, "y": 350, "width": 120, "height": 18, "type": "platform", "color": "#0a0e1a" },
+    { "x": 2450, "y": 420, "width": 130, "height": 18, "type": "platform", "color": "#0a0e1a" },
+
+    { "x": 450, "y": 200, "width": 100, "height": 16, "type": "platform", "color": "#0a0e1a" },
+    { "x": 800, "y": 150, "width": 90, "height": 16, "type": "platform", "color": "#0a0e1a" },
+    { "x": 1400, "y": 160, "width": 100, "height": 16, "type": "platform", "color": "#0a0e1a" },
+    { "x": 2000, "y": 130, "width": 110, "height": 16, "type": "platform", "color": "#0a0e1a" },
+    { "x": 2350, "y": 200, "width": 90, "height": 16, "type": "platform", "color": "#0a0e1a" }
+  ],
+  "enemies": [
+    { "type": "glacialSentinel", "x": 600, "y": 200, "patrolStart": 400, "patrolEnd": 900 },
+    { "type": "glacialSentinel", "x": 1500, "y": 180, "patrolStart": 1200, "patrolEnd": 1800 },
+    { "type": "glacialSentinel", "x": 2200, "y": 200, "patrolStart": 1900, "patrolEnd": 2500 },
+    { "type": "frostShard", "x": 800, "y": 500, "patrolStart": 600, "patrolEnd": 1000 },
+    { "type": "frostShard", "x": 1600, "y": 500, "patrolStart": 1400, "patrolEnd": 1800 },
+    { "type": "frostShard", "x": 2300, "y": 500, "patrolStart": 2100, "patrolEnd": 2500 }
+  ],
+  "gravity": {
+    "multiplier": 0.5
+  },
+  "backgroundSilhouette": "glacialTitan",
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room15Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom14",
+      "targetSpawn": "fromRoom15"
+    },
+    {
+      "id": "room15Exit",
+      "type": "iceDoor",
+      "x": 2710,
+      "y": 450,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 500 },
+    "fromRoom14": { "x": 100, "y": 500 }
+  },
+  "biome": "ice"
+}
