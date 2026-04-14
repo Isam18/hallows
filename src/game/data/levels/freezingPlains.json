@@ -11,14 +11,7 @@
     { "x": 0, "y": 30, "width": 30, "height": 520, "type": "wall" },
     { "x": 2370, "y": 30, "width": 30, "height": 520, "type": "wall" }
   ],
-  "enemies": [
-    { "type": "frostCharger", "x": 500, "y": 510 },
-    { "type": "frostShard", "x": 800, "y": 510 },
-    { "type": "glacialSentinel", "x": 1100, "y": 350 },
-    { "type": "frozenGatekeeper", "x": 1600, "y": 350, "stage": 1, "guaranteed": true },
-    { "type": "siegeConstruct", "x": 2000, "y": 400, "guaranteed": true },
-    { "type": "frostShard", "x": 2200, "y": 510 }
-  ],
+  "enemies": [],
   "pickups": [],
   "triggers": [],
   "spawns": {
