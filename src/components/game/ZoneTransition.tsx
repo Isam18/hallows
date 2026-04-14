@@ -11,8 +11,8 @@ export function ZoneTransition({ zoneName, onComplete }: ZoneTransitionProps) {
   // Check if this is Medulla transition
   const isMedulla = zoneName.includes('MEDULLA');
   const isForgotten = zoneName.includes('FORGOTTEN');
-  const mainTitle = isMedulla ? 'THE MEDULLA' : isForgotten ? 'FORGOTTEN BATTLEFIELD' : zoneName;
-  const subtitle = isMedulla ? 'The burnt lands' : isForgotten ? 'Where autumn reigns eternal' : 'The Overgrown Path';
+  const mainTitle = isMedulla ? 'THE MEDULLA' : isForgotten ? 'FORGOTTEN WARFIELD' : zoneName;
+  const subtitle = isMedulla ? 'The burnt lands' : isForgotten ? 'Where the fallen rest' : 'The Overgrown Path';
 
   useEffect(() => {
     // Phase 1: Fade to black (already black from start)
