@@ -37,7 +37,13 @@
     { "x": 1550, "y": 545, "type": "fallenLeaves" },
     { "x": 2000, "y": 540, "type": "fallenLeaves" }
   ],
-  "enemies": [],
+  "enemies": [
+    { "type": "autumnWraith", "x": 500, "y": 500, "guaranteed": true },
+    { "type": "autumnWraith", "x": 900, "y": 300, "guaranteed": true },
+    { "type": "autumnWraith", "x": 1300, "y": 500, "guaranteed": true },
+    { "type": "autumnWraith", "x": 1700, "y": 350, "guaranteed": true },
+    { "type": "autumnWraith", "x": 2100, "y": 400, "guaranteed": true }
+  ],
   "portals": [],
   "hazards": [],
   "ambience": {
