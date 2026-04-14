@@ -304,17 +304,13 @@ export class FrostShard extends Phaser.Physics.Arcade.Sprite {
           const currentHp = gameState.getHp();
           gameState.setHp(currentHp - 1);
           if (gameState.getHp() <= 0) {
-          gameState.setHp(currentHp - 1);
-          if (gameState.getHp() <= 0) {
             gameScene.handlePlayerDeath();
           } else {
-            // Knockback player away from shatter
             const kbDir = gameScene.player.x > deathX ? 1 : -1;
             const playerBody = gameScene.player.body as Phaser.Physics.Arcade.Body;
             if (playerBody) {
               playerBody.setVelocity(kbDir * 200, -150);
             }
-            // Flash player
             gameScene.player.setTint(0xff4444);
             this.scene.time.delayedCall(150, () => {
               if (gameScene.player && gameScene.player.active) gameScene.player.clearTint();
