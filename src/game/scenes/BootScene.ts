@@ -3544,7 +3544,65 @@ export class BootScene extends Phaser.Scene {
     hg.destroy();
   }
 
-  create(): void {
+  private createGlacialTitanSprite(key: string): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const w = 200;
+    const h = 140;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // Massive obsidian/permafrost body - rooted monument shape
+    g.fillStyle(0x0a1520);
+    g.fillRect(cx - 70, cy - 50, 140, 100);
+
+    // Tapered top (monument shape)
+    g.fillStyle(0x0c1825);
+    g.fillTriangle(cx - 70, cy - 50, cx + 70, cy - 50, cx, cy - 90);
+
+    // Base roots (rooted in ground)
+    g.fillStyle(0x081018);
+    g.fillRect(cx - 80, cy + 30, 160, 40);
+    g.fillTriangle(cx - 90, cy + 70, cx - 60, cy + 30, cx - 30, cy + 70);
+    g.fillTriangle(cx + 30, cy + 70, cx + 60, cy + 30, cx + 90, cy + 70);
+
+    // Ice crystal formations on shoulders
+    g.fillStyle(0x44aaff, 0.7);
+    g.fillTriangle(cx - 60, cy - 40, cx - 75, cy - 80, cx - 45, cy - 65);
+    g.fillTriangle(cx + 60, cy - 40, cx + 75, cy - 80, cx + 45, cy - 65);
+
+    // Smaller crystals
+    g.fillStyle(0x66ccff, 0.6);
+    g.fillTriangle(cx - 40, cy - 45, cx - 50, cy - 70, cx - 30, cy - 60);
+    g.fillTriangle(cx + 40, cy - 45, cx + 50, cy - 70, cx + 30, cy - 60);
+
+    // Plate armor lines
+    g.lineStyle(2, 0x1a2838);
+    g.lineBetween(cx - 60, cy - 20, cx + 60, cy - 20);
+    g.lineBetween(cx - 55, cy, cx + 55, cy);
+    g.lineBetween(cx - 50, cy + 20, cx + 50, cy + 20);
+
+    // Glowing blue heart core
+    g.fillStyle(0x44aaff, 0.9);
+    g.fillCircle(cx, cy - 10, 14);
+    g.fillStyle(0x88ddff, 0.7);
+    g.fillCircle(cx, cy - 10, 8);
+    g.fillStyle(0xccffff, 0.5);
+    g.fillCircle(cx, cy - 10, 4);
+
+    // Eyes - cold blue slits
+    g.fillStyle(0x44aaff, 0.8);
+    g.fillRect(cx - 25, cy - 45, 12, 4);
+    g.fillRect(cx + 13, cy - 45, 12, 4);
+
+    // Edge frost glow
+    g.lineStyle(1, 0x44aaff, 0.3);
+    g.strokeRect(cx - 70, cy - 50, 140, 100);
+
+    g.generateTexture(key, w, h);
+    g.destroy();
+  }
+
+
     gameState.resetRun();
     this.scene.start('MenuScene');
   }
