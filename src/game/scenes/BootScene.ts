@@ -3603,6 +3603,69 @@ export class BootScene extends Phaser.Scene {
     g.destroy();
   }
 
+  private createAutumnWraithSprites(): void {
+    const w = 40, h = 52;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Lean insectoid body - bronze/rust plating
+    g.fillStyle(0x886633);
+    g.fillRect(cx - 6, cy - 8, 12, 22);
+    
+    // Tattered leaf-rags (burnt-orange skirt)
+    g.fillStyle(0xcc5522, 0.8);
+    g.fillTriangle(cx - 10, cy + 10, cx, cy + 24, cx + 2, cy + 10);
+    g.fillStyle(0x882211, 0.7);
+    g.fillTriangle(cx - 2, cy + 10, cx + 10, cy + 24, cx + 8, cy + 10);
+    g.fillStyle(0xdd6633, 0.6);
+    g.fillTriangle(cx - 6, cy + 12, cx - 4, cy + 22, cx + 4, cy + 12);
+
+    // Wrapped headpiece - tall, tattered linen
+    g.fillStyle(0xaa9977);
+    g.fillRect(cx - 7, cy - 22, 14, 16);
+    // Top wrap tattered edges
+    g.fillStyle(0x998866);
+    g.fillTriangle(cx - 8, cy - 22, cx - 4, cy - 28, cx, cy - 22);
+    g.fillTriangle(cx, cy - 22, cx + 4, cy - 30, cx + 7, cy - 22);
+    // Leather strap across head
+    g.fillStyle(0x443322);
+    g.fillRect(cx - 8, cy - 16, 16, 3);
+
+    // Arms - thin, insectoid
+    g.lineStyle(2, 0x775533);
+    g.lineBetween(cx - 6, cy - 2, cx - 14, cy + 8);
+    g.lineBetween(cx + 6, cy - 2, cx + 14, cy + 4);
+    
+    // Rust blade in right hand
+    g.fillStyle(0x664433);
+    g.fillRect(cx + 12, cy - 2, 3, 14);
+    g.fillStyle(0x885544);
+    g.fillTriangle(cx + 11, cy - 2, cx + 14, cy - 8, cx + 16, cy - 2);
+
+    // Legs - thin segmented
+    g.lineStyle(2, 0x775533);
+    g.lineBetween(cx - 4, cy + 22, cx - 6, cy + 30);
+    g.lineBetween(cx + 4, cy + 22, cx + 6, cy + 30);
+
+    // Battle scars - dark lines
+    g.lineStyle(1, 0x332211, 0.6);
+    g.lineBetween(cx - 3, cy - 4, cx + 1, cy + 4);
+    g.lineBetween(cx + 2, cy, cx + 5, cy + 6);
+
+    g.generateTexture('autumnWraith', w, h);
+    g.destroy();
+
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillRect(cx - 6, cy - 8, 12, 22);
+    hg.fillRect(cx - 7, cy - 22, 14, 16);
+    hg.fillTriangle(cx - 10, cy + 10, cx, cy + 24, cx + 2, cy + 10);
+    hg.fillTriangle(cx - 2, cy + 10, cx + 10, cy + 24, cx + 8, cy + 10);
+    hg.generateTexture('autumnWraith_hurt', w, h);
+    hg.destroy();
+  }
+
   create(): void {
     gameState.resetRun();
     this.scene.start('MenuScene');
