@@ -1,0 +1,68 @@
+{
+  "id": "freezingPlainsRoom4",
+  "name": "Hall of Shivering Silk",
+  "width": 3200,
+  "height": 500,
+  "backgroundColor": "#1a0a0f",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 450, "width": 3200, "height": 50, "type": "ground", "color": "#2a0f1a" },
+    { "x": 0, "y": 0, "width": 3200, "height": 30, "type": "wall", "color": "#2a0f1a" },
+    { "x": 0, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#2a0f1a" },
+    { "x": 3170, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#2a0f1a" },
+
+    { "x": 200, "y": 30, "width": 8, "height": 120, "type": "icicle", "color": "#6ad0f0" },
+    { "x": 500, "y": 30, "width": 12, "height": 160, "type": "icicle", "color": "#5ac0e0" },
+    { "x": 520, "y": 30, "width": 6, "height": 100, "type": "icicle", "color": "#7ae0ff" },
+    { "x": 900, "y": 30, "width": 10, "height": 140, "type": "icicle", "color": "#6ad0f0" },
+    { "x": 920, "y": 30, "width": 14, "height": 180, "type": "icicle", "color": "#5ac0e0" },
+    { "x": 940, "y": 30, "width": 7, "height": 110, "type": "icicle", "color": "#7ae0ff" },
+    { "x": 1300, "y": 30, "width": 10, "height": 150, "type": "icicle", "color": "#6ad0f0" },
+    { "x": 1320, "y": 30, "width": 8, "height": 120, "type": "icicle", "color": "#5ac0e0" },
+    { "x": 1700, "y": 30, "width": 12, "height": 170, "type": "icicle", "color": "#5ac0e0" },
+    { "x": 1720, "y": 30, "width": 6, "height": 90, "type": "icicle", "color": "#7ae0ff" },
+    { "x": 2100, "y": 30, "width": 14, "height": 190, "type": "icicle", "color": "#6ad0f0" },
+    { "x": 2120, "y": 30, "width": 8, "height": 130, "type": "icicle", "color": "#5ac0e0" },
+    { "x": 2500, "y": 30, "width": 10, "height": 150, "type": "icicle", "color": "#6ad0f0" },
+    { "x": 2520, "y": 30, "width": 7, "height": 100, "type": "icicle", "color": "#7ae0ff" },
+    { "x": 2900, "y": 30, "width": 12, "height": 160, "type": "icicle", "color": "#5ac0e0" },
+
+    { "x": 400, "y": 350, "width": 120, "height": 15, "type": "platform", "color": "#2a0f1a" },
+    { "x": 1000, "y": 320, "width": 100, "height": 15, "type": "platform", "color": "#2a0f1a" },
+    { "x": 1600, "y": 340, "width": 130, "height": 15, "type": "platform", "color": "#2a0f1a" },
+    { "x": 2200, "y": 310, "width": 110, "height": 15, "type": "platform", "color": "#2a0f1a" },
+    { "x": 2800, "y": 350, "width": 120, "height": 15, "type": "platform", "color": "#2a0f1a" }
+  ],
+  "enemies": [
+    { "type": "frostCharger", "x": 600, "y": 400, "patrolStart": 400, "patrolEnd": 900 },
+    { "type": "frostCharger", "x": 1400, "y": 400, "patrolStart": 1200, "patrolEnd": 1700 },
+    { "type": "frostCharger", "x": 2300, "y": 400, "patrolStart": 2100, "patrolEnd": 2600 },
+    { "type": "glacialSentinel", "x": 800, "y": 200, "patrolStart": 500, "patrolEnd": 1100 },
+    { "type": "glacialSentinel", "x": 1900, "y": 180, "patrolStart": 1600, "patrolEnd": 2200 },
+    { "type": "glacialSentinel", "x": 2700, "y": 210, "patrolStart": 2400, "patrolEnd": 3000 }
+  ],
+  "pickups": [],
+  "slipperyZones": [
+    { "x": 300, "y": 440, "width": 400, "friction": 0.15 },
+    { "x": 1000, "y": 440, "width": 500, "friction": 0.15 },
+    { "x": 1800, "y": 440, "width": 400, "friction": 0.15 },
+    { "x": 2500, "y": 440, "width": 500, "friction": 0.15 }
+  ],
+  "triggers": [
+    {
+      "id": "room4Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom3",
+      "targetSpawn": "fromRoom4"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromRoom3": { "x": 100, "y": 400 }
+  },
+  "biome": "ice"
+}

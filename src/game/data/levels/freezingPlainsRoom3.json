@@ -60,11 +60,22 @@
       "height": 100,
       "target": "freezingPlainsRoom2",
       "targetSpawn": "fromRoom3"
+    },
+    {
+      "id": "room3ToRoom4",
+      "type": "iceDoor",
+      "x": 2900,
+      "y": 550,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom4",
+      "targetSpawn": "default"
     }
   ],
   "spawns": {
     "default": { "x": 100, "y": 600 },
-    "fromRoom2": { "x": 100, "y": 600 }
+    "fromRoom2": { "x": 100, "y": 600 },
+    "fromRoom4": { "x": 2880, "y": 600 }
   },
   "biome": "ice"
 }
