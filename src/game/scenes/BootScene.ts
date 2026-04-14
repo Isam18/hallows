@@ -3229,7 +3229,69 @@ export class BootScene extends Phaser.Scene {
     hg.destroy();
   }
 
-  create(): void {
+  private createFrostShardSprites(): void {
+    const w = 44, h = 48;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Body - spherical cluster of ice shards
+    g.fillStyle(0x8abbdd);
+    g.fillCircle(cx, cy + 4, 16);
+
+    // Ruffled frost-shard petals
+    const shardColors = [0x99ccee, 0xaaddff, 0xbbddff, 0x88bbdd];
+    for (let i = 0; i < 12; i++) {
+      const angle = (i / 12) * Math.PI * 2;
+      const r = 14;
+      const sx = cx + Math.cos(angle) * r;
+      const sy = cy + 4 + Math.sin(angle) * r;
+      g.fillStyle(shardColors[i % shardColors.length], 0.85);
+      g.fillTriangle(
+        sx, sy,
+        sx + Math.cos(angle) * 8, sy + Math.sin(angle) * 8,
+        sx + Math.cos(angle + 0.5) * 6, sy + Math.sin(angle + 0.5) * 6
+      );
+    }
+
+    // White shimmer edges
+    g.lineStyle(1, 0xeef4ff, 0.6);
+    g.strokeCircle(cx, cy + 4, 16);
+
+    // Dark permafrost crown on top
+    g.fillStyle(0x2a3040);
+    g.fillRect(cx - 10, cy - 14, 20, 10);
+    // Crown jagged top
+    g.fillTriangle(cx - 10, cy - 14, cx - 8, cy - 20, cx - 4, cy - 14);
+    g.fillTriangle(cx - 2, cy - 14, cx, cy - 22, cx + 2, cy - 14);
+    g.fillTriangle(cx + 4, cy - 14, cx + 8, cy - 20, cx + 10, cy - 14);
+    // Rune marks
+    g.lineStyle(1, 0x6688aa);
+    g.lineBetween(cx - 6, cy - 11, cx - 4, cy - 7);
+    g.lineBetween(cx, cy - 12, cx + 2, cy - 7);
+    g.lineBetween(cx + 5, cy - 11, cx + 3, cy - 7);
+
+    // Spindly needle legs
+    g.lineStyle(1.5, 0x1a1a20);
+    g.lineBetween(cx - 8, cy + 16, cx - 12, cy + 24);
+    g.lineBetween(cx - 3, cy + 18, cx - 5, cy + 24);
+    g.lineBetween(cx + 3, cy + 18, cx + 5, cy + 24);
+    g.lineBetween(cx + 8, cy + 16, cx + 12, cy + 24);
+
+    g.generateTexture('frostShard', w, h);
+    g.destroy();
+
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillCircle(cx, cy + 4, 16);
+    hg.fillRect(cx - 10, cy - 14, 20, 10);
+    hg.fillTriangle(cx - 10, cy - 14, cx - 8, cy - 20, cx - 4, cy - 14);
+    hg.fillTriangle(cx - 2, cy - 14, cx, cy - 22, cx + 2, cy - 14);
+    hg.fillTriangle(cx + 4, cy - 14, cx + 8, cy - 20, cx + 10, cy - 14);
+    hg.generateTexture('frostShard_hurt', w, h);
+    hg.destroy();
+  }
+
     gameState.resetRun();
     this.scene.start('MenuScene');
   }
