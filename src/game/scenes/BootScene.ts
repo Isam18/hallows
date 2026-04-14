@@ -3456,6 +3456,91 @@ export class BootScene extends Phaser.Scene {
     hg.destroy();
   }
 
+  private createSiegeConstructSprites(): void {
+    const w = 80, h = 70;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Main obsidian plates - rectangular geometric formation
+    g.fillStyle(0x222233);
+    // Center plate
+    g.fillRect(cx - 16, cy - 20, 32, 40);
+    // Left plate
+    g.fillRect(cx - 34, cy - 14, 16, 28);
+    // Right plate
+    g.fillRect(cx + 18, cy - 14, 16, 28);
+    // Top plate
+    g.fillRect(cx - 10, cy - 32, 20, 12);
+    // Bottom plate
+    g.fillRect(cx - 12, cy + 18, 24, 12);
+
+    // Plate outlines
+    g.lineStyle(2, 0x0a0a15);
+    g.strokeRect(cx - 16, cy - 20, 32, 40);
+    g.strokeRect(cx - 34, cy - 14, 16, 28);
+    g.strokeRect(cx + 18, cy - 14, 16, 28);
+    g.strokeRect(cx - 10, cy - 32, 20, 12);
+    g.strokeRect(cx - 12, cy + 18, 24, 12);
+
+    // Red organic tendrils between plates
+    g.lineStyle(2.5, 0xcc2222, 0.8);
+    // Horizontal tendrils
+    g.lineBetween(cx - 18, cy - 6, cx - 34, cy - 4);
+    g.lineBetween(cx + 16, cy - 6, cx + 18, cy - 4);
+    g.lineBetween(cx - 18, cy + 8, cx - 34, cy + 6);
+    g.lineBetween(cx + 16, cy + 8, cx + 18, cy + 6);
+    // Vertical tendrils
+    g.lineBetween(cx - 4, cy - 20, cx - 6, cy - 32);
+    g.lineBetween(cx + 4, cy - 20, cx + 6, cy - 32);
+    g.lineBetween(cx - 4, cy + 18, cx - 2, cy + 18);
+    g.lineBetween(cx + 4, cy + 18, cx + 2, cy + 18);
+
+    // Pulsating muscle mass at joints
+    g.fillStyle(0xaa1111, 0.7);
+    g.fillCircle(cx - 18, cy - 2, 4);
+    g.fillCircle(cx + 18, cy - 2, 4);
+    g.fillCircle(cx, cy - 22, 3);
+    g.fillCircle(cx - 6, cy + 18, 3);
+    g.fillCircle(cx + 6, cy + 18, 3);
+
+    // Central glowing core (eye/cannon)
+    g.fillStyle(0xff2222, 0.4);
+    g.fillCircle(cx, cy, 12);
+    g.fillStyle(0xff4444, 0.7);
+    g.fillCircle(cx, cy, 8);
+    g.fillStyle(0xff8866, 0.9);
+    g.fillCircle(cx, cy, 4);
+
+    // Crimson claws (jagged limbs)
+    g.fillStyle(0x881111);
+    // Left claw
+    g.fillTriangle(cx - 34, cy + 14, cx - 40, cy + 30, cx - 30, cy + 28);
+    g.fillTriangle(cx - 36, cy + 20, cx - 44, cy + 26, cx - 34, cy + 26);
+    // Right claw
+    g.fillTriangle(cx + 34, cy + 14, cx + 40, cy + 30, cx + 30, cy + 28);
+    g.fillTriangle(cx + 36, cy + 20, cx + 44, cy + 26, cx + 34, cy + 26);
+
+    // Claw outlines
+    g.lineStyle(1.5, 0x440808);
+    g.lineBetween(cx - 34, cy + 14, cx - 40, cy + 30);
+    g.lineBetween(cx + 34, cy + 14, cx + 40, cy + 30);
+
+    g.generateTexture('siegeConstruct', w, h);
+    g.destroy();
+
+    // Hurt frame
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0xffffff);
+    hg.fillRect(cx - 16, cy - 20, 32, 40);
+    hg.fillRect(cx - 34, cy - 14, 16, 28);
+    hg.fillRect(cx + 18, cy - 14, 16, 28);
+    hg.fillRect(cx - 10, cy - 32, 20, 12);
+    hg.fillRect(cx - 12, cy + 18, 24, 12);
+    hg.fillCircle(cx, cy, 8);
+    hg.generateTexture('siegeConstruct_hurt', w, h);
+    hg.destroy();
+  }
+
   create(): void {
     gameState.resetRun();
     this.scene.start('MenuScene');
