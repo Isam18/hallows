@@ -105,7 +105,7 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
 
     // Update heart position
     if (this.heartGlow) {
-      this.heartGlow.setPosition(this.x, this.y - 20);
+      this.heartGlow.setPosition(this.x, this.y - 40);
       const pulse = 0.6 + Math.sin(this.heartPulseTimer * 0.004) * 0.3;
       this.heartGlow.setAlpha(pulse);
       // Scale pulse
@@ -492,6 +492,9 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
       this.die();
     }
 
+    // Update HP bar
+    this.updateHPBar();
+
     // Emit HP update
     const gs = this.gameScene as any;
     gs.emitUIEvent?.('bossHpUpdate', {
@@ -567,6 +570,7 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     body.setVelocity(0, 0);
     this.cleanupAttacks();
     this.openGates();
+    this.destroyHPBar();
 
     // Phase 1: Ice shatter roar
     this.scene.time.delayedCall(0, () => this.createDeathRoar());
