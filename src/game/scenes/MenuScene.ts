@@ -5,6 +5,7 @@ import gameState from '../core/GameState';
 export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text;
   private startButton!: Phaser.GameObjects.Text;
+  private endlessButton!: Phaser.GameObjects.Text;
   private debugButton!: Phaser.GameObjects.Text;
   private particles!: Phaser.GameObjects.Graphics;
   private debugMode = false;
@@ -58,8 +59,28 @@ export class MenuScene extends Phaser.Scene {
       this.startGame();
     });
     
+    // Endless Deads button
+    this.endlessButton = this.add.text(width / 2, height * 0.63, '[ ENDLESS DEADS ]', {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '20px',
+      color: '#cc4444',
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerover', () => {
+      this.endlessButton.setColor('#ff6666');
+      this.endlessButton.setScale(1.1);
+    })
+    .on('pointerout', () => {
+      this.endlessButton.setColor('#cc4444');
+      this.endlessButton.setScale(1);
+    })
+    .on('pointerdown', () => {
+      this.startEndlessMode();
+    });
+
     // Debug mode toggle button
-    this.debugButton = this.add.text(width / 2, height * 0.65, '[ DEBUG MODE: OFF ]', {
+    this.debugButton = this.add.text(width / 2, height * 0.73, '[ DEBUG MODE: OFF ]', {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '16px',
       color: '#666677',
@@ -79,7 +100,7 @@ export class MenuScene extends Phaser.Scene {
     });
     
     // Debug mode explanation
-    this.add.text(width / 2, height * 0.72, 'Shows hitboxes, stats, and enables teleport commands', {
+    this.add.text(width / 2, height * 0.79, 'Shows hitboxes, stats, and enables teleport commands', {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '11px',
       color: '#444455',
