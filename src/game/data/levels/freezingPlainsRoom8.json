@@ -62,13 +62,14 @@
       "y": 350,
       "width": 50,
       "height": 100,
-      "target": "",
+      "target": "freezingPlainsRoom9",
       "targetSpawn": "default"
     }
   ],
   "spawns": {
     "default": { "x": 100, "y": 400 },
-    "fromBench": { "x": 100, "y": 400 }
+    "fromBench": { "x": 100, "y": 400 },
+    "fromRoom9": { "x": 3390, "y": 400 }
   },
   "biome": "ice"
 }
