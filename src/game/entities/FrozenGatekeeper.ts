@@ -80,7 +80,7 @@ export class FrozenGatekeeper extends Phaser.Physics.Arcade.Sprite {
     this.maxHp = Math.floor(this.cfg.hp * hpMultiplier);
     this.currentHp = this.maxHp;
     this.stage = stage;
-    this.hoverBaseY = y;
+    this.hoverBaseY = this.clampHoverBaseY(y);
 
     scene.add.existing(this);
     scene.physics.add.existing(this);
@@ -91,6 +91,7 @@ export class FrozenGatekeeper extends Phaser.Physics.Arcade.Sprite {
     body.setOffset((this.width - this.cfg.width) / 2, (this.height - this.cfg.height) / 2);
     body.setAllowGravity(false);
     body.setImmovable(false);
+    body.reset(x, this.hoverBaseY);
 
     this.arenaLeft = x - 400;
     this.arenaRight = x + 400;
@@ -99,6 +100,19 @@ export class FrozenGatekeeper extends Phaser.Physics.Arcade.Sprite {
     if (this.stage >= 2) {
       this.createVeilShards();
     }
+  }
+
+  private getFloorTopY(): number {
+    const worldHeight = this.scene.physics.world.bounds.height || this.scene.scale.height || 600;
+    return worldHeight - 50;
+  }
+
+  private getMaxHoverCenterY(): number {
+    return this.getFloorTopY() - this.displayHeight / 2 - 10;
+  }
+
+  private clampHoverBaseY(y: number): number {
+    return Phaser.Math.Clamp(y, 80, this.getMaxHoverCenterY());
   }
 
   private createVeilShards(): void {
@@ -137,8 +151,21 @@ export class FrozenGatekeeper extends Phaser.Physics.Arcade.Sprite {
 
   private updateHover(delta: number): void {
     if (this.aiState === 'hurt' || this.aiState === 'dead') return;
+
+    this.hoverBaseY = this.clampHoverBaseY(this.hoverBaseY);
     this.hoverTimer += delta * 0.0015;
-    this.y = this.hoverBaseY + Math.sin(this.hoverTimer) * 10;
+
+    const hoverY = Phaser.Math.Clamp(
+      this.hoverBaseY + Math.sin(this.hoverTimer) * 10,
+      80,
+      this.getMaxHoverCenterY()
+    );
+
+    this.setY(hoverY);
+
+    const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setVelocityY(0);
+    body.updateFromGameObject();
   }
 
   private updateVeilVisuals(delta: number): void {
