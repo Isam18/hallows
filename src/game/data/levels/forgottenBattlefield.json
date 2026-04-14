@@ -1,0 +1,42 @@
+{
+  "id": "forgottenBattlefield",
+  "name": "Forgotten Battlefield",
+  "width": 2400,
+  "height": 600,
+  "backgroundColor": "#2a1a0a",
+  "theme": "autumn",
+  "spawnPoints": {
+    "default": { "x": 100, "y": 450 },
+    "fromTitanVictory": { "x": 100, "y": 450 }
+  },
+  "platforms": [
+    { "x": 0, "y": 560, "width": 2400, "height": 40, "type": "ground" },
+    { "x": 300, "y": 440, "width": 160, "height": 20, "type": "platform" },
+    { "x": 600, "y": 380, "width": 120, "height": 20, "type": "platform" },
+    { "x": 900, "y": 350, "width": 200, "height": 20, "type": "platform" },
+    { "x": 1200, "y": 420, "width": 140, "height": 20, "type": "platform" },
+    { "x": 1500, "y": 360, "width": 180, "height": 20, "type": "platform" },
+    { "x": 1800, "y": 400, "width": 160, "height": 20, "type": "platform" },
+    { "x": 2100, "y": 440, "width": 200, "height": 20, "type": "platform" }
+  ],
+  "walls": [],
+  "decorations": [
+    { "x": 150, "y": 520, "type": "fallenLeaves" },
+    { "x": 400, "y": 530, "type": "brokenSword" },
+    { "x": 700, "y": 540, "type": "skeletonRemains" },
+    { "x": 1000, "y": 530, "type": "fallenBanner" },
+    { "x": 1300, "y": 520, "type": "autumnTree" },
+    { "x": 1600, "y": 540, "type": "brokenShield" },
+    { "x": 1900, "y": 530, "type": "autumnTree" },
+    { "x": 2200, "y": 520, "type": "fallenLeaves" }
+  ],
+  "enemies": [],
+  "portals": [],
+  "hazards": [],
+  "ambience": {
+    "particles": "fallingLeaves",
+    "fog": true,
+    "fogColor": "#8B4513",
+    "fogOpacity": 0.15
+  }
+}
