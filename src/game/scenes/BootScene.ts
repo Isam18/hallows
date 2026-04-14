@@ -817,6 +817,7 @@ export class BootScene extends Phaser.Scene {
     this.createFrostShardSprites();
     this.createGlacialSentinelSprites();
     this.createFrozenGatekeeperSprites();
+    this.createSiegeConstructSprites();
   }
 
   private createVengeflySprite(): void {
