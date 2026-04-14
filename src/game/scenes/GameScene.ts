@@ -65,6 +65,7 @@ import greenwayData from '../data/levels/greenway.json';
 import mossTitanArenaData from '../data/levels/mossTitanArena.json';
 import theMedullaData from '../data/levels/theMedulla.json';
 import enemiesData from '../data/enemies.json';
+import bossesData from '../data/boss.json';
 
 // Medulla room data (16 rooms)
 import medullaRoom1Data from '../data/levels/medulla/room1-ribGate.json';
