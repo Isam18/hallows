@@ -1,0 +1,53 @@
+{
+  "id": "freezingPlainsBench",
+  "name": "Frozen Respite",
+  "width": 800,
+  "height": 500,
+  "backgroundColor": "#060e1e",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 450, "width": 800, "height": 50, "type": "ground", "color": "#0a0e18" },
+    { "x": 0, "y": 0, "width": 800, "height": 30, "type": "wall", "color": "#0a0e18" },
+    { "x": 0, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#0a0e18" },
+    { "x": 770, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#0a0e18" }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "benchSeat",
+      "type": "bench",
+      "benchTypeId": "basic_bench",
+      "x": 380,
+      "y": 410,
+      "width": 40,
+      "height": 40
+    },
+    {
+      "id": "benchBack",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom7",
+      "targetSpawn": "fromBench"
+    },
+    {
+      "id": "benchExit",
+      "type": "iceDoor",
+      "x": 710,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom8",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromRoom7": { "x": 100, "y": 400 },
+    "fromRoom8": { "x": 690, "y": 400 }
+  },
+  "biome": "ice"
+}
