@@ -375,7 +375,7 @@ export class GameScene extends Phaser.Scene {
     }
     
     // Auto-enter boss arena if loading a dedicated boss arena level
-    if (this.levelId === 'mossTitanArena' && this.currentLevel.bossArena) {
+    if ((this.levelId === 'mossTitanArena' || this.levelId === 'glacialTitanArena') && this.currentLevel.bossArena) {
       this.time.delayedCall(500, () => {
         this.enterBossArena();
       });
@@ -1317,6 +1317,8 @@ export class GameScene extends Phaser.Scene {
     // Determine which boss was defeated and show appropriate victory
     if (this.levelId === 'huntersMarchBossArena') {
       this.showAntElderVictory();
+    } else if (this.levelId === 'glacialTitanArena') {
+      this.showGlacialTitanVictory();
     }
   }
 
