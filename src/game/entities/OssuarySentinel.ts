@@ -372,7 +372,7 @@ export class OssuarySentinel extends Phaser.Physics.Arcade.Sprite {
 
       // Check collision with player
       const gameScene = this.scene as any;
-      if (gameScene.player && !gameScene.player.isDying()) {
+      if (gameScene.player && gameScene.player.active) {
         const px = gameScene.player.x;
         const py = gameScene.player.y;
         const dist = Phaser.Math.Distance.Between(shard.x, shard.y, px, py);
