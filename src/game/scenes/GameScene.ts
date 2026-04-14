@@ -327,6 +327,8 @@ export class GameScene extends Phaser.Scene {
       this.createHuntersMarchEnvironment(biome !== GameScene.lastEnteredBiome);
     } else if (biome === 'ice') {
       this.createIceEnvironment();
+    } else if (this.levelId === 'forgottenBattlefield' || (this.currentLevel as any).theme === 'autumn') {
+      this.createForgottenWarfieldEnvironment();
     }
     GameScene.lastEnteredBiome = biome;
     
