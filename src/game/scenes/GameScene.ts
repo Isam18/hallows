@@ -26,6 +26,7 @@ import { WingedWarrior } from '../entities/WingedWarrior';
 import { ColonyVanguard } from '../entities/ColonyVanguard';
 import { WingedCommander } from '../entities/WingedCommander';
 import { FrostCharger } from '../entities/FrostCharger';
+import { FrostShard } from '../entities/FrostShard';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -591,6 +592,9 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'frostCharger') {
           const charger = new FrostCharger(this, e.x, e.y, config);
           this.enemies.add(charger);
+        } else if (e.type === 'frostShard') {
+          const shard = new FrostShard(this, e.x, e.y, config);
+          this.enemies.add(shard);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {

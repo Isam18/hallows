@@ -452,5 +452,24 @@
     "width": 48,
     "height": 44,
     "isIce": true
+  },
+  "frostShard": {
+    "id": "frostShard",
+    "displayName": "Frost Shard",
+    "hp": 2,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 90,
+    "moveSpeedAggro": 500,
+    "aggroRangePx": 200,
+    "deaggroRangePx": 350,
+    "knockbackOnHit": { "x": 120, "y": 60 },
+    "hitstunMs": 200,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 5, "max": 12 },
+    "hurtFlashMs": 150,
+    "spriteKey": "frostShard",
+    "width": 36,
+    "height": 36,
+    "isIce": true
   }
 }
