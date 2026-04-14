@@ -34,6 +34,14 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
   private heartExposed = false;
   private heartPulseTimer = 0;
 
+  // HP Bar
+  private hpBarBg: Phaser.GameObjects.Rectangle | null = null;
+  private hpBarFill: Phaser.GameObjects.Rectangle | null = null;
+  private hpBarBorder: Phaser.GameObjects.Rectangle | null = null;
+  private hpBarNameText: Phaser.GameObjects.Text | null = null;
+  private readonly HP_BAR_WIDTH = 300;
+  private readonly HP_BAR_HEIGHT = 12;
+
   // Gates
   private leftGate: Phaser.GameObjects.Rectangle | null = null;
   private rightGate: Phaser.GameObjects.Rectangle | null = null;
@@ -81,8 +89,11 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     this.arenaRight = x + 600;
 
     // Create heart core glow
-    this.heartGlow = scene.add.ellipse(x, y - 20, 30, 30, 0x44aaff, 0.6);
+    this.heartGlow = scene.add.ellipse(x, y - 40, 40, 40, 0x44aaff, 0.6);
     this.heartGlow.setDepth(this.depth + 1);
+
+    // Create boss HP bar (screen-fixed at top center)
+    this.createBossHPBar();
   }
 
   update(time: number, delta: number, player: Player): void {
@@ -697,4 +708,76 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     );
   }
   getContactDamage(): number { return CFG.contactDamage; }
+  getHeadBounds(): Phaser.Geom.Rectangle | null {
+    // Heart core acts as the "head" weak point when staggered
+    if (this.heartExposed && this.heartGlow) {
+      return new Phaser.Geom.Rectangle(
+        this.x - 25, this.y - 55, 50, 50
+      );
+    }
+    return null;
+  }
+
+  private createBossHPBar(): void {
+    const cam = this.scene.cameras.main;
+    const barX = cam.width / 2;
+    const barY = 50;
+
+    // Name
+    this.hpBarNameText = this.scene.add.text(barX, barY - 18, CFG.name.toUpperCase(), {
+      fontFamily: 'Georgia, serif',
+      fontSize: '16px',
+      color: '#44aaff',
+      fontStyle: 'bold',
+      stroke: '#000000',
+      strokeThickness: 3,
+    });
+    this.hpBarNameText.setOrigin(0.5);
+    this.hpBarNameText.setScrollFactor(0);
+    this.hpBarNameText.setDepth(999);
+
+    // Background
+    this.hpBarBg = this.scene.add.rectangle(barX, barY, this.HP_BAR_WIDTH + 4, this.HP_BAR_HEIGHT + 4, 0x000000, 0.8);
+    this.hpBarBg.setScrollFactor(0);
+    this.hpBarBg.setDepth(999);
+
+    // Fill
+    this.hpBarFill = this.scene.add.rectangle(
+      barX - this.HP_BAR_WIDTH / 2, barY,
+      this.HP_BAR_WIDTH, this.HP_BAR_HEIGHT,
+      0x44aaff, 0.9
+    );
+    this.hpBarFill.setOrigin(0, 0.5);
+    this.hpBarFill.setScrollFactor(0);
+    this.hpBarFill.setDepth(1000);
+
+    // Border
+    this.hpBarBorder = this.scene.add.rectangle(barX, barY, this.HP_BAR_WIDTH + 4, this.HP_BAR_HEIGHT + 4);
+    this.hpBarBorder.setStrokeStyle(2, 0x44aaff, 0.6);
+    this.hpBarBorder.setFillStyle(0x000000, 0);
+    this.hpBarBorder.setScrollFactor(0);
+    this.hpBarBorder.setDepth(1000);
+  }
+
+  private updateHPBar(): void {
+    if (!this.hpBarFill) return;
+    const ratio = Math.max(0, this.bossHp / this.bossMaxHp);
+    this.hpBarFill.width = this.HP_BAR_WIDTH * ratio;
+
+    // Color shifts as HP drops
+    if (ratio < 0.25) {
+      this.hpBarFill.setFillStyle(0xff4444, 0.9);
+    } else if (ratio < 0.5) {
+      this.hpBarFill.setFillStyle(0xff8844, 0.9);
+    } else {
+      this.hpBarFill.setFillStyle(0x44aaff, 0.9);
+    }
+  }
+
+  private destroyHPBar(): void {
+    this.hpBarBg?.destroy();
+    this.hpBarFill?.destroy();
+    this.hpBarBorder?.destroy();
+    this.hpBarNameText?.destroy();
+  }
 }
