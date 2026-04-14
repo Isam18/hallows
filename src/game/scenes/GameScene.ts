@@ -4453,8 +4453,8 @@ export class GameScene extends Phaser.Scene {
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
       if (!config) continue;
 
-      const spawnX = 100 + Math.random() * (arenaWidth - 200);
-      const spawnY = (config as any).isFlying ? Phaser.Math.Between(150, 300) : groundY;
+      const spawnX = 80 + Math.random() * (arenaWidth - 160);
+      const spawnY = (config as any).isFlying ? Phaser.Math.Between(350, 450) : groundY;
 
       // Spawn using the same logic as buildLevel
       if (typeId === 'huskGuard' || typeId === 'colonyVanguard') {
