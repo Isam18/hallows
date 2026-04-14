@@ -85,8 +85,8 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     body.setAllowGravity(true);
 
-    this.arenaLeft = x - 600;
-    this.arenaRight = x + 600;
+    this.arenaLeft = x - 900;
+    this.arenaRight = x + 900;
 
     // Create heart core glow
     this.heartGlow = scene.add.ellipse(x, y - 40, 40, 40, 0x44aaff, 0.6);
