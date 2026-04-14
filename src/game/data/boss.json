@@ -190,7 +190,7 @@
     "contactDamage": 2,
     "width": 200,
     "height": 140,
-    "scale": 2.2,
+    "scale": 3.5,
     "reward": {
       "shells": 350,
       "charm": "glacialStrength"
