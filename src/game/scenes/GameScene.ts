@@ -1534,6 +1534,12 @@ export class GameScene extends Phaser.Scene {
     this.player.setTint(0xff4444);
     this.player.setAlpha(0.7);
     
+    // For endless mode, store final stats in registry
+    if (this.endlessMode) {
+      this.registry.set('endlessFinalkills', this.endlessKills);
+      this.registry.set('endlessFinalWave', this.endlessWave);
+    }
+    
     // Set death state
     gameState.setState('death');
     
@@ -1542,6 +1548,9 @@ export class GameScene extends Phaser.Scene {
       shells: playerData.shells,
       x: this.player.x,
       y: this.player.y,
+      endless: this.endlessMode,
+      endlessKills: this.endlessKills,
+      endlessWave: this.endlessWave,
     });
   }
 
@@ -1549,6 +1558,21 @@ export class GameScene extends Phaser.Scene {
    * Respawn player at last bench
    */
   respawnPlayer(): void {
+    // Endless mode: restart the arena fresh
+    if (this.endlessMode) {
+      this.randomizeEndlessArena();
+      (gameState as any).playerData.maxHp = 6;
+      (gameState as any).playerData.hp = 6;
+      gameState.refillSoul();
+      gameState.setState('playing');
+      this.scene.restart({
+        levelId: 'endlessArena',
+        spawnId: 'default',
+        endlessMode: true,
+      });
+      return;
+    }
+
     const lastBench = gameState.getLastBench();
     
     // Heal player
