@@ -814,6 +814,7 @@ export class BootScene extends Phaser.Scene {
     
     // Frost Charger - icy beetle for Freezing Plains
     this.createFrostChargerSprites();
+    this.createFrostShardSprites();
   }
 
   private createVengeflySprite(): void {
