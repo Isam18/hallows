@@ -1158,6 +1158,10 @@ export class GameScene extends Phaser.Scene {
       // Spawn Moss Titan
       const mossTitan = new MossTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
       this.boss = mossTitan as any;
+    } else if (this.levelId === 'glacialTitanArena') {
+      // Spawn Glacial Titan
+      const glacialTitan = new GlacialTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
+      this.boss = glacialTitan as any;
     } else {
       // Spawn default boss
       this.boss = new Boss(this, arena.bossSpawn.x, arena.bossSpawn.y);
