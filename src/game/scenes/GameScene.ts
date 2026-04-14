@@ -2492,6 +2492,129 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private createForgottenWarfieldEnvironment(): void {
+    const w = this.currentLevel.width;
+    const h = this.currentLevel.height;
+    const groundY = h - 50;
+
+    // Warm autumn gradient background
+    const bgTop = this.add.rectangle(w / 2, 0, w, h / 2, 0x1a0f05);
+    bgTop.setOrigin(0.5, 0);
+    bgTop.setDepth(-10);
+    const bgBot = this.add.rectangle(w / 2, h / 2, w, h / 2, 0x2a1a0a);
+    bgBot.setOrigin(0.5, 0);
+    bgBot.setDepth(-10);
+
+    // Corpse piles - dead player-like figures stacked
+    const pilePositions = [180, 450, 650, 850, 1050, 1250, 1450, 1650, 1900, 2150];
+    for (let pi = 0; pi < pilePositions.length; pi++) {
+      const px = pilePositions[pi];
+      const hasFlowers = pi % 2 === 1;
+      const pileSize = Phaser.Math.Between(3, 6);
+      
+      for (let b = 0; b < pileSize; b++) {
+        const bx = px + Phaser.Math.Between(-25, 25);
+        const by = groundY - b * 8 - Phaser.Math.Between(0, 5);
+        const bodyAngle = Phaser.Math.Between(-40, 40);
+        
+        // Body (like the player sprite - small dark figure)
+        const body = this.add.rectangle(bx, by, 14, 18, 0x222222, 0.7);
+        body.setAngle(bodyAngle);
+        body.setDepth(2);
+        
+        // Head
+        const headX = bx + Math.sin(bodyAngle * Math.PI / 180) * 8;
+        const headY = by - 10 - Math.abs(Math.cos(bodyAngle * Math.PI / 180)) * 3;
+        const head = this.add.circle(headX, headY, 5, 0x1a1a1a, 0.7);
+        head.setDepth(2);
+        
+        // Tattered cloak detail
+        const cloak = this.add.rectangle(bx, by + 5, 16, 6, 0x111111, 0.5);
+        cloak.setAngle(bodyAngle + Phaser.Math.Between(-10, 10));
+        cloak.setDepth(1.9);
+      }
+      
+      // Flowers growing from the pile
+      if (hasFlowers) {
+        const flowerCount = Phaser.Math.Between(2, 5);
+        for (let f = 0; f < flowerCount; f++) {
+          const fx = px + Phaser.Math.Between(-20, 20);
+          const fy = groundY - pileSize * 8 - Phaser.Math.Between(5, 15);
+          const container = this.add.container(fx, fy);
+          container.setDepth(3);
+          
+          // Stem
+          const stemH = Phaser.Math.Between(12, 22);
+          const stem = this.add.rectangle(0, -stemH / 2, 2, stemH, 0x556633, 0.8);
+          container.add(stem);
+          
+          // Petals - warm autumn colors
+          const petalColors = [0xcc4422, 0xdd6633, 0xee8844, 0xffaa55, 0xcc3355];
+          const petalCount = Phaser.Math.Between(4, 6);
+          for (let p = 0; p < petalCount; p++) {
+            const angle = (p / petalCount) * Math.PI * 2;
+            const petalX = Math.cos(angle) * 5;
+            const petalY = -stemH + Math.sin(angle) * 5;
+            const petal = this.add.ellipse(petalX, petalY, 4, 7, petalColors[p % petalColors.length], 0.7);
+            petal.setRotation(angle + Math.PI / 2);
+            container.add(petal);
+          }
+          
+          // Center
+          const center = this.add.circle(0, -stemH, 2.5, 0xffdd88, 0.8);
+          container.add(center);
+          
+          // Gentle sway
+          this.tweens.add({
+            targets: container,
+            rotation: { from: -0.05, to: 0.05 },
+            duration: 2500 + Math.random() * 1500,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+          });
+        }
+      }
+    }
+
+    // Falling autumn leaves particles
+    for (let i = 0; i < 20; i++) {
+      const leafX = Phaser.Math.Between(0, w);
+      const leafY = Phaser.Math.Between(0, h);
+      const leafColors = [0xcc4400, 0xdd6611, 0xee8822, 0xbb3300, 0xcc7733, 0xaa5500];
+      const leaf = this.add.ellipse(leafX, leafY, 6, 4, Phaser.Math.RND.pick(leafColors), 0.6);
+      leaf.setDepth(0);
+      leaf.setRotation(Math.random() * Math.PI * 2);
+      this.tweens.add({
+        targets: leaf,
+        y: h + 10,
+        x: leaf.x + Phaser.Math.Between(-50, 50),
+        rotation: leaf.rotation + Phaser.Math.Between(-3, 3),
+        duration: 5000 + Math.random() * 5000,
+        repeat: -1,
+        onRepeat: () => {
+          leaf.y = -10;
+          leaf.x = Phaser.Math.Between(0, w);
+        }
+      });
+    }
+
+    // Soft amber fog layers
+    for (let i = 0; i < 4; i++) {
+      const fogX = Phaser.Math.Between(0, w);
+      const fog = this.add.ellipse(fogX, groundY - 30, Phaser.Math.Between(200, 400), 60, 0x8B4513, 0.08);
+      fog.setDepth(-1);
+      this.tweens.add({
+        targets: fog,
+        x: fog.x + Phaser.Math.Between(-80, 80),
+        alpha: { from: 0.05, to: 0.12 },
+        duration: 6000 + Math.random() * 4000,
+        yoyo: true,
+        repeat: -1
+      });
+    }
+  }
+
   private bossExitDoorVisuals: Phaser.GameObjects.GameObject[] = [];
   private bossExitZone: Phaser.GameObjects.Zone | null = null;
   private bossExitTarget: string = '';
