@@ -53,7 +53,7 @@
       "y": 450,
       "width": 50,
       "height": 100,
-      "target": "",
+      "target": "freezingPlainsBench",
       "targetSpawn": "default",
       "locked": true,
       "unlockOnClear": true
@@ -61,7 +61,8 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 500 },
-    "fromRoom6": { "x": 100, "y": 500 }
+    "fromRoom6": { "x": 100, "y": 500 },
+    "fromBench": { "x": 2090, "y": 500 }
   },
   "biome": "ice"
 }
