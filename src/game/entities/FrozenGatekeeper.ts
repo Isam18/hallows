@@ -86,10 +86,11 @@ export class FrozenGatekeeper extends Phaser.Physics.Arcade.Sprite {
     scene.physics.add.existing(this);
 
     this.setScale(1.5);
-    this.setSize(this.cfg.width, this.cfg.height);
     const body = this.body as Phaser.Physics.Arcade.Body;
+    body.setSize(this.cfg.width, this.cfg.height);
+    body.setOffset((this.width - this.cfg.width) / 2, (this.height - this.cfg.height) / 2);
     body.setAllowGravity(false);
-    body.setImmovable(true);
+    body.setImmovable(false);
 
     this.arenaLeft = x - 400;
     this.arenaRight = x + 400;
