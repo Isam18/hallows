@@ -1488,7 +1488,7 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
-
+  /**
    * Handle player death - drop currency, show death screen
    */
   handlePlayerDeath(): void {
