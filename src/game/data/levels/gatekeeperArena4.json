@@ -1,0 +1,35 @@
+{
+  "id": "gatekeeperArena4",
+  "name": "Frozen Gate - Final Warden",
+  "width": 1600,
+  "height": 650,
+  "backgroundColor": "#030816",
+  "spawnPoint": { "x": 100, "y": 550 },
+  "platforms": [
+    { "x": 0, "y": 600, "width": 1600, "height": 50, "type": "ground" },
+    { "x": 0, "y": 0, "width": 1600, "height": 30, "type": "wall" },
+    { "x": 0, "y": 30, "width": 30, "height": 570, "type": "wall" },
+    { "x": 1570, "y": 30, "width": 30, "height": 570, "type": "wall" },
+    { "x": 200, "y": 470, "width": 120, "height": 16, "type": "platform" },
+    { "x": 500, "y": 390, "width": 140, "height": 16, "type": "platform" },
+    { "x": 800, "y": 300, "width": 160, "height": 16, "type": "platform" },
+    { "x": 1100, "y": 390, "width": 140, "height": 16, "type": "platform" },
+    { "x": 1350, "y": 470, "width": 120, "height": 16, "type": "platform" },
+    { "x": 350, "y": 250, "width": 100, "height": 16, "type": "platform" },
+    { "x": 650, "y": 180, "width": 100, "height": 16, "type": "platform" },
+    { "x": 1000, "y": 180, "width": 100, "height": 16, "type": "platform" },
+    { "x": 1250, "y": 250, "width": 100, "height": 16, "type": "platform" }
+  ],
+  "enemies": [
+    { "type": "frozenGatekeeper", "x": 800, "y": 400, "stage": 4, "guaranteed": true },
+    { "type": "frostCharger", "x": 400, "y": 560 },
+    { "type": "frostShard", "x": 600, "y": 560 },
+    { "type": "frostShard", "x": 1200, "y": 560 }
+  ],
+  "pickups": [],
+  "triggers": [],
+  "spawns": {
+    "default": { "x": 100, "y": 550 }
+  },
+  "biome": "ice"
+}
