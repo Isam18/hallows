@@ -196,4 +196,23 @@ export class MenuScene extends Phaser.Scene {
       });
     });
   }
+
+  private startEndlessMode(): void {
+    gameState.resetRun();
+    // Set 6 HP / 6 maxHp for endless mode
+    (gameState as any).playerData.maxHp = 6;
+    (gameState as any).playerData.hp = 6;
+    gameState.refillSoul();
+    gameState.setState('playing');
+    
+    this.cameras.main.fadeOut(300, 30, 0, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('GameScene', { 
+        levelId: 'endlessArena', 
+        spawnId: 'default',
+        debugMode: this.debugMode,
+        endlessMode: true
+      });
+    });
+  }
 }
