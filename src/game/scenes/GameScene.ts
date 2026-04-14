@@ -99,6 +99,7 @@ import freezingPlainsRoom2Data from '../data/levels/freezingPlainsRoom2.json';
 import freezingPlainsRoom3Data from '../data/levels/freezingPlainsRoom3.json';
 import freezingPlainsRoom4Data from '../data/levels/freezingPlainsRoom4.json';
 import freezingPlainsRoom5Data from '../data/levels/freezingPlainsRoom5.json';
+import freezingPlainsRoom6Data from '../data/levels/freezingPlainsRoom6.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -154,6 +155,7 @@ const LEVELS: Record<string, LevelConfig> = {
   freezingPlainsRoom3: freezingPlainsRoom3Data as unknown as LevelConfig,
   freezingPlainsRoom4: freezingPlainsRoom4Data as unknown as LevelConfig,
   freezingPlainsRoom5: freezingPlainsRoom5Data as unknown as LevelConfig,
+  freezingPlainsRoom6: freezingPlainsRoom6Data as unknown as LevelConfig,
   gatekeeperArena1: gatekeeperArena1Data as unknown as LevelConfig,
   gatekeeperArena2: gatekeeperArena2Data as unknown as LevelConfig,
   gatekeeperArena3: gatekeeperArena3Data as unknown as LevelConfig,

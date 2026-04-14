@@ -73,7 +73,8 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 500 },
-    "fromRoom4": { "x": 100, "y": 500 }
+    "fromRoom4": { "x": 100, "y": 500 },
+    "fromRoom6": { "x": 1690, "y": 500 }
   },
   "biome": "ice"
 }
