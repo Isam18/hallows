@@ -572,17 +572,71 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     this.openGates();
     this.destroyHPBar();
 
-    // Phase 1: Ice shatter roar
+    // Phase 1: Intense screen shake + ice shatter
     this.scene.time.delayedCall(0, () => this.createDeathRoar());
-    // Phase 2: Ice explosion
-    this.scene.time.delayedCall(1000, () => this.createIceExplosion());
-    // Phase 3: Collapse
-    this.scene.time.delayedCall(3000, () => this.createCollapse());
-    // Phase 4: Victory
-    this.scene.time.delayedCall(5000, () => {
-      this.gameScene.handleBossDefeated();
-      (this.gameScene as any).showGlacialTitanVictory?.();
+    this.gameScene.cameras.main.shake(2000, 0.06);
+    
+    // Phase 2: Ice explosion with massive icicles collapsing
+    this.scene.time.delayedCall(1000, () => {
+      this.createIceExplosion();
+      this.createIcicleCollapse();
     });
+    
+    // Phase 3: Collapse the titan body
+    this.scene.time.delayedCall(2500, () => this.createCollapse());
+    
+    // Phase 4: Emit UI event for white screen dialog
+    this.scene.time.delayedCall(4000, () => {
+      this.gameScene.handleBossDefeated();
+      // Emit UI event for React to show the continue dialog
+      this.gameScene.game.registry.set('lastUIEvent', {
+        event: 'showGlacialTitanVictoryDialog',
+        timestamp: Date.now()
+      });
+    });
+  }
+
+  private createIcicleCollapse(): void {
+    // Giant icicles falling from ceiling
+    for (let i = 0; i < 15; i++) {
+      const x = this.arenaLeft + Math.random() * (this.arenaRight - this.arenaLeft);
+      const size = Phaser.Math.Between(20, 60);
+      const icicle = this.scene.add.graphics();
+      icicle.fillStyle(Phaser.Math.RND.pick([0x88ddff, 0x66ccff, 0xaaeeff]), 0.8);
+      // Icicle shape - triangle pointing down
+      icicle.fillTriangle(0, size * 2, -size / 2, 0, size / 2, 0);
+      icicle.setPosition(x, -50);
+      icicle.setDepth(50);
+      
+      this.scene.tweens.add({
+        targets: icicle,
+        y: this.gameScene.currentLevel.height - 60,
+        duration: 600 + Math.random() * 800,
+        delay: i * 100,
+        ease: 'Quad.easeIn',
+        onComplete: () => {
+          // Impact shake
+          this.gameScene.cameras.main.shake(200, 0.02);
+          // Shatter particles
+          for (let j = 0; j < 6; j++) {
+            const shard = this.scene.add.rectangle(
+              icicle.x + Phaser.Math.Between(-20, 20),
+              (this.gameScene.currentLevel.height - 60),
+              Phaser.Math.Between(4, 10), Phaser.Math.Between(4, 10),
+              0x88ddff, 0.7
+            );
+            this.scene.tweens.add({
+              targets: shard,
+              x: shard.x + Phaser.Math.Between(-60, 60),
+              y: shard.y - Phaser.Math.Between(20, 80),
+              alpha: 0, duration: 500,
+              onComplete: () => shard.destroy()
+            });
+          }
+          icicle.destroy();
+        }
+      });
+    }
   }
 
   private createDeathRoar(): void {

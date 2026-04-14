@@ -1449,43 +1449,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   showGlacialTitanVictory(): void {
-    const centerX = this.cameras.main.width / 2;
-    const centerY = this.cameras.main.height / 2;
+    // Now handled by React UI (GlacialTitanVictoryDialog)
+    // This is kept as fallback but the UI event triggers the dialog
+  }
 
-    const bgBar = this.add.rectangle(centerX, centerY, 0, 80, 0x000000, 0.9);
-    bgBar.setScrollFactor(0);
-    bgBar.setDepth(1000);
-
-    const victoryText = this.add.text(centerX, centerY, 'GLACIAL TITAN HAS BEEN DEFEATED', {
-      fontFamily: 'Georgia, serif',
-      fontSize: '36px',
-      color: '#44aaff',
-      fontStyle: 'bold italic',
-      stroke: '#000000',
-      strokeThickness: 6,
-      shadow: { offsetX: 2, offsetY: 2, color: '#003366', blur: 5, fill: true }
-    });
-    victoryText.setOrigin(0.5);
-    victoryText.setScrollFactor(0);
-    victoryText.setDepth(1001);
-    victoryText.setAlpha(0);
-
-    this.tweens.add({ targets: bgBar, width: 700, duration: 400, ease: 'Power2' });
-    this.tweens.add({
-      targets: victoryText, alpha: 1, scale: { from: 0.8, to: 1 },
-      duration: 600, delay: 300, ease: 'Elastic.easeOut'
-    });
-
-    this.time.delayedCall(4000, () => {
-      this.tweens.add({
-        targets: [victoryText, bgBar], alpha: 0, duration: 500, ease: 'Power2',
-        onComplete: () => {
-          victoryText.destroy();
-          bgBar.destroy();
-          this.transitionToLevel('chainRoom', 'fromBoss');
-        }
-      });
-    });
+  transitionToForgottenBattlefield(): void {
+    this.transitionToLevel('forgottenBattlefield', 'fromTitanVictory');
   }
 
   /**
