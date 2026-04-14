@@ -26,6 +26,7 @@ import { WingedWarrior } from '../entities/WingedWarrior';
 import { ColonyVanguard } from '../entities/ColonyVanguard';
 import { WingedCommander } from '../entities/WingedCommander';
 import { FrostCharger } from '../entities/FrostCharger';
+import { FrostShard } from '../entities/FrostShard';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
