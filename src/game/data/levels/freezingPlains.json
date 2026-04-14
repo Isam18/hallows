@@ -16,8 +16,8 @@
     { "type": "frostShard", "x": 800, "y": 510 },
     { "type": "glacialSentinel", "x": 1100, "y": 350 },
     { "type": "frozenGatekeeper", "x": 1600, "y": 350, "stage": 1, "guaranteed": true },
-    { "type": "frostCharger", "x": 1900, "y": 510 },
-    { "type": "frostShard", "x": 2100, "y": 510 }
+    { "type": "siegeConstruct", "x": 2000, "y": 400, "guaranteed": true },
+    { "type": "frostShard", "x": 2200, "y": 510 }
   ],
   "pickups": [],
   "triggers": [],
