@@ -10,8 +10,9 @@ export function ZoneTransition({ zoneName, onComplete }: ZoneTransitionProps) {
   
   // Check if this is Medulla transition
   const isMedulla = zoneName.includes('MEDULLA');
-  const mainTitle = isMedulla ? 'THE MEDULLA' : zoneName;
-  const subtitle = isMedulla ? 'The burnt lands' : 'The Overgrown Path';
+  const isForgotten = zoneName.includes('FORGOTTEN');
+  const mainTitle = isMedulla ? 'THE MEDULLA' : isForgotten ? 'FORGOTTEN BATTLEFIELD' : zoneName;
+  const subtitle = isMedulla ? 'The burnt lands' : isForgotten ? 'Where autumn reigns eternal' : 'The Overgrown Path';
 
   useEffect(() => {
     // Phase 1: Fade to black (already black from start)
@@ -42,7 +43,69 @@ export function ZoneTransition({ zoneName, onComplete }: ZoneTransitionProps) {
         phase === 'fadeOut' ? 'opacity-0' : 'opacity-100'
       }`}
     >
-      {isMedulla ? (
+      {isForgotten ? (
+        // AUTUMN FORGOTTEN BATTLEFIELD TRANSITION
+        <div 
+          className={`text-center transition-all duration-700 relative ${
+            phase === 'title' ? 'opacity-100 scale-100' : 'opacity-0 scale-95'
+          }`}
+        >
+          {/* Warm autumn glow */}
+          <div 
+            className="absolute inset-0 blur-3xl opacity-30"
+            style={{
+              background: 'radial-gradient(circle, #cc6622 0%, #884411 30%, transparent 70%)',
+            }}
+          />
+
+          {/* Falling leaves */}
+          <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {[...Array(15)].map((_, i) => (
+              <div
+                key={i}
+                className="absolute"
+                style={{
+                  left: `${3 + i * 6.5}%`,
+                  top: '-10px',
+                  width: '12px',
+                  height: '12px',
+                  background: ['#cc4400', '#dd6611', '#ee8822', '#bb3300', '#cc7733'][i % 5],
+                  borderRadius: '50% 0 50% 0',
+                  opacity: 0.8,
+                  animation: `autumnLeafFall ${2 + i * 0.3}s ease-in infinite`,
+                  animationDelay: `${i * 0.2}s`,
+                }}
+              />
+            ))}
+          </div>
+
+          {/* Main Title */}
+          <h1 
+            className="relative z-10 font-title text-5xl md:text-7xl lg:text-8xl tracking-[0.2em] text-transparent bg-clip-text"
+            style={{
+              backgroundImage: 'linear-gradient(180deg, #ee8833 0%, #cc5522 30%, #993311 60%, #662200 100%)',
+              textShadow: '0 0 30px rgba(204, 85, 34, 0.8), 0 0 60px rgba(204, 85, 34, 0.4)',
+            }}
+          >
+            {mainTitle}
+          </h1>
+
+          {/* Subtitle */}
+          <p className="relative z-10 text-amber-500/70 text-xl md:text-2xl mt-8 tracking-[0.3em] uppercase font-medium italic">
+            {subtitle}
+          </p>
+
+          {/* Bottom warm glow */}
+          <div 
+            className="relative z-10 mt-12 mx-auto blur-xl opacity-40"
+            style={{
+              width: '300px',
+              height: '60px',
+              background: 'radial-gradient(ellipse, #cc6622 0%, transparent 70%)',
+            }}
+          />
+        </div>
+      ) : isMedulla ? (
         // FIERY MEDULLA TRANSITION
         <div 
           className={`text-center transition-all duration-700 relative ${
