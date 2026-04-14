@@ -4656,6 +4656,9 @@ export class GameScene extends Phaser.Scene {
         entity = new Enemy(this, x, y, config); break;
     }
     this.enemies.add(entity);
+    // Add physics colliders so enemies don't fall through the floor
+    this.physics.add.collider(entity, this.platforms);
+    this.physics.add.collider(entity, this.walls);
   }
 
   /**
