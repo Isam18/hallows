@@ -480,7 +480,9 @@ export class FrozenGatekeeper extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(400, () => {
       if (this.isDead) return;
       this.x = clampedX;
-      this.hoverBaseY = player.y - 40;
+      this.hoverBaseY = this.clampHoverBaseY(player.y - 40);
+      this.setY(this.hoverBaseY);
+      (this.body as Phaser.Physics.Arcade.Body).reset(this.x, this.y);
       this.setAlpha(1);
 
       // Appear effect
