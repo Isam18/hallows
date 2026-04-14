@@ -129,7 +129,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   };
 
   return (
-    <div className="fixed top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-4 font-mono text-sm z-50 min-w-[280px] shadow-lg">
+    <div className="fixed top-4 left-4 bg-card/90 backdrop-blur-sm border border-border rounded-lg p-4 font-mono text-sm z-50 min-w-[280px] shadow-lg max-h-[90vh] overflow-y-auto">
       <div className="flex items-center justify-between mb-3 pb-2 border-b border-border">
         <span className="text-muted-foreground text-xs">Movement Debug [F1]</span>
         {debugState ? (
