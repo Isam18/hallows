@@ -1,0 +1,70 @@
+{
+  "id": "freezingPlainsRoom12",
+  "name": "The Frost-Wind Tunnel",
+  "width": 3600,
+  "height": 500,
+  "backgroundColor": "#030610",
+  "spawnPoint": { "x": 100, "y": 400 },
+  "platforms": [
+    { "x": 0, "y": 450, "width": 3600, "height": 50, "type": "ground", "color": "#0a0e18" },
+    { "x": 0, "y": 0, "width": 3600, "height": 30, "type": "wall", "color": "#0a0e18" },
+    { "x": 0, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#0a0e18" },
+    { "x": 3570, "y": 30, "width": 30, "height": 420, "type": "wall", "color": "#0a0e18" },
+
+    { "x": 400, "y": 340, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 800, "y": 300, "width": 100, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1200, "y": 350, "width": 130, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 1600, "y": 280, "width": 110, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 2000, "y": 330, "width": 120, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 2400, "y": 300, "width": 100, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 2800, "y": 350, "width": 130, "height": 18, "type": "platform", "color": "#0e1220" },
+    { "x": 3200, "y": 310, "width": 110, "height": 18, "type": "platform", "color": "#0e1220" },
+
+    { "x": 600, "y": 200, "width": 90, "height": 16, "type": "platform", "color": "#0e1220" },
+    { "x": 1400, "y": 180, "width": 100, "height": 16, "type": "platform", "color": "#0e1220" },
+    { "x": 2200, "y": 190, "width": 90, "height": 16, "type": "platform", "color": "#0e1220" },
+    { "x": 3000, "y": 200, "width": 100, "height": 16, "type": "platform", "color": "#0e1220" }
+  ],
+  "enemies": [
+    { "type": "frostCharger", "x": 500, "y": 400, "patrolStart": 350, "patrolEnd": 750 },
+    { "type": "frostCharger", "x": 1300, "y": 400, "patrolStart": 1100, "patrolEnd": 1550 },
+    { "type": "frostCharger", "x": 2100, "y": 400, "patrolStart": 1900, "patrolEnd": 2350 },
+    { "type": "frostCharger", "x": 2900, "y": 400, "patrolStart": 2700, "patrolEnd": 3150 },
+    { "type": "glacialSentinel", "x": 800, "y": 180, "patrolStart": 500, "patrolEnd": 1100 },
+    { "type": "glacialSentinel", "x": 1800, "y": 160, "patrolStart": 1500, "patrolEnd": 2100 },
+    { "type": "glacialSentinel", "x": 2800, "y": 180, "patrolStart": 2500, "patrolEnd": 3200 }
+  ],
+  "wind": {
+    "direction": "right",
+    "force": 80,
+    "constant": true
+  },
+  "pickups": [],
+  "triggers": [
+    {
+      "id": "room12Back",
+      "type": "iceDoor",
+      "x": 40,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "freezingPlainsRoom11",
+      "targetSpawn": "fromRoom12"
+    },
+    {
+      "id": "room12Exit",
+      "type": "iceDoor",
+      "x": 3510,
+      "y": 350,
+      "width": 50,
+      "height": 100,
+      "target": "",
+      "targetSpawn": "default"
+    }
+  ],
+  "spawns": {
+    "default": { "x": 100, "y": 400 },
+    "fromRoom11": { "x": 100, "y": 400 }
+  },
+  "biome": "ice"
+}
