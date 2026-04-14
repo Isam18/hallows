@@ -482,7 +482,8 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     }
 
     // Emit HP update
-    this.gameScene.emitUIEvent?.('bossHpUpdate', {
+    const gs = this.gameScene as any;
+    gs.emitUIEvent?.('bossHpUpdate', {
       hp: this.bossHp,
       maxHp: this.bossMaxHp,
     });
@@ -565,7 +566,7 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     // Phase 4: Victory
     this.scene.time.delayedCall(5000, () => {
       this.gameScene.handleBossDefeated();
-      this.gameScene.showGlacialTitanVictory?.();
+      (this.gameScene as any).showGlacialTitanVictory?.();
     });
   }
 
