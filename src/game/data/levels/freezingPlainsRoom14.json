@@ -45,13 +45,14 @@
       "y": 350,
       "width": 50,
       "height": 100,
-      "target": "",
-      "targetSpawn": "default"
+      "target": "freezingPlainsRoom15",
+      "targetSpawn": "fromRoom14"
     }
   ],
   "spawns": {
     "default": { "x": 100, "y": 400 },
-    "fromRoom13": { "x": 100, "y": 400 }
+    "fromRoom13": { "x": 100, "y": 400 },
+    "fromRoom15": { "x": 2050, "y": 400 }
   },
   "biome": "ice"
 }
