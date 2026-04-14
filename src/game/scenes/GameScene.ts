@@ -4440,7 +4440,7 @@ export class GameScene extends Phaser.Scene {
     'frostCharger', 'autumnWraith', 'ossuarySentinel', 'warfieldReaper',
     'colonyVanguard', 'glacialSentinel',
     'vengefly', 'aspid', 'squit', 'infectedHusk', 'mossCreep',
-    'skullScuttler', 'adaptedSkuller', 'skullRavanger', 'skullBrute',
+    'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
   ];
@@ -4531,7 +4531,7 @@ export class GameScene extends Phaser.Scene {
 
     // Mix bosses and mini-bosses
     const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
-      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'skullBrute'].includes(e)
+      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger'].includes(e)
     )];
 
     let spawned = 0;
@@ -4656,6 +4656,9 @@ export class GameScene extends Phaser.Scene {
         entity = new Enemy(this, x, y, config); break;
     }
     this.enemies.add(entity);
+    // Add physics colliders so enemies don't fall through the floor
+    this.physics.add.collider(entity, this.platforms);
+    this.physics.add.collider(entity, this.walls);
   }
 
   /**
