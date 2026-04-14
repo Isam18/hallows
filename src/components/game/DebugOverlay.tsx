@@ -250,6 +250,7 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           <button onClick={() => handleTeleport('gatekeeperArena2')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">🧊 Gatekeeper 2</button>
           <button onClick={() => handleTeleport('gatekeeperArena3')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors">🧊 Gatekeeper 3</button>
           <button onClick={() => handleTeleport('gatekeeperArena4')} className="px-2 py-1 text-xs bg-cyan-600/20 hover:bg-cyan-600/40 border border-cyan-600/30 rounded transition-colors font-bold">🧊 Gatekeeper 4 (Final)</button>
+          <button onClick={() => handleTeleport('forgottenBattlefield')} className="px-2 py-1 text-xs bg-amber-600/20 hover:bg-amber-600/40 border border-amber-600/30 rounded transition-colors">🍂 Forgotten Battlefield</button>
           <button onClick={() => handleTeleport('mossTitanArena')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Moss Titan Arena</button>
         </div>
       </div>
