@@ -535,5 +535,23 @@
     "isHuntersMarch": true,
     "isElite": true,
     "isBoss": true
+  },
+  "autumnWraith": {
+    "id": "autumnWraith",
+    "displayName": "Autumn Wraith",
+    "hp": 4,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 220,
+    "deaggroRangePx": 350,
+    "knockbackOnHit": { "x": 100, "y": 60 },
+    "hitstunMs": 180,
+    "invulnOnHitMs": 160,
+    "dropShells": { "min": 12, "max": 20 },
+    "hurtFlashMs": 140,
+    "spriteKey": "autumnWraith",
+    "width": 30,
+    "height": 42
   }
 }
