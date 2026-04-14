@@ -397,6 +397,20 @@ export class GameScene extends Phaser.Scene {
         this.enterBossArena();
       });
     }
+
+    // Endless mode setup
+    if (this.endlessMode) {
+      this.endlessKills = 0;
+      this.endlessWave = 1;
+      this.endlessSpawnTimer = 2000; // First wave after 2s
+      this.endlessActiveEnemies = 0;
+      this.registry.set('endlessMode', true);
+      this.registry.set('endlessKills', 0);
+      this.registry.set('endlessWave', 1);
+      // Set 6 HP and full soul for endless
+      gameState.setHp(6);
+      gameState.refillSoul();
+    }
   }
   
   private setupDebugMode(): void {
