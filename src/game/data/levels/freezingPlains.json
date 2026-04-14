@@ -16,7 +16,12 @@
     { "x": 1400, "y": 400, "width": 150, "height": 20, "type": "platform" },
     { "x": 1800, "y": 430, "width": 180, "height": 20, "type": "platform" }
   ],
-  "enemies": [],
+  "enemies": [
+    { "type": "frostCharger", "x": 500, "y": 510 },
+    { "type": "frostCharger", "x": 1100, "y": 510 },
+    { "type": "frostCharger", "x": 1700, "y": 510 },
+    { "type": "frostCharger", "x": 2100, "y": 510 }
+  ],
   "pickups": [],
   "triggers": [],
   "spawns": {

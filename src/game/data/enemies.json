@@ -433,5 +433,24 @@
     "isFlying": true,
     "isElite": true,
     "isBoss": true
+  },
+  "frostCharger": {
+    "id": "frostCharger",
+    "displayName": "Frost Charger",
+    "hp": 12,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 20,
+    "moveSpeedAggro": 270,
+    "aggroRangePx": 180,
+    "deaggroRangePx": 300,
+    "knockbackOnHit": { "x": 40, "y": 20 },
+    "hitstunMs": 120,
+    "invulnOnHitMs": 150,
+    "dropShells": { "min": 10, "max": 18 },
+    "hurtFlashMs": 120,
+    "spriteKey": "frostCharger",
+    "width": 48,
+    "height": 44,
+    "isIce": true
   }
 }
