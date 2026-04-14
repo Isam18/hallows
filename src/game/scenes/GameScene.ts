@@ -33,6 +33,7 @@ import { SiegeConstruct } from '../entities/SiegeConstruct';
 import { GlacialTitan } from '../entities/GlacialTitan';
 import { AutumnWraith } from '../entities/AutumnWraith';
 import { OssuarySentinel } from '../entities/OssuarySentinel';
+import { WarfieldReaper } from '../entities/WarfieldReaper';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -663,6 +664,9 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'ossuarySentinel') {
           const sentinel = new OssuarySentinel(this, e.x, e.y, config);
           this.enemies.add(sentinel);
+        } else if (e.type === 'warfieldReaper') {
+          const reaper = new WarfieldReaper(this, e.x, e.y, config);
+          this.enemies.add(reaper);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
