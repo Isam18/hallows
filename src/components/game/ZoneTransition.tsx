@@ -257,6 +257,19 @@ if (typeof document !== 'undefined') {
           height: 15px;
         }
       }
+
+      @keyframes autumnLeafFall {
+        0% {
+          transform: translateY(-10px) rotate(0deg);
+          opacity: 0;
+        }
+        10% {
+          opacity: 0.8;
+        }
+        100% {
+          transform: translateY(500px) rotate(360deg);
+          opacity: 0;
+        }
     `;
     document.head.appendChild(style);
   }
