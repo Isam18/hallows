@@ -95,20 +95,36 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
     if (!gameRef) return;
 
     const sceneManager = gameRef.scene;
-    const isGameSceneActive = sceneManager.isActive('GameScene');
+    
+    try {
+      const isGameSceneActive = sceneManager.isActive('GameScene');
 
-    // If GameScene isn't running yet (e.g. user is still on MenuScene), start it directly
-    // at the requested level so the button always does something.
-    if (!isGameSceneActive) {
-      console.log('[DebugOverlay] Starting GameScene at', roomId);
-      sceneManager.start('GameScene', { levelId: roomId, spawnId: 'default', debugMode: true });
-      return;
+      // If GameScene isn't running yet (e.g. user is still on MenuScene), start it directly
+      if (!isGameSceneActive) {
+        console.log('[DebugOverlay] Starting GameScene at', roomId);
+        // Stop any currently active scene first
+        const activeScenes = sceneManager.getScenes(true);
+        activeScenes.forEach((s: any) => {
+          if (s.scene?.key && s.scene.key !== 'GameScene') {
+            sceneManager.stop(s.scene.key);
+          }
+        });
+        sceneManager.start('GameScene', { levelId: roomId, spawnId: 'default', debugMode: true });
+        return;
+      }
+
+      const scene = sceneManager.getScene('GameScene') as any;
+      console.log('[DebugOverlay] Teleporting to', roomId);
+      scene?.teleportToLevel?.(roomId);
+    } catch (err) {
+      console.warn('[DebugOverlay] Teleport error, retrying via scene restart:', err);
+      try {
+        sceneManager.stop('GameScene');
+        sceneManager.start('GameScene', { levelId: roomId, spawnId: 'default', debugMode: true });
+      } catch (e2) {
+        console.error('[DebugOverlay] Failed to restart GameScene:', e2);
+      }
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const scene = sceneManager.getScene('GameScene') as any;
-    console.log('[DebugOverlay] Teleporting to', roomId);
-    scene?.teleportToLevel?.(roomId);
   };
 
   return (
