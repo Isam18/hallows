@@ -301,9 +301,8 @@ export class FrostShard extends Phaser.Physics.Arcade.Sprite {
       if (gameScene.player && gameScene.player.active) {
         const playerDist = Phaser.Math.Distance.Between(deathX, deathY, gameScene.player.x, gameScene.player.y);
         if (playerDist < shatterRadius) {
-          const currentHp = gameState.getHp();
-          gameState.setHp(currentHp - 1);
-          if (gameState.getHp() <= 0) {
+          gameState.damage(1);
+          if (gameState.getPlayerData().hp <= 0) {
             gameScene.handlePlayerDeath();
           } else {
             const kbDir = gameScene.player.x > deathX ? 1 : -1;
