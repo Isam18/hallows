@@ -1534,6 +1534,12 @@ export class GameScene extends Phaser.Scene {
     this.player.setTint(0xff4444);
     this.player.setAlpha(0.7);
     
+    // For endless mode, store final stats in registry
+    if (this.endlessMode) {
+      this.registry.set('endlessFinalkills', this.endlessKills);
+      this.registry.set('endlessFinalWave', this.endlessWave);
+    }
+    
     // Set death state
     gameState.setState('death');
     
@@ -1542,6 +1548,9 @@ export class GameScene extends Phaser.Scene {
       shells: playerData.shells,
       x: this.player.x,
       y: this.player.y,
+      endless: this.endlessMode,
+      endlessKills: this.endlessKills,
+      endlessWave: this.endlessWave,
     });
   }
 
@@ -1549,6 +1558,21 @@ export class GameScene extends Phaser.Scene {
    * Respawn player at last bench
    */
   respawnPlayer(): void {
+    // Endless mode: restart the arena fresh
+    if (this.endlessMode) {
+      this.randomizeEndlessArena();
+      (gameState as any).playerData.maxHp = 6;
+      (gameState as any).playerData.hp = 6;
+      gameState.refillSoul();
+      gameState.setState('playing');
+      this.scene.restart({
+        levelId: 'endlessArena',
+        spawnId: 'default',
+        endlessMode: true,
+      });
+      return;
+    }
+
     const lastBench = gameState.getLastBench();
     
     // Heal player
@@ -4498,5 +4522,38 @@ export class GameScene extends Phaser.Scene {
 
     // Spawn flash effect
     this.cameras.main.flash(200, 60, 0, 0);
+  }
+
+  /**
+   * Randomize the endless arena layout before a restart.
+   * Mutates the LEVELS.endlessArena platforms so each run feels different.
+   */
+  private randomizeEndlessArena(): void {
+    const arena = LEVELS.endlessArena;
+    if (!arena) return;
+
+    const W = arena.width;
+    // Always keep ground floor
+    const ground = { x: 0, y: 560, width: W, height: 40, type: 'ground' as const };
+
+    // Generate 5-7 random platforms that are reachable
+    const platCount = Phaser.Math.Between(5, 7);
+    const platforms: any[] = [ground];
+
+    // Divide arena into columns for variety
+    const colWidth = (W - 80) / platCount;
+
+    for (let i = 0; i < platCount; i++) {
+      const px = 40 + i * colWidth + Phaser.Math.Between(0, Math.floor(colWidth * 0.5));
+      const py = Phaser.Math.Between(370, 490); // Always reachable by jump
+      const pw = Phaser.Math.Between(80, 180);
+      platforms.push({ x: px, y: py, width: pw, height: 20, type: 'platform' });
+    }
+
+    (arena as any).platforms = platforms;
+
+    // Randomize background color slightly
+    const tints = ['#0a0808', '#0c0606', '#080a08', '#0a0608', '#08060a'];
+    (arena as any).backgroundColor = Phaser.Math.RND.pick(tints);
   }
 }
