@@ -65,7 +65,7 @@
       "y": 450,
       "width": 50,
       "height": 100,
-      "target": "",
+      "target": "freezingPlainsRoom6",
       "targetSpawn": "default",
       "locked": true,
       "unlockOnClear": true
