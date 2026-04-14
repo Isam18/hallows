@@ -514,5 +514,26 @@
     "isFlying": true,
     "isElite": true,
     "isBoss": true
+  },
+  "siegeConstruct": {
+    "id": "siegeConstruct",
+    "displayName": "Colony Siege-Construct",
+    "hp": 55,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 0,
+    "moveSpeedAggro": 0,
+    "aggroRangePx": 350,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": { "x": 10, "y": 5 },
+    "hitstunMs": 0,
+    "invulnOnHitMs": 250,
+    "dropShells": { "min": 80, "max": 140 },
+    "hurtFlashMs": 120,
+    "spriteKey": "siegeConstruct",
+    "width": 80,
+    "height": 70,
+    "isHuntersMarch": true,
+    "isElite": true,
+    "isBoss": true
   }
 }

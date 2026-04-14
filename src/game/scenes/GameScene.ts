@@ -29,6 +29,7 @@ import { FrostCharger } from '../entities/FrostCharger';
 import { FrostShard } from '../entities/FrostShard';
 import { GlacialSentinel } from '../entities/GlacialSentinel';
 import { FrozenGatekeeper } from '../entities/FrozenGatekeeper';
+import { SiegeConstruct } from '../entities/SiegeConstruct';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -612,6 +613,9 @@ export class GameScene extends Phaser.Scene {
           const stage = (e as any).stage || 1;
           const gatekeeper = new FrozenGatekeeper(this, e.x, e.y, config, stage);
           this.enemies.add(gatekeeper);
+        } else if (e.type === 'siegeConstruct') {
+          const siege = new SiegeConstruct(this, e.x, e.y, config);
+          this.enemies.add(siege);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
