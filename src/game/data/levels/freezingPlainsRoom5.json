@@ -65,7 +65,7 @@
       "y": 450,
       "width": 50,
       "height": 100,
-      "target": "",
+      "target": "freezingPlainsRoom6",
       "targetSpawn": "default",
       "locked": true,
       "unlockOnClear": true
@@ -73,7 +73,8 @@
   ],
   "spawns": {
     "default": { "x": 100, "y": 500 },
-    "fromRoom4": { "x": 100, "y": 500 }
+    "fromRoom4": { "x": 100, "y": 500 },
+    "fromRoom6": { "x": 1690, "y": 500 }
   },
   "biome": "ice"
 }
