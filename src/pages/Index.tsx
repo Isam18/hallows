@@ -15,6 +15,7 @@ import { GreenDoorDialog } from '@/components/game/GreenDoorDialog';
 import { TheMedullaDialog } from '@/components/game/TheMedullaDialog';
 import { ZoneTransition } from '@/components/game/ZoneTransition';
 import { GlacialTitanVictoryDialog } from '@/components/game/GlacialTitanVictoryDialog';
+import { EndlessHUD } from '@/components/game/EndlessHUD';
 
 const Index = () => {
   const gameContainer = useRef<HTMLDivElement>(null);
@@ -218,6 +219,7 @@ const Index = () => {
       {/* Debug Overlays - F1 for movement, F2 for combat */}
       {gameLoaded && <DebugOverlay gameRef={gameRef.current} />}
       {gameLoaded && <CombatDebugOverlay gameRef={gameRef.current} />}
+      {gameLoaded && <EndlessHUD gameRef={gameRef.current} />}
 
       {/* UI Overlay */}
       {gameLoaded && uiState !== 'menu' && (
