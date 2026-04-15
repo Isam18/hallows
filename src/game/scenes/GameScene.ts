@@ -702,6 +702,9 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'brokenEffigy') {
           const effigy = new BrokenEffigy(this, e.x, e.y, config);
           this.enemies.add(effigy);
+        } else if (e.type === 'warfieldBrute') {
+          const brute = new WarfieldBrute(this, e.x, e.y, config);
+          this.enemies.add(brute);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
@@ -4448,7 +4451,7 @@ export class GameScene extends Phaser.Scene {
     'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
-    'brokenEffigy',
+    'brokenEffigy', 'warfieldBrute',
   ];
 
   private readonly ENDLESS_BOSS_POOL = [
@@ -4697,6 +4700,8 @@ export class GameScene extends Phaser.Scene {
         entity = new BasicHusk(this, x, y, config); break;
       case 'brokenEffigy':
         entity = new BrokenEffigy(this, x, y, config); break;
+      case 'warfieldBrute':
+        entity = new WarfieldBrute(this, x, y, config); break;
       default:
         entity = new Enemy(this, x, y, config); break;
     }
