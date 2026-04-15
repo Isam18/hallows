@@ -4505,7 +4505,8 @@ export class GameScene extends Phaser.Scene {
     { maxWave: 5, pool: ['mossTitan'] },
     { maxWave: 10, pool: ['antElder'] },
     { maxWave: 15, pool: ['falseChampion'] },
-    { maxWave: Infinity, pool: ['glacialTitan'] },
+    { maxWave: 20, pool: ['glacialTitan'] },
+    { maxWave: Infinity, pool: ['ravana'] },
   ];
 
   private getEndlessBossPool(): string[] {
