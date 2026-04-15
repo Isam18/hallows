@@ -84,6 +84,7 @@ export class WarfieldMedic extends Phaser.Physics.Arcade.Sprite {
   getHp(): number { return this.currentHp; }
   getMaxHp(): number { return this.maxHp; }
   getIsDead(): boolean { return this.isDead; }
+  isInvulnerable(): boolean { return this._isInvulnerable; }
 
   takeDamage(amount: number, attackX?: number): void {
     if (this.isDead || this._isInvulnerable) return;
