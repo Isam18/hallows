@@ -263,7 +263,7 @@ export class GameScene extends Phaser.Scene {
   private bossSummoned = false;
 
   // Endless mode
-  private endlessMode = false;
+  public endlessMode = false;
   private endlessKills = 0;
   private endlessWave = 1;
   private endlessSpawnTimer = 0;
