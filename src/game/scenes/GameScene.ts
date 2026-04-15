@@ -4611,7 +4611,8 @@ export class GameScene extends Phaser.Scene {
         }
       }
 
-      const typeId = Phaser.Math.RND.pick(this.ENDLESS_ENEMY_POOL);
+      const currentPool = this.getEndlessEnemyPool();
+      const typeId = Phaser.Math.RND.pick(currentPool);
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
       if (!config) continue;
 
@@ -4637,7 +4638,8 @@ export class GameScene extends Phaser.Scene {
     const bossCount = 4;
 
     // Mix bosses and mini-bosses
-    const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
+    const currentPool = this.getEndlessEnemyPool();
+    const pool = [...this.ENDLESS_BOSS_POOL, ...currentPool.filter(e => 
       ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath'].includes(e)
     )];
 
