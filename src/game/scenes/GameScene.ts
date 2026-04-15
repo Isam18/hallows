@@ -1220,8 +1220,9 @@ export class GameScene extends Phaser.Scene {
       const mossTitan = new MossTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
       this.boss = mossTitan as any;
     } else if (this.levelId === 'glacialTitanArena') {
-      // Spawn Glacial Titan
-      const glacialTitan = new GlacialTitan(this, arena.bossSpawn.x, arena.bossSpawn.y);
+      // Spawn Glacial Titan - snap to ground platform
+      const spawnY = this.getLivePlatformSpawnY(arena.bossSpawn.x, (CFG_GT?.height || 120) * (CFG_GT?.scale || 3.5));
+      const glacialTitan = new GlacialTitan(this, arena.bossSpawn.x, spawnY);
       this.boss = glacialTitan as any;
     } else {
       // Spawn default boss
