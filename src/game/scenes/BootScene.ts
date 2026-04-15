@@ -2516,6 +2516,9 @@ export class BootScene extends Phaser.Scene {
     
     // Glacial Titan - massive ice monument boss
     this.createGlacialTitanSprite('glacialTitan');
+
+    // Ravana, Lord of the Dead - multi-limbed necromancer king
+    this.createRavanaSprite('ravana');
     
     // Ant Elder - Phase 1 (cloaked tank) and Phase 2 (agile predator)
     this.createAntElderPhase1Sprite('antElder_phase1_idle');

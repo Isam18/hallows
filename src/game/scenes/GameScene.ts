@@ -41,6 +41,7 @@ import { WarfieldMedic } from '../entities/WarfieldMedic';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
+import { Ravana } from '../entities/Ravana';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
 import { Portal } from '../entities/Portal';
