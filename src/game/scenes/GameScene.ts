@@ -526,6 +526,17 @@ export class GameScene extends Phaser.Scene {
         );
       }
     });
+
+    // Add invisible boundary walls on left and right edges to keep enemies in bounds
+    const wallThickness = 20;
+    const lvlW = this.currentLevel.width;
+    const lvlH = this.currentLevel.height;
+    const leftWall = this.add.rectangle(-wallThickness / 2, lvlH / 2, wallThickness, lvlH, 0x000000, 0);
+    this.physics.add.existing(leftWall, true);
+    this.walls.add(leftWall);
+    const rightWall = this.add.rectangle(lvlW + wallThickness / 2, lvlH / 2, wallThickness, lvlH, 0x000000, 0);
+    this.physics.add.existing(rightWall, true);
+    this.walls.add(rightWall);
     
     // Triggers (benches, portals)
     this.currentLevel.triggers.forEach(t => {
