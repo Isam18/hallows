@@ -4532,7 +4532,7 @@ export class GameScene extends Phaser.Scene {
 
     // Mix bosses and mini-bosses
     const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
-      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger'].includes(e)
+      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy'].includes(e)
     )];
 
     let spawned = 0;
