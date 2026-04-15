@@ -4641,8 +4641,8 @@ export class GameScene extends Phaser.Scene {
       const clampedX = Phaser.Math.Clamp(spawnX, 60, arenaWidth - 60);
 
       if (spawnBoss) {
-        // Force Ravana at wave 49, otherwise pick from pool
-        const bossTypeId = this.endlessWave === 49 ? 'ravana' : Phaser.Math.RND.pick(this.getEndlessBossPool());
+        // Force Ravana at wave 50, otherwise pick from pool
+        const bossTypeId = this.endlessWave === 50 ? 'ravana' : Phaser.Math.RND.pick(this.getEndlessBossPool());
         const bossData = (bossesData as any)[bossTypeId];
         if (bossData) {
           const bossSpawnY = this.getLivePlatformSpawnY(clampedX, 120);
