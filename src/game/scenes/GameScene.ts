@@ -4758,49 +4758,64 @@ export class GameScene extends Phaser.Scene {
       ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath'].includes(e)
     )];
 
-    let spawned = 0;
+    // Gather spawn data
+    const spawnEntries: { x: number; isBoss: boolean; typeId: string; config?: any }[] = [];
     for (let i = 0; i < bossCount; i++) {
       const typeId = Phaser.Math.RND.pick(pool);
       const isBoss = bossPool.includes(typeId);
       const spawnX = 100 + (i / (bossCount - 1)) * (arenaWidth - 200);
-
       if (isBoss) {
         const bossData = (bossesData as any)[typeId];
         if (!bossData) continue;
-
-        const bossSpawnY = this.getLivePlatformSpawnY(spawnX, 120);
-        let bossEntity: any;
-        if (typeId === 'mossTitan') {
-          bossEntity = new MossTitan(this, spawnX, bossSpawnY);
-        } else if (typeId === 'glacialTitan') {
-          bossEntity = new GlacialTitan(this, spawnX, bossSpawnY);
-        } else if (typeId === 'antElder') {
-          bossEntity = new AntElder(this, spawnX, bossSpawnY);
-        } else if (typeId === 'ravana') {
-          bossEntity = new Ravana(this, spawnX, bossSpawnY);
-        } else {
-          bossEntity = new Boss(this, spawnX, bossSpawnY);
-        }
-
-        this.snapEntityToLivePlatforms(bossEntity);
-        this.physics.add.collider(bossEntity, this.platforms);
-        this.physics.add.collider(bossEntity, this.walls);
-        this.physics.add.overlap(this.player, bossEntity, () => this.handlePlayerBossContact());
-        this.enemies.add(bossEntity);
-        spawned++;
+        spawnEntries.push({ x: spawnX, isBoss: true, typeId });
       } else {
         const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
         if (!config) continue;
-        const spawnY = (config as any).isFlying
-          ? Phaser.Math.Between(350, 450)
-          : this.getLivePlatformSpawnY(spawnX, config.height ?? 40);
-        this.spawnEndlessEnemy(typeId, spawnX, spawnY, config);
-        spawned++;
+        spawnEntries.push({ x: spawnX, isBoss: false, typeId, config });
       }
     }
 
-    this.endlessActiveEnemies = spawned;
-    this.cameras.main.flash(400, 120, 0, 0);
+    // Show spawn circles
+    for (const entry of spawnEntries) {
+      const circleY = this.getLivePlatformSpawnY(entry.x, entry.isBoss ? 120 : (entry.config?.height ?? 40));
+      this.createSpawnCircle(entry.x, circleY, entry.isBoss);
+    }
+
+    // Delay actual spawning
+    this.time.delayedCall(1800, () => {
+      let spawned = 0;
+      for (const entry of spawnEntries) {
+        if (entry.isBoss) {
+          const bossSpawnY = this.getLivePlatformSpawnY(entry.x, 120);
+          let bossEntity: any;
+          if (entry.typeId === 'mossTitan') {
+            bossEntity = new MossTitan(this, entry.x, bossSpawnY);
+          } else if (entry.typeId === 'glacialTitan') {
+            bossEntity = new GlacialTitan(this, entry.x, bossSpawnY);
+          } else if (entry.typeId === 'antElder') {
+            bossEntity = new AntElder(this, entry.x, bossSpawnY);
+          } else if (entry.typeId === 'ravana') {
+            bossEntity = new Ravana(this, entry.x, bossSpawnY);
+          } else {
+            bossEntity = new Boss(this, entry.x, bossSpawnY);
+          }
+          this.snapEntityToLivePlatforms(bossEntity);
+          this.physics.add.collider(bossEntity, this.platforms);
+          this.physics.add.collider(bossEntity, this.walls);
+          this.physics.add.overlap(this.player, bossEntity, () => this.handlePlayerBossContact());
+          this.enemies.add(bossEntity);
+          spawned++;
+        } else {
+          const spawnY = (entry.config as any)?.isFlying
+            ? Phaser.Math.Between(350, 450)
+            : this.getLivePlatformSpawnY(entry.x, entry.config?.height ?? 40);
+          this.spawnEndlessEnemy(entry.typeId, entry.x, spawnY, entry.config);
+          spawned++;
+        }
+      }
+      this.endlessActiveEnemies = spawned;
+      this.cameras.main.flash(400, 120, 0, 0);
+    });
   }
 
   private removeEndlessPlatforms(): void {
