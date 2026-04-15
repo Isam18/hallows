@@ -502,10 +502,31 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private getBiomePlatformColors(): { main: number; light: number; wall: number } {
+    const biome = this.currentLevel?.biome || 'crossroads';
+    switch (biome) {
+      case 'greenway':
+        return { main: 0x1a2e1a, light: 0x2a4a2a, wall: 0x0e1a0e };
+      case 'medulla':
+        return { main: 0x2a1010, light: 0x3a1818, wall: 0x1a0808 };
+      case 'huntersMarch':
+        return { main: 0x2a2010, light: 0x3a3018, wall: 0x1a1508 };
+      case 'ice':
+        return { main: 0x1a2030, light: 0x2a3848, wall: 0x101820 };
+      case 'autumn':
+        return { main: 0x2a1a10, light: 0x3a2818, wall: 0x1a1008 };
+      case 'fungus':
+        return { main: 0x22200a, light: 0x343010, wall: 0x181606 };
+      default: // crossroads
+        return { main: COLORS.platform, light: COLORS.platformLight, wall: COLORS.wall };
+    }
+  }
+
   private buildLevel(): void {
     // Platforms and walls
+    const biomeCols = this.getBiomePlatformColors();
     this.currentLevel.platforms.forEach(p => {
-      const color = p.type === 'wall' ? COLORS.wall : COLORS.platform;
+      const color = p.type === 'wall' ? biomeCols.wall : biomeCols.main;
       const platform = this.add.rectangle(
         p.x + p.width / 2,
         p.y + p.height / 2,
@@ -527,7 +548,7 @@ export class GameScene extends Phaser.Scene {
           p.y + 2,
           p.width,
           4,
-          COLORS.platformLight
+          biomeCols.light
         );
       }
     });
@@ -4679,10 +4700,11 @@ export class GameScene extends Phaser.Scene {
   private restoreEndlessPlatforms(): void {
     if (!this.endlessStoredPlatforms) return;
 
+    const biomeCols = this.getBiomePlatformColors();
     this.endlessStoredPlatforms.forEach(p => {
-      const platform = this.add.rectangle(p.x, p.y, p.width, p.height, COLORS.platform);
+      const platform = this.add.rectangle(p.x, p.y, p.width, p.height, biomeCols.main);
       this.platforms.add(platform);
-      this.add.rectangle(p.x, p.y - p.height / 2 + 2, p.width, 4, COLORS.platformLight);
+      this.add.rectangle(p.x, p.y - p.height / 2 + 2, p.width, 4, biomeCols.light);
     });
 
     this.endlessStoredPlatforms = null;
