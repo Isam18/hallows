@@ -4611,6 +4611,8 @@ export class GameScene extends Phaser.Scene {
             bossEntity = new GlacialTitan(this, clampedX, bossSpawnY);
           } else if (bossTypeId === 'antElder') {
             bossEntity = new AntElder(this, clampedX, bossSpawnY);
+          } else if (bossTypeId === 'ravana') {
+            bossEntity = new Ravana(this, clampedX, bossSpawnY);
           } else {
             bossEntity = new Boss(this, clampedX, bossSpawnY);
           }
@@ -4675,6 +4677,8 @@ export class GameScene extends Phaser.Scene {
           bossEntity = new GlacialTitan(this, spawnX, bossSpawnY);
         } else if (typeId === 'antElder') {
           bossEntity = new AntElder(this, spawnX, bossSpawnY);
+        } else if (typeId === 'ravana') {
+          bossEntity = new Ravana(this, spawnX, bossSpawnY);
         } else {
           bossEntity = new Boss(this, spawnX, bossSpawnY);
         }
