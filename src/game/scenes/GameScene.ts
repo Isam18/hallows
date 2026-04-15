@@ -1064,6 +1064,7 @@ export class GameScene extends Phaser.Scene {
     
     this.enemies.getChildren().forEach((enemy) => {
       const e = enemy as any; // Could be Enemy, BasicHusk, Vengefly, etc.
+      if (!e || !e.active || !e.takeDamage) return;
       if (!(e.isDying?.() ?? e.isDead) && !(e.isInvulnerable?.() ?? false)) {
         // Use getHitRect if available, otherwise getBounds
         const enemyBounds = e.getHitRect ? e.getHitRect() : e.getBounds();
