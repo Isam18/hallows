@@ -4483,17 +4483,22 @@ export class GameScene extends Phaser.Scene {
 
 
   // ===================== ENDLESS MODE =====================
-  private readonly ENDLESS_ENEMY_POOL = [
-    'basicHusk', 'huskGuard',
-    'mosskin', 'mossWarrior', 'frontierScout', 'frontierWarrior',
-    'frostCharger', 'autumnWraith', 'ossuarySentinel', 'warfieldReaper',
-    'colonyVanguard', 'glacialSentinel',
-    'vengefly', 'aspid', 'squit', 'infectedHusk',
-    'skullScuttler', 'skullRavanger',
-    'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
-    'siegeConstruct', 'frostShard', 'megaSkullRavager',
-    'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath', 'warfieldMedic',
+  private readonly ENDLESS_TIERS: { maxWave: number; pool: string[] }[] = [
+    { maxWave: 3, pool: ['basicHusk', 'vengefly', 'squit', 'mosskin', 'infectedHusk'] },
+    { maxWave: 6, pool: ['huskGuard', 'frontierScout', 'aspid', 'frostShard', 'skullScuttler'] },
+    { maxWave: 10, pool: ['frontierWarrior', 'mossWarrior', 'frostCharger', 'autumnWraith', 'glacialSentinel', 'colonyVanguard'] },
+    { maxWave: 15, pool: ['wingedWarrior', 'skullRavanger', 'ossuarySentinel', 'warfieldReaper', 'warfieldMedic'] },
+    { maxWave: Infinity, pool: ['wingedCommander', 'frozenGatekeeper', 'siegeConstruct', 'megaSkullRavager', 'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath'] },
   ];
+
+  private getEndlessEnemyPool(): string[] {
+    const pool: string[] = [];
+    for (const tier of this.ENDLESS_TIERS) {
+      pool.push(...tier.pool);
+      if (this.endlessWave <= tier.maxWave) break;
+    }
+    return pool;
+  }
 
   private readonly ENDLESS_BOSS_POOL = [
     'mossTitan', 'antElder', 'glacialTitan', 'falseChampion',
@@ -4606,7 +4611,8 @@ export class GameScene extends Phaser.Scene {
         }
       }
 
-      const typeId = Phaser.Math.RND.pick(this.ENDLESS_ENEMY_POOL);
+      const currentPool = this.getEndlessEnemyPool();
+      const typeId = Phaser.Math.RND.pick(currentPool);
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
       if (!config) continue;
 
@@ -4632,7 +4638,8 @@ export class GameScene extends Phaser.Scene {
     const bossCount = 4;
 
     // Mix bosses and mini-bosses
-    const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
+    const currentPool = this.getEndlessEnemyPool();
+    const pool = [...this.ENDLESS_BOSS_POOL, ...currentPool.filter(e => 
       ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath'].includes(e)
     )];
 
