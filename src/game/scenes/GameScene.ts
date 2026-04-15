@@ -4435,11 +4435,11 @@ export class GameScene extends Phaser.Scene {
 
   // ===================== ENDLESS MODE =====================
   private readonly ENDLESS_ENEMY_POOL = [
-    'basicHusk', 'spikyGrub', 'crawlingHusk', 'huskGuard',
+    'basicHusk', 'huskGuard',
     'mosskin', 'mossWarrior', 'frontierScout', 'frontierWarrior',
     'frostCharger', 'autumnWraith', 'ossuarySentinel', 'warfieldReaper',
     'colonyVanguard', 'glacialSentinel',
-    'vengefly', 'aspid', 'squit', 'infectedHusk', 'mossCreep',
+    'vengefly', 'aspid', 'squit', 'infectedHusk',
     'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
