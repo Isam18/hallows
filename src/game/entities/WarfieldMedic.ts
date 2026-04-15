@@ -82,9 +82,16 @@ export class WarfieldMedic extends Phaser.Physics.Arcade.Sprite {
   }
 
   getHp(): number { return this.currentHp; }
+  getCurrentHp(): number { return this.currentHp; }
   getMaxHp(): number { return this.maxHp; }
   getIsDead(): boolean { return this.isDead; }
+  isDying(): boolean { return this.isDead; }
   isInvulnerable(): boolean { return this._isInvulnerable; }
+  getContactDamage(): number { return this.cfg.contactDamage || 1; }
+  getDisplayName(): string { return this.cfg.displayName || 'Warfield Medic'; }
+  getHitRect(): Phaser.Geom.Rectangle {
+    return new Phaser.Geom.Rectangle(this.x - this.width / 2, this.y - this.height / 2, this.width, this.height);
+  }
 
   takeDamage(amount: number, attackX?: number): void {
     if (this.isDead || this._isInvulnerable) return;
