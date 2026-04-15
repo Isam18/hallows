@@ -300,6 +300,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Randomize endless arena on first load too
+    if (this.endlessMode) {
+      this.randomizeEndlessArena();
+    }
+
     // Load level
     this.currentLevel = LEVELS[this.levelId];
     if (!this.currentLevel) {
@@ -4812,7 +4817,22 @@ export class GameScene extends Phaser.Scene {
     (arena as any).platforms = platforms;
 
     // Randomize background color slightly
-    const tints = ['#0a0808', '#0c0606', '#080a08', '#0a0608', '#08060a'];
-    (arena as any).backgroundColor = Phaser.Math.RND.pick(tints);
+    // Randomize biome style for visual variety
+    const biomeOptions = [
+      { biome: 'crossroads', bg: '#0a0808' },
+      { biome: 'greenway', bg: '#080e08' },
+      { biome: 'medulla', bg: '#100808' },
+      { biome: 'huntersMarch', bg: '#0c0a06' },
+      { biome: 'ice', bg: '#080a10' },
+      { biome: 'autumn', bg: '#0e0a06' },
+    ];
+    const picked = Phaser.Math.RND.pick(biomeOptions);
+    (arena as any).biome = picked.biome;
+    (arena as any).backgroundColor = picked.bg;
+    if (picked.biome === 'autumn') {
+      (arena as any).theme = 'autumn';
+    } else {
+      delete (arena as any).theme;
+    }
   }
 }
