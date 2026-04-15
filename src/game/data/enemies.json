@@ -798,6 +798,31 @@
     "isElite": true,
     "isBoss": true
   },
+  "arborealWarGoliath": {
+    "id": "arborealWarGoliath",
+    "displayName": "Arboreal War-Goliath",
+    "hp": 50,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 25,
+    "moveSpeedAggro": 45,
+    "aggroRangePx": 300,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": {
+      "x": 0,
+      "y": 0
+    },
+    "hitstunMs": 0,
+    "invulnOnHitMs": 200,
+    "dropShells": {
+      "min": 60,
+      "max": 100
+    },
+    "hurtFlashMs": 100,
+    "spriteKey": "arborealWarGoliath",
+    "width": 65,
+    "height": 60,
+    "isElite": true
+  },
   "warfieldBrute": {
     "id": "warfieldBrute",
     "displayName": "Warfield Brute",

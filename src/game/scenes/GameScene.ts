@@ -36,6 +36,7 @@ import { OssuarySentinel } from '../entities/OssuarySentinel';
 import { WarfieldReaper } from '../entities/WarfieldReaper';
 import { BrokenEffigy } from '../entities/BrokenEffigy';
 import { WarfieldBrute } from '../entities/WarfieldBrute';
+import { ArborealWarGoliath } from '../entities/ArborealWarGoliath';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -4451,7 +4452,7 @@ export class GameScene extends Phaser.Scene {
     'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
-    'brokenEffigy', 'warfieldBrute',
+    'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath',
   ];
 
   private readonly ENDLESS_BOSS_POOL = [
@@ -4539,7 +4540,7 @@ export class GameScene extends Phaser.Scene {
 
     // Mix bosses and mini-bosses
     const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
-      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy', 'warfieldBrute'].includes(e)
+      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath'].includes(e)
     )];
 
     let spawned = 0;
@@ -4702,6 +4703,8 @@ export class GameScene extends Phaser.Scene {
         entity = new BrokenEffigy(this, x, y, config); break;
       case 'warfieldBrute':
         entity = new WarfieldBrute(this, x, y, config); break;
+      case 'arborealWarGoliath':
+        entity = new ArborealWarGoliath(this, x, y, config); break;
       default:
         entity = new Enemy(this, x, y, config); break;
     }
