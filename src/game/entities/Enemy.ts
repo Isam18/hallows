@@ -193,8 +193,13 @@ export class Enemy extends Phaser.Physics.Arcade.Sprite {
     if (swingId !== -1 && swingId === this.lastHitBySwingId) return false;
     this.lastHitBySwingId = swingId;
     
-    // Apply damage
-    this.currentHp -= amount;
+    // Apply damage (instakill in endless debug mode)
+    const instakill = this.scene.game.registry.get('endlessInstakill');
+    if (instakill) {
+      this.currentHp = 0;
+    } else {
+      this.currentHp -= amount;
+    }
     
     // Enter hurt state
     this.aiState = 'hurt';
