@@ -2987,6 +2987,67 @@ export class BootScene extends Phaser.Scene {
     g.destroy();
   }
 
+  private createWarfieldMedicSprites(): void {
+    const w = 36, h = 52;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Robes - gradient brown to green
+    g.fillStyle(0x3d2b1a, 0.7);
+    g.fillTriangle(cx - 14, cy - 10, cx + 14, cy - 10, cx - 18, cy + 26);
+    g.fillTriangle(cx - 14, cy - 10, cx + 14, cy - 10, cx + 18, cy + 26);
+    g.fillStyle(0x2a6b3a, 0.6);
+    g.fillTriangle(cx - 12, cy + 5, cx + 12, cy + 5, cx - 16, cy + 26);
+    g.fillTriangle(cx - 12, cy + 5, cx + 12, cy + 5, cx + 16, cy + 26);
+
+    // Hollow metallic head
+    g.fillStyle(0x777777, 0.9);
+    g.fillRoundedRect(cx - 8, cy - 24, 16, 16, 4);
+    g.fillStyle(0x111111, 1);
+    g.fillRoundedRect(cx - 5, cy - 21, 10, 10, 3);
+
+    // Floating geometric plates around head
+    g.fillStyle(0x888888, 0.7);
+    g.fillRect(cx - 14, cy - 22, 5, 5);
+    g.fillRect(cx + 9, cy - 22, 5, 5);
+    g.fillRect(cx - 3, cy - 28, 6, 4);
+
+    // Emerald core in chest
+    g.fillStyle(0x00ff44, 0.9);
+    g.fillCircle(cx, cy, 5);
+    g.fillStyle(0x88ffaa, 0.5);
+    g.fillCircle(cx, cy, 8);
+
+    // Arms (thin, spectral)
+    g.lineStyle(2, 0x3d6b4a, 0.6);
+    g.strokeRect(cx - 16, cy - 8, 4, 18);
+    g.strokeRect(cx + 12, cy - 8, 4, 18);
+
+    g.generateTexture('warfieldMedic', w, h);
+    g.destroy();
+
+    // Hurt variant
+    const gh = this.make.graphics({ x: 0, y: 0 });
+    gh.fillStyle(0x4d3b2a, 0.8);
+    gh.fillTriangle(cx - 14, cy - 10, cx + 14, cy - 10, cx - 18, cy + 26);
+    gh.fillTriangle(cx - 14, cy - 10, cx + 14, cy - 10, cx + 18, cy + 26);
+    gh.fillStyle(0x3a8b4a, 0.7);
+    gh.fillTriangle(cx - 12, cy + 5, cx + 12, cy + 5, cx - 16, cy + 26);
+    gh.fillTriangle(cx - 12, cy + 5, cx + 12, cy + 5, cx + 16, cy + 26);
+    gh.fillStyle(0x999999, 0.9);
+    gh.fillRoundedRect(cx - 8, cy - 24, 16, 16, 4);
+    gh.fillStyle(0x222222, 1);
+    gh.fillRoundedRect(cx - 5, cy - 21, 10, 10, 3);
+    gh.fillStyle(0x888888, 0.7);
+    gh.fillRect(cx - 14, cy - 22, 5, 5);
+    gh.fillRect(cx + 9, cy - 22, 5, 5);
+    gh.fillStyle(0x66ff88, 1);
+    gh.fillCircle(cx, cy, 6);
+    gh.fillStyle(0xaaffcc, 0.6);
+    gh.fillCircle(cx, cy, 9);
+    gh.generateTexture('warfieldMedicHurt', w, h);
+    gh.destroy();
+  }
 
   private createPickupSprites(): void {
     // Shell pickup - refined gem/shell look
