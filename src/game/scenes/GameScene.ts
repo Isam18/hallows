@@ -300,6 +300,11 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Randomize endless arena on first load too
+    if (this.endlessMode) {
+      this.randomizeEndlessArena();
+    }
+
     // Load level
     this.currentLevel = LEVELS[this.levelId];
     if (!this.currentLevel) {
