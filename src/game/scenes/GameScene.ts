@@ -1026,7 +1026,7 @@ export class GameScene extends Phaser.Scene {
     
     this.enemies.getChildren().forEach((enemy) => {
       const e = enemy as any; // Could be Enemy, BasicHusk, Vengefly, etc.
-      if (!e.isDying() && !e.isInvulnerable()) {
+      if (!(e.isDying?.() ?? e.isDead) && !(e.isInvulnerable?.() ?? false)) {
         // Use getHitRect if available, otherwise getBounds
         const enemyBounds = e.getHitRect ? e.getHitRect() : e.getBounds();
         if (Phaser.Geom.Rectangle.Overlaps(hitbox, enemyBounds)) {
@@ -2990,7 +2990,7 @@ export class GameScene extends Phaser.Scene {
     if (this.levelId === 'skullRavagerArena' && !this.bossExitDoorOpened) {
       const activeEnemies = this.enemies.getChildren().filter((enemy) => {
         const e = enemy as any;
-        return !e.isDying();
+        return !(e.isDying?.() ?? e.isDead);
       });
       if (activeEnemies.length === 0) {
         this.bossExitDoorOpened = true;
@@ -3009,7 +3009,7 @@ export class GameScene extends Phaser.Scene {
     // Check if all enemies are dead
     const activeEnemies = this.enemies.getChildren().filter((enemy) => {
       const e = enemy as any;
-      return !e.isDying();
+      return !(e.isDying?.() ?? e.isDead);
     });
     
     if (activeEnemies.length === 0 && !this.bossSummoned) {
