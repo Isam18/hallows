@@ -86,10 +86,10 @@ export class WarfieldMedic extends Phaser.Physics.Arcade.Sprite {
   getIsDead(): boolean { return this.isDead; }
 
   takeDamage(amount: number, attackX?: number): void {
-    if (this.isDead || this.isInvulnerable) return;
+    if (this.isDead || this._isInvulnerable) return;
 
     this.currentHp -= amount;
-    this.isInvulnerable = true;
+    this._isInvulnerable = true;
     this.invulnTimer = this.cfg.invulnOnHitMs || 150;
     this.hurtFlashTimer = this.cfg.hurtFlashMs || 120;
     this.setTint(0xffffff);
@@ -148,7 +148,7 @@ export class WarfieldMedic extends Phaser.Physics.Arcade.Sprite {
     // Invuln timer
     if (this.invulnTimer > 0) {
       this.invulnTimer -= delta;
-      if (this.invulnTimer <= 0) this.isInvulnerable = false;
+      if (this.invulnTimer <= 0) this._isInvulnerable = false;
     }
 
     // Hurt flash
