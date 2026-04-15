@@ -4444,6 +4444,7 @@ export class GameScene extends Phaser.Scene {
     'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
+    'brokenEffigy',
   ];
 
   private readonly ENDLESS_BOSS_POOL = [
@@ -4690,6 +4691,8 @@ export class GameScene extends Phaser.Scene {
         entity = new FrostShard(this, x, y, config); break;
       case 'basicHusk':
         entity = new BasicHusk(this, x, y, config); break;
+      case 'brokenEffigy':
+        entity = new BrokenEffigy(this, x, y, config); break;
       default:
         entity = new Enemy(this, x, y, config); break;
     }
