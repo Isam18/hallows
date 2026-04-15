@@ -448,6 +448,14 @@ export class Boss extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount: number, fromX: number): void {
     if (this.dead) return;
     
+    // Instakill in endless debug mode
+    const instakill = this.scene.game.registry.get('endlessInstakill');
+    if (instakill) {
+      this.bossHp = 0;
+      this.die();
+      return;
+    }
+    
     this.totalDamageDealt += amount;
     
     // If staggered and head exposed, damage the main HP

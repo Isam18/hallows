@@ -10,6 +10,9 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   const [debugMode, setDebugMode] = useState(false);
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
   const [immortal, setImmortal] = useState(false);
+  const [endlessActive, setEndlessActive] = useState(false);
+  const [endlessWave, setEndlessWave] = useState(1);
+  const [endlessInstakill, setEndlessInstakill] = useState(false);
   const prevDebugMode = useRef(false);
 
   // F1 manual override for movement overlay, A to toggle debug mode on/off
@@ -56,6 +59,13 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
       const scene = gameRef.scene.getScene('GameScene') as any;
       if (scene?.player) {
         setDebugState(scene.player.getDebugState());
+      }
+      
+      // Poll endless mode state
+      const endless = gameRef.registry?.get('endlessMode') ?? false;
+      setEndlessActive(endless);
+      if (endless) {
+        setEndlessWave(gameRef.registry?.get('endlessWave') ?? 1);
       }
     }, 50);
 
@@ -254,6 +264,63 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
           <button onClick={() => handleTeleport('mossTitanArena')} className="px-2 py-1 text-xs bg-orange-600/20 hover:bg-orange-600/40 border border-orange-600/30 rounded transition-colors">Moss Titan Arena</button>
         </div>
       </div>
+
+      {/* Endless Deads Debug */}
+      {endlessActive && (
+        <div className="mt-3 pt-2 border-t border-border">
+          <div className="text-xs font-semibold text-red-400 mb-2">☠️ Endless Deads Debug</div>
+          
+          <div className="text-xs text-muted-foreground mb-2">Current Wave: <span className="text-red-300 font-bold">{endlessWave}</span></div>
+          
+          <button
+            onClick={() => {
+              const next = !endlessInstakill;
+              setEndlessInstakill(next);
+              if (gameRef) {
+                gameRef.registry.set('endlessInstakill', next);
+              }
+            }}
+            className={`px-3 py-1.5 text-xs rounded transition-colors font-bold w-full mb-1.5 ${
+              endlessInstakill
+                ? 'bg-red-600/30 border border-red-500/50 text-red-300'
+                : 'bg-muted/30 border border-border text-muted-foreground'
+            }`}
+          >
+            {endlessInstakill ? '⚡ INSTAKILL: ON' : '⚡ Instakill: OFF'}
+          </button>
+          
+          <div className="text-xs text-muted-foreground mt-2 mb-1">Skip to Wave:</div>
+          <div className="grid grid-cols-3 gap-1">
+            {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(w => (
+              <button
+                key={w}
+                onClick={() => {
+                  if (gameRef) {
+                    // Kill all current enemies
+                    const scene = gameRef.scene.getScene('GameScene') as any;
+                    if (scene) {
+                      scene.enemies?.getChildren().forEach((e: any) => {
+                        if (e.active) e.destroy();
+                      });
+                      if (scene.boss && (scene.boss as any).active) {
+                        (scene.boss as any).destroy();
+                        scene.boss = null;
+                      }
+                      scene.endlessWave = w - 1;
+                      scene.endlessActiveEnemies = 0;
+                      scene.endlessSpawnTimer = 500;
+                      gameRef.registry.set('endlessWave', w - 1);
+                    }
+                  }
+                }}
+                className="px-2 py-1 text-xs bg-red-600/20 hover:bg-red-600/40 border border-red-600/30 rounded transition-colors"
+              >
+                Wave {w}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="mt-3 pt-2 border-t border-border text-xs text-muted-foreground text-center">
         Press A to toggle debug · F1 for overlay
