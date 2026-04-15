@@ -1406,6 +1406,43 @@ export class GameScene extends Phaser.Scene {
   handleBossDefeated(): void {
     if (!this.boss) return;
     
+    // In endless mode, don't teleport or trigger victory state
+    if (this.endlessMode) {
+      gameState.addShells(50);
+      this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+      
+      // Show "BOSS DEFEATED" text
+      const centerX = this.cameras.main.width / 2;
+      const centerY = this.cameras.main.height / 2;
+      const defeatText = this.add.text(centerX, centerY, 'BOSS DEFEATED', {
+        fontFamily: 'Georgia, serif',
+        fontSize: '42px',
+        color: '#ff4444',
+        fontStyle: 'bold',
+        stroke: '#000000',
+        strokeThickness: 6,
+      });
+      defeatText.setOrigin(0.5);
+      defeatText.setScrollFactor(0);
+      defeatText.setDepth(1000);
+      defeatText.setAlpha(0);
+      
+      this.tweens.add({
+        targets: defeatText,
+        alpha: 1,
+        duration: 500,
+        yoyo: true,
+        hold: 1500,
+        onComplete: () => defeatText.destroy(),
+      });
+      
+      // Clean up boss reference so endless mode continues
+      this.boss = null;
+      this.endlessBossWaveActive = false;
+      this.restoreEndlessPlatforms();
+      return;
+    }
+    
     gameState.addShells(100);
     gameState.setState('victory');
     this.player.jumpMultiplier = 1;
@@ -4582,7 +4619,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   private spawnEndlessWave(): void {
-    const spawnCount = 4;
+    // Every 10 waves permanently adds +1 enemy, caps at 10 extra
+    const bonusEnemies = Math.min(10, Math.floor((this.endlessWave - 1) / 10));
+    const spawnCount = 4 + bonusEnemies;
     const arenaWidth = this.currentLevel.width;
     let spawned = 0;
 
