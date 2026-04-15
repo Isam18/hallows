@@ -847,5 +847,30 @@
     "width": 55,
     "height": 65,
     "isElite": true
+  },
+  "warfieldMedic": {
+    "id": "warfieldMedic",
+    "displayName": "Warfield Medic",
+    "hp": 12,
+    "contactDamage": 1,
+    "moveSpeedPatrol": 30,
+    "moveSpeedAggro": 50,
+    "aggroRangePx": 300,
+    "deaggroRangePx": 450,
+    "knockbackOnHit": {
+      "x": 80,
+      "y": 40
+    },
+    "hitstunMs": 150,
+    "invulnOnHitMs": 150,
+    "dropShells": {
+      "min": 20,
+      "max": 35
+    },
+    "hurtFlashMs": 120,
+    "spriteKey": "warfieldMedic",
+    "width": 36,
+    "height": 52,
+    "isFlying": true
   }
 }

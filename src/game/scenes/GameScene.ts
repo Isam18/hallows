@@ -37,6 +37,7 @@ import { WarfieldReaper } from '../entities/WarfieldReaper';
 import { BrokenEffigy } from '../entities/BrokenEffigy';
 import { WarfieldBrute } from '../entities/WarfieldBrute';
 import { ArborealWarGoliath } from '../entities/ArborealWarGoliath';
+import { WarfieldMedic } from '../entities/WarfieldMedic';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -4452,7 +4453,7 @@ export class GameScene extends Phaser.Scene {
     'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
-    'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath',
+    'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath', 'warfieldMedic',
   ];
 
   private readonly ENDLESS_BOSS_POOL = [
@@ -4705,6 +4706,8 @@ export class GameScene extends Phaser.Scene {
         entity = new WarfieldBrute(this, x, y, config); break;
       case 'arborealWarGoliath':
         entity = new ArborealWarGoliath(this, x, y, config); break;
+      case 'warfieldMedic':
+        entity = new WarfieldMedic(this, x, y, config); break;
       default:
         entity = new Enemy(this, x, y, config); break;
     }
