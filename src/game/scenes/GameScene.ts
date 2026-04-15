@@ -4479,7 +4479,7 @@ export class GameScene extends Phaser.Scene {
 
   private updateEndlessMode(delta: number): void {
     // Remove enemies that fell off the map and count as kills
-    const levelHeight = this.levelData?.height || 600;
+    const levelHeight = this.currentLevel?.height || 600;
     const fallThreshold = levelHeight + 100;
     this.enemies.getChildren().forEach((e: any) => {
       if (e.active && e.y > fallThreshold) {
