@@ -4516,9 +4516,15 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < spawnCount; i++) {
       // 25% chance to spawn a boss instead of a normal enemy
       const spawnBoss = Math.random() < 0.10;
-      const spawnX = this.player
-        ? this.player.x + Phaser.Math.Between(-200, 200)
-        : 80 + Math.random() * (arenaWidth - 160);
+      // Ensure enemies don't spawn on top of the player (min 120px away)
+      let spawnX: number;
+      if (this.player) {
+        const minDist = 120;
+        const offset = Phaser.Math.Between(minDist, 300) * (Math.random() < 0.5 ? -1 : 1);
+        spawnX = this.player.x + offset;
+      } else {
+        spawnX = 80 + Math.random() * (arenaWidth - 160);
+      }
       const clampedX = Phaser.Math.Clamp(spawnX, 60, arenaWidth - 60);
 
       if (spawnBoss) {
