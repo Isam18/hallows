@@ -4463,7 +4463,7 @@ export class GameScene extends Phaser.Scene {
     'frostCharger', 'autumnWraith', 'ossuarySentinel', 'warfieldReaper',
     'colonyVanguard', 'glacialSentinel',
     'vengefly', 'aspid', 'squit', 'infectedHusk',
-    'skullScuttler', 'adaptedSkuller', 'skullRavanger',
+    'skullScuttler', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
     'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath', 'warfieldMedic',
