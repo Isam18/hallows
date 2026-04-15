@@ -821,6 +821,8 @@ export class BootScene extends Phaser.Scene {
     this.createAutumnWraithSprites();
     this.createBrokenEffigySprites();
     this.createWarfieldBruteSprites();
+    this.createWarfieldMedicSprites();
+    this.createArborealWarGoliathSprites();
     this.createArborealWarGoliathSprites();
   }
 
