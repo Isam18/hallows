@@ -60,6 +60,13 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
       if (scene?.player) {
         setDebugState(scene.player.getDebugState());
       }
+      
+      // Poll endless mode state
+      const endless = gameRef.registry?.get('endlessMode') ?? false;
+      setEndlessActive(endless);
+      if (endless) {
+        setEndlessWave(gameRef.registry?.get('endlessWave') ?? 1);
+      }
     }, 50);
 
     return () => clearInterval(interval);
