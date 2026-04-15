@@ -4498,19 +4498,19 @@ export class GameScene extends Phaser.Scene {
   private spawnEndlessWave(): void {
     const spawnCount = 4;
     const arenaWidth = this.currentLevel.width;
-    const groundY = 520;
 
     for (let i = 0; i < spawnCount; i++) {
       const typeId = Phaser.Math.RND.pick(this.ENDLESS_ENEMY_POOL);
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
       if (!config) continue;
 
-      // Can spawn on top of player
       const spawnX = this.player
         ? this.player.x + Phaser.Math.Between(-200, 200)
         : 80 + Math.random() * (arenaWidth - 160);
       const clampedX = Phaser.Math.Clamp(spawnX, 60, arenaWidth - 60);
-      const spawnY = (config as any).isFlying ? Phaser.Math.Between(350, 450) : groundY;
+      const spawnY = (config as any).isFlying
+        ? Phaser.Math.Between(350, 450)
+        : 0;
 
       this.spawnEndlessEnemy(typeId, clampedX, spawnY, config);
     }
@@ -4526,7 +4526,6 @@ export class GameScene extends Phaser.Scene {
     this.removeEndlessPlatforms();
 
     const arenaWidth = this.currentLevel.width;
-    const groundY = 520;
     const bossCount = 4;
 
     // Mix bosses and mini-bosses
@@ -4538,32 +4537,36 @@ export class GameScene extends Phaser.Scene {
     for (let i = 0; i < bossCount; i++) {
       const typeId = Phaser.Math.RND.pick(pool);
       const isBoss = this.ENDLESS_BOSS_POOL.includes(typeId);
-
       const spawnX = 100 + (i / (bossCount - 1)) * (arenaWidth - 200);
 
       if (isBoss) {
         const bossData = (bossesData as any)[typeId];
         if (!bossData) continue;
+
+        const bossSpawnY = this.getLivePlatformSpawnY(spawnX, 120);
         let bossEntity: any;
         if (typeId === 'mossTitan') {
-          bossEntity = new MossTitan(this, spawnX, groundY);
+          bossEntity = new MossTitan(this, spawnX, bossSpawnY);
         } else if (typeId === 'glacialTitan') {
-          bossEntity = new GlacialTitan(this, spawnX, groundY);
+          bossEntity = new GlacialTitan(this, spawnX, bossSpawnY);
         } else if (typeId === 'antElder') {
-          bossEntity = new AntElder(this, spawnX, groundY);
+          bossEntity = new AntElder(this, spawnX, bossSpawnY);
         } else {
-          bossEntity = new Boss(this, spawnX, groundY);
+          bossEntity = new Boss(this, spawnX, bossSpawnY);
         }
+
+        this.snapEntityToLivePlatforms(bossEntity);
         this.physics.add.collider(bossEntity, this.platforms);
         this.physics.add.collider(bossEntity, this.walls);
         this.physics.add.overlap(this.player, bossEntity, () => this.handlePlayerBossContact());
-        // Store as enemies group so they get tracked
         this.enemies.add(bossEntity);
         spawned++;
       } else {
         const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
         if (!config) continue;
-        const spawnY = (config as any).isFlying ? Phaser.Math.Between(350, 450) : groundY;
+        const spawnY = (config as any).isFlying
+          ? Phaser.Math.Between(350, 450)
+          : this.getLivePlatformSpawnY(spawnX, config.height ?? 40);
         this.spawnEndlessEnemy(typeId, spawnX, spawnY, config);
         spawned++;
       }
@@ -4574,29 +4577,63 @@ export class GameScene extends Phaser.Scene {
   }
 
   private removeEndlessPlatforms(): void {
-    // Store current non-ground platforms and destroy them
     this.endlessStoredPlatforms = [];
     const toRemove: Phaser.GameObjects.GameObject[] = [];
+
     this.platforms.getChildren().forEach((p: any) => {
-      if (p.y < 550) { // Not the ground
-        this.endlessStoredPlatforms!.push({ x: p.x, y: p.y, width: p.displayWidth, height: p.displayHeight });
+      const width = p.displayWidth ?? p.width ?? 0;
+      const height = p.displayHeight ?? p.height ?? 0;
+      const top = p.y - height / 2;
+
+      if (top < 550) {
+        this.endlessStoredPlatforms!.push({ x: p.x, y: p.y, width, height });
         toRemove.push(p);
       }
     });
+
     toRemove.forEach(p => p.destroy());
   }
 
   private restoreEndlessPlatforms(): void {
     if (!this.endlessStoredPlatforms) return;
+
     this.endlessStoredPlatforms.forEach(p => {
-      const plat = this.platforms.create(p.x, p.y, '__WHITE') as Phaser.Physics.Arcade.Sprite;
-      plat.setDisplaySize(p.width, p.height);
-      plat.setImmovable(true);
-      (plat.body as Phaser.Physics.Arcade.Body).allowGravity = false;
-      plat.setTint(0x333333);
-      plat.setAlpha(0.8);
+      const platform = this.add.rectangle(p.x, p.y, p.width, p.height, COLORS.platform);
+      this.platforms.add(platform);
+      this.add.rectangle(p.x, p.y - p.height / 2 + 2, p.width, 4, COLORS.platformLight);
     });
+
     this.endlessStoredPlatforms = null;
+  }
+
+  private getLivePlatformSpawnY(x: number, entityHeight: number): number {
+    let surfaceTop: number | null = null;
+
+    this.platforms.getChildren().forEach((platform: any) => {
+      const width = platform.displayWidth ?? platform.width ?? 0;
+      const height = platform.displayHeight ?? platform.height ?? 0;
+      const left = platform.x - width / 2;
+      const right = platform.x + width / 2;
+      const top = platform.y - height / 2;
+
+      if (x >= left && x <= right) {
+        if (surfaceTop === null || top < surfaceTop) {
+          surfaceTop = top;
+        }
+      }
+    });
+
+    const fallbackTop = this.currentLevel.height - 40;
+    return (surfaceTop ?? fallbackTop) - entityHeight / 2;
+  }
+
+  private snapEntityToLivePlatforms(entity: any): void {
+    const body = entity?.body as Phaser.Physics.Arcade.Body | undefined;
+    if (!entity || !body || body.allowGravity === false) return;
+
+    const snappedY = this.getLivePlatformSpawnY(entity.x, body.height || entity.height || 40);
+    entity.setPosition(entity.x, snappedY);
+    body.reset(entity.x, snappedY);
   }
 
   private spawnEndlessEnemy(typeId: string, x: number, y: number, config: EnemyCombatConfig): void {
