@@ -45,7 +45,7 @@ export class WarfieldMedic extends Phaser.Physics.Arcade.Sprite {
   private invulnTimer = 0;
   private hurtTimer = 0;
   private isDead = false;
-  private isInvulnerable = false;
+  private _isInvulnerable = false;
   private hurtFlashTimer = 0;
 
   // Core pulse visual

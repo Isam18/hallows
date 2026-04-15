@@ -4515,7 +4515,7 @@ export class GameScene extends Phaser.Scene {
 
     for (let i = 0; i < spawnCount; i++) {
       // 25% chance to spawn a boss instead of a normal enemy
-      const spawnBoss = Math.random() < 0.25;
+      const spawnBoss = Math.random() < 0.10;
       const spawnX = this.player
         ? this.player.x + Phaser.Math.Between(-200, 200)
         : 80 + Math.random() * (arenaWidth - 160);
