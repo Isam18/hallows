@@ -4599,7 +4599,7 @@ export class GameScene extends Phaser.Scene {
       const clampedX = Phaser.Math.Clamp(spawnX, 60, arenaWidth - 60);
 
       if (spawnBoss) {
-        const bossTypeId = Phaser.Math.RND.pick(this.ENDLESS_BOSS_POOL);
+        const bossTypeId = Phaser.Math.RND.pick(this.getEndlessBossPool());
         const bossData = (bossesData as any)[bossTypeId];
         if (bossData) {
           const bossSpawnY = this.getLivePlatformSpawnY(clampedX, 120);
@@ -4651,14 +4651,15 @@ export class GameScene extends Phaser.Scene {
 
     // Mix bosses and mini-bosses
     const currentPool = this.getEndlessEnemyPool();
-    const pool = [...this.ENDLESS_BOSS_POOL, ...currentPool.filter(e => 
+    const bossPool = this.getEndlessBossPool();
+    const pool = [...bossPool, ...currentPool.filter(e => 
       ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy', 'warfieldBrute', 'arborealWarGoliath'].includes(e)
     )];
 
     let spawned = 0;
     for (let i = 0; i < bossCount; i++) {
       const typeId = Phaser.Math.RND.pick(pool);
-      const isBoss = this.ENDLESS_BOSS_POOL.includes(typeId);
+      const isBoss = bossPool.includes(typeId);
       const spawnX = 100 + (i / (bossCount - 1)) * (arenaWidth - 200);
 
       if (isBoss) {
