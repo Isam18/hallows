@@ -797,5 +797,30 @@
     "height": 60,
     "isElite": true,
     "isBoss": true
+  },
+  "warfieldBrute": {
+    "id": "warfieldBrute",
+    "displayName": "Warfield Brute",
+    "hp": 40,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 25,
+    "moveSpeedAggro": 45,
+    "aggroRangePx": 300,
+    "deaggroRangePx": 500,
+    "knockbackOnHit": {
+      "x": 0,
+      "y": 0
+    },
+    "hitstunMs": 0,
+    "invulnOnHitMs": 200,
+    "dropShells": {
+      "min": 50,
+      "max": 90
+    },
+    "hurtFlashMs": 100,
+    "spriteKey": "warfieldBrute",
+    "width": 55,
+    "height": 65,
+    "isElite": true
   }
 }
