@@ -10,6 +10,9 @@ export const DebugOverlay = ({ gameRef }: DebugOverlayProps) => {
   const [debugMode, setDebugMode] = useState(false);
   const [debugState, setDebugState] = useState<MovementDebugState | null>(null);
   const [immortal, setImmortal] = useState(false);
+  const [endlessActive, setEndlessActive] = useState(false);
+  const [endlessWave, setEndlessWave] = useState(1);
+  const [endlessInstakill, setEndlessInstakill] = useState(false);
   const prevDebugMode = useRef(false);
 
   // F1 manual override for movement overlay, A to toggle debug mode on/off
