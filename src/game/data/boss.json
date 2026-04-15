@@ -195,5 +195,52 @@
       "shells": 350,
       "charm": "glacialStrength"
     }
+  },
+  "ravana": {
+    "id": "ravana",
+    "name": "Ravana, Lord of the Dead",
+    "subtitle": "The Undead Sovereign",
+    "nameColor": "#aa44ff",
+    "maxHp": 600,
+    "staggerThreshold": 30,
+    "staggerDuration": 4000,
+    "staggerRecoveryRageTime": 2500,
+    "attackPatterns": {
+      "bladeCombo": {
+        "swingDelay": 350,
+        "forwardMove": 100,
+        "range": 90,
+        "damage": 1,
+        "cooldown": 1800
+      },
+      "overheadSlam": {
+        "windupTime": 700,
+        "slamSpeed": 900,
+        "shockwaveDamage": 2,
+        "cooldown": 2200
+      },
+      "spiritVessels": {
+        "count": 5,
+        "contactDamage": 2,
+        "cooldown": 3000
+      },
+      "necroticVolley": {
+        "count": 6,
+        "fireInterval": 400,
+        "damage": 1,
+        "cooldown": 2500
+      },
+      "ashTrap": {
+        "damage": 1,
+        "duration": 4000
+      }
+    },
+    "contactDamage": 2,
+    "width": 120,
+    "height": 100,
+    "scale": 2.5,
+    "reward": {
+      "shells": 500
+    }
   }
 }
