@@ -475,6 +475,9 @@ export class MossTitan extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount: number, fromX: number, swingId?: number): boolean {
     if (this.dead || this.isInvulnerable()) return false;
     
+    const instakill = this.scene.game.registry.get('endlessInstakill');
+    if (instakill) { this.bossHp = 0; this.die(); return true; }
+    
     this.totalDamageDealt += amount;
     
     // If staggered and head exposed, damage main HP

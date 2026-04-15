@@ -749,6 +749,9 @@ export class AntElder extends Phaser.Physics.Arcade.Sprite {
 
     // Invulnerable while hiding
     if (this.bossState === 'hiding') return;
+    
+    const instakill = this.scene.game.registry.get('endlessInstakill');
+    if (instakill) { this.phase1Hp = 0; this.phase2Hp = 0; this.bossHp = 0; this.die(); return; }
 
     // Phase 2 takes 1.5x damage
     const finalDamage = this.phase === 2 ? Math.ceil(amount * CFG.phase2.damageMultiplier) : amount;

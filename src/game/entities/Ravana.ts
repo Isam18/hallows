@@ -594,6 +594,9 @@ export class Ravana extends Phaser.Physics.Arcade.Sprite {
   takeDamage(amount: number, fromX: number): boolean {
     if (this.dead) return false;
     if (this.bossState === 'recovering') return false;
+    
+    const instakill = this.scene.game.registry.get('endlessInstakill');
+    if (instakill) { this.bossHp = 0; this.die(); return true; }
 
     this.bossHp -= amount;
     this.totalDamageDealt += amount;
