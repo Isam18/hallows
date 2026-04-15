@@ -820,6 +820,65 @@ export class BootScene extends Phaser.Scene {
     this.createSiegeConstructSprites();
     this.createAutumnWraithSprites();
     this.createBrokenEffigySprites();
+    this.createWarfieldBruteSprites();
+  }
+
+  private createWarfieldBruteSprites(): void {
+    const w = 55, h = 65;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Dark brown fur body
+    g.fillStyle(0x332211, 1);
+    g.fillEllipse(cx, cy + 5, 45, 50);
+
+    // Bronze armor plates
+    g.fillStyle(0x886633, 1);
+    g.fillEllipse(cx - 8, cy - 8, 25, 20);
+    g.fillEllipse(cx + 5, cy + 12, 22, 18);
+
+    // Fur texture
+    g.lineStyle(1, 0x221100, 0.5);
+    for (let i = -2; i <= 2; i++) {
+      g.lineBetween(cx - 12, cy + i * 9, cx + 12, cy + i * 9 + 2);
+    }
+
+    // Thick legs
+    g.fillStyle(0x2a1a0a, 1);
+    g.fillEllipse(cx - 10, cy + 25, 15, 12);
+    g.fillEllipse(cx + 10, cy + 25, 15, 12);
+
+    // Bronze helmet
+    g.fillStyle(0x997744, 1);
+    g.fillEllipse(cx, cy - 18, 24, 22);
+    // Vent holes
+    g.fillStyle(0x111111, 1);
+    for (let i = 0; i < 3; i++) {
+      g.fillCircle(cx - 4 + i * 4, cy - 22, 1.5);
+    }
+    // Helmet ridge
+    g.lineStyle(2, 0xaa8855, 0.8);
+    g.lineBetween(cx - 10, cy - 28, cx + 10, cy - 28);
+
+    // Sickle-sword
+    g.lineStyle(3, 0x666666, 1);
+    g.lineBetween(cx + 22, cy, cx + 27, cy - 45);
+    g.lineStyle(2, 0x888888, 0.7);
+    g.lineBetween(cx + 27, cy - 45, cx + 32, cy - 40);
+    g.lineBetween(cx + 27, cy - 35, cx + 32, cy - 30);
+    g.lineBetween(cx + 27, cy - 25, cx + 32, cy - 20);
+
+    g.generateTexture('warfieldBrute', w, h);
+    g.destroy();
+
+    // Hurt variant
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0x443322, 1);
+    hg.fillEllipse(cx, cy + 5, 45, 50);
+    hg.fillStyle(0xaa7744, 1);
+    hg.fillEllipse(cx, cy - 18, 24, 22);
+    hg.generateTexture('warfieldBrute_hurt', w, h);
+    hg.destroy();
   }
 
   private createBrokenEffigySprites(): void {
