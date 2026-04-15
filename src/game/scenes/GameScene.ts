@@ -35,6 +35,7 @@ import { AutumnWraith } from '../entities/AutumnWraith';
 import { OssuarySentinel } from '../entities/OssuarySentinel';
 import { WarfieldReaper } from '../entities/WarfieldReaper';
 import { BrokenEffigy } from '../entities/BrokenEffigy';
+import { WarfieldBrute } from '../entities/WarfieldBrute';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
