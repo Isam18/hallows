@@ -83,7 +83,7 @@ export class GlacialTitan extends Phaser.Physics.Arcade.Sprite {
     this.setImmovable(true);
 
     const body = this.body as Phaser.Physics.Arcade.Body;
-    body.setAllowGravity(true);
+    body.setAllowGravity(false);
 
     this.arenaLeft = x - 900;
     this.arenaRight = x + 900;
