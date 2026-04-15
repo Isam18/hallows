@@ -4500,9 +4500,21 @@ export class GameScene extends Phaser.Scene {
     return pool;
   }
 
-  private readonly ENDLESS_BOSS_POOL = [
-    'mossTitan', 'antElder', 'glacialTitan', 'falseChampion',
+  private readonly ENDLESS_BOSS_TIERS: { maxWave: number; pool: string[] }[] = [
+    { maxWave: 5, pool: ['mossTitan'] },
+    { maxWave: 10, pool: ['antElder'] },
+    { maxWave: 15, pool: ['falseChampion'] },
+    { maxWave: Infinity, pool: ['glacialTitan'] },
   ];
+
+  private getEndlessBossPool(): string[] {
+    const pool: string[] = [];
+    for (const tier of this.ENDLESS_BOSS_TIERS) {
+      pool.push(...tier.pool);
+      if (this.endlessWave <= tier.maxWave) break;
+    }
+    return pool;
+  }
 
   // Track stored platforms for boss wave removal/restoration
   private endlessStoredPlatforms: any[] | null = null;
