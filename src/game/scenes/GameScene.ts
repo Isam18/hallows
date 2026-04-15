@@ -4478,6 +4478,23 @@ export class GameScene extends Phaser.Scene {
   private endlessBossWaveActive = false;
 
   private updateEndlessMode(delta: number): void {
+    // Remove enemies that fell off the map and count as kills
+    const levelHeight = this.currentLevel?.height || 600;
+    const fallThreshold = levelHeight + 100;
+    this.enemies.getChildren().forEach((e: any) => {
+      if (e.active && e.y > fallThreshold) {
+        this.endlessKills++;
+        this.registry.set('endlessKills', this.endlessKills);
+        e.destroy();
+      }
+    });
+    if (this.boss && (this.boss as any).active && (this.boss as any).y > fallThreshold) {
+      this.endlessKills++;
+      this.registry.set('endlessKills', this.endlessKills);
+      (this.boss as any).destroy();
+      this.boss = null;
+    }
+
     // Count alive enemies
     const aliveCount = this.enemies.getChildren().filter(
       (e: any) => e.active && !e.isDying?.()
