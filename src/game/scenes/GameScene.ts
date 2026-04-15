@@ -1077,7 +1077,7 @@ export class GameScene extends Phaser.Scene {
     });
     
     // Check boss hitbox (use getHitRect)
-    if (this.boss && !this.boss.isDying()) {
+    if (this.boss && this.boss.active && !this.boss.isDying()) {
       // Check head hitbox first (when staggered and exposed)
       const headBounds = this.boss.getHeadBounds();
       if (headBounds && Phaser.Geom.Rectangle.Overlaps(hitbox, headBounds)) {
