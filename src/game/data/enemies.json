@@ -8,10 +8,16 @@
     "moveSpeedAggro": 270,
     "aggroRangePx": 160,
     "deaggroRangePx": 250,
-    "knockbackOnHit": { "x": 60, "y": 30 },
+    "knockbackOnHit": {
+      "x": 60,
+      "y": 30
+    },
     "hitstunMs": 150,
     "invulnOnHitMs": 140,
-    "dropShells": { "min": 4, "max": 8 },
+    "dropShells": {
+      "min": 4,
+      "max": 8
+    },
     "hurtFlashMs": 140,
     "spriteKey": "basicHusk",
     "width": 32,
@@ -26,10 +32,16 @@
     "moveSpeedAggro": 95,
     "aggroRangePx": 140,
     "deaggroRangePx": 200,
-    "knockbackOnHit": { "x": 130, "y": 70 },
+    "knockbackOnHit": {
+      "x": 130,
+      "y": 70
+    },
     "hitstunMs": 220,
     "invulnOnHitMs": 180,
-    "dropShells": { "min": 3, "max": 6 },
+    "dropShells": {
+      "min": 3,
+      "max": 6
+    },
     "hurtFlashMs": 160,
     "spriteKey": "spikyGrub",
     "width": 32,
@@ -44,10 +56,16 @@
     "moveSpeedAggro": 70,
     "aggroRangePx": 110,
     "deaggroRangePx": 160,
-    "knockbackOnHit": { "x": 100, "y": 50 },
+    "knockbackOnHit": {
+      "x": 100,
+      "y": 50
+    },
     "hitstunMs": 180,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 2, "max": 4 },
+    "dropShells": {
+      "min": 2,
+      "max": 4
+    },
     "hurtFlashMs": 140,
     "spriteKey": "crawlingHusk",
     "width": 28,
@@ -62,10 +80,16 @@
     "moveSpeedAggro": 110,
     "aggroRangePx": 120,
     "deaggroRangePx": 220,
-    "knockbackOnHit": { "x": 80, "y": 40 },
+    "knockbackOnHit": {
+      "x": 80,
+      "y": 40
+    },
     "hitstunMs": 200,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 2, "max": 5 },
+    "dropShells": {
+      "min": 2,
+      "max": 5
+    },
     "hurtFlashMs": 150,
     "spriteKey": "vengefly",
     "width": 26,
@@ -81,10 +105,16 @@
     "moveSpeedAggro": 80,
     "aggroRangePx": 200,
     "deaggroRangePx": 300,
-    "knockbackOnHit": { "x": 90, "y": 50 },
+    "knockbackOnHit": {
+      "x": 90,
+      "y": 50
+    },
     "hitstunMs": 180,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 5, "max": 10 },
+    "dropShells": {
+      "min": 5,
+      "max": 10
+    },
     "hurtFlashMs": 150,
     "spriteKey": "aspid",
     "width": 30,
@@ -100,10 +130,16 @@
     "moveSpeedAggro": 50,
     "aggroRangePx": 150,
     "deaggroRangePx": 250,
-    "knockbackOnHit": { "x": 40, "y": 20 },
+    "knockbackOnHit": {
+      "x": 40,
+      "y": 20
+    },
     "hitstunMs": 100,
     "invulnOnHitMs": 100,
-    "dropShells": { "min": 15, "max": 25 },
+    "dropShells": {
+      "min": 15,
+      "max": 25
+    },
     "hurtFlashMs": 120,
     "spriteKey": "huskGuard",
     "width": 48,
@@ -119,10 +155,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 0,
     "deaggroRangePx": 0,
-    "knockbackOnHit": { "x": 0, "y": 0 },
+    "knockbackOnHit": {
+      "x": 0,
+      "y": 0
+    },
     "hitstunMs": 0,
     "invulnOnHitMs": 0,
-    "dropShells": { "min": 0, "max": 0 },
+    "dropShells": {
+      "min": 0,
+      "max": 0
+    },
     "hurtFlashMs": 100,
     "spriteKey": "infectedHusk",
     "width": 56,
@@ -138,10 +180,16 @@
     "moveSpeedAggro": 270,
     "aggroRangePx": 140,
     "deaggroRangePx": 220,
-    "knockbackOnHit": { "x": 70, "y": 35 },
+    "knockbackOnHit": {
+      "x": 70,
+      "y": 35
+    },
     "hitstunMs": 160,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 5, "max": 10 },
+    "dropShells": {
+      "min": 5,
+      "max": 10
+    },
     "hurtFlashMs": 150,
     "spriteKey": "mosskin",
     "width": 36,
@@ -157,10 +205,16 @@
     "moveSpeedAggro": 30,
     "aggroRangePx": 120,
     "deaggroRangePx": 180,
-    "knockbackOnHit": { "x": 50, "y": 25 },
+    "knockbackOnHit": {
+      "x": 50,
+      "y": 25
+    },
     "hitstunMs": 100,
     "invulnOnHitMs": 80,
-    "dropShells": { "min": 1, "max": 3 },
+    "dropShells": {
+      "min": 1,
+      "max": 3
+    },
     "hurtFlashMs": 80,
     "spriteKey": "mossCreep",
     "width": 24,
@@ -177,10 +231,16 @@
     "moveSpeedAggro": 45,
     "aggroRangePx": 80,
     "deaggroRangePx": 300,
-    "knockbackOnHit": { "x": 30, "y": 15 },
+    "knockbackOnHit": {
+      "x": 30,
+      "y": 15
+    },
     "hitstunMs": 80,
     "invulnOnHitMs": 120,
-    "dropShells": { "min": 25, "max": 40 },
+    "dropShells": {
+      "min": 25,
+      "max": 40
+    },
     "hurtFlashMs": 100,
     "spriteKey": "mossWarrior",
     "width": 44,
@@ -197,10 +257,16 @@
     "moveSpeedAggro": 350,
     "aggroRangePx": 150,
     "deaggroRangePx": 250,
-    "knockbackOnHit": { "x": 100, "y": 60 },
+    "knockbackOnHit": {
+      "x": 100,
+      "y": 60
+    },
     "hitstunMs": 180,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 3, "max": 7 },
+    "dropShells": {
+      "min": 3,
+      "max": 7
+    },
     "hurtFlashMs": 140,
     "spriteKey": "squit",
     "width": 24,
@@ -217,10 +283,16 @@
     "moveSpeedAggro": 400,
     "aggroRangePx": 100,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 30, "y": 15 },
+    "knockbackOnHit": {
+      "x": 30,
+      "y": 15
+    },
     "hitstunMs": 120,
     "invulnOnHitMs": 200,
-    "dropShells": { "min": 80, "max": 120 },
+    "dropShells": {
+      "min": 80,
+      "max": 120
+    },
     "hurtFlashMs": 100,
     "spriteKey": "mossTitan",
     "width": 120,
@@ -238,10 +310,16 @@
     "moveSpeedAggro": 60,
     "aggroRangePx": 0,
     "deaggroRangePx": 0,
-    "knockbackOnHit": { "x": 50, "y": 25 },
+    "knockbackOnHit": {
+      "x": 50,
+      "y": 25
+    },
     "hitstunMs": 150,
     "invulnOnHitMs": 140,
-    "dropShells": { "min": 5, "max": 10 },
+    "dropShells": {
+      "min": 5,
+      "max": 10
+    },
     "hurtFlashMs": 140,
     "spriteKey": "skullScuttler",
     "width": 35,
@@ -258,10 +336,16 @@
     "moveSpeedAggro": 180,
     "aggroRangePx": 200,
     "deaggroRangePx": 300,
-    "knockbackOnHit": { "x": 70, "y": 35 },
+    "knockbackOnHit": {
+      "x": 70,
+      "y": 35
+    },
     "hitstunMs": 160,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 12, "max": 20 },
+    "dropShells": {
+      "min": 12,
+      "max": 20
+    },
     "hurtFlashMs": 150,
     "spriteKey": "adaptedSkuller",
     "width": 45,
@@ -278,10 +362,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 400,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 30, "y": 15 },
+    "knockbackOnHit": {
+      "x": 30,
+      "y": 15
+    },
     "hitstunMs": 120,
     "invulnOnHitMs": 200,
-    "dropShells": { "min": 80, "max": 120 },
+    "dropShells": {
+      "min": 80,
+      "max": 120
+    },
     "hurtFlashMs": 100,
     "spriteKey": "skullRavanger",
     "width": 70,
@@ -299,10 +389,16 @@
     "moveSpeedAggro": 350,
     "aggroRangePx": 200,
     "deaggroRangePx": 300,
-    "knockbackOnHit": { "x": 20, "y": 10 },
+    "knockbackOnHit": {
+      "x": 20,
+      "y": 10
+    },
     "hitstunMs": 80,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 20, "max": 35 },
+    "dropShells": {
+      "min": 20,
+      "max": 35
+    },
     "hurtFlashMs": 100,
     "spriteKey": "skullBrute",
     "width": 60,
@@ -319,10 +415,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 400,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 20, "y": 10 },
+    "knockbackOnHit": {
+      "x": 20,
+      "y": 10
+    },
     "hitstunMs": 80,
     "invulnOnHitMs": 200,
-    "dropShells": { "min": 120, "max": 180 },
+    "dropShells": {
+      "min": 120,
+      "max": 180
+    },
     "hurtFlashMs": 100,
     "spriteKey": "megaSkullRavager",
     "width": 110,
@@ -340,10 +442,16 @@
     "moveSpeedAggro": 200,
     "aggroRangePx": 200,
     "deaggroRangePx": 320,
-    "knockbackOnHit": { "x": 80, "y": 40 },
+    "knockbackOnHit": {
+      "x": 80,
+      "y": 40
+    },
     "hitstunMs": 140,
     "invulnOnHitMs": 120,
-    "dropShells": { "min": 15, "max": 25 },
+    "dropShells": {
+      "min": 15,
+      "max": 25
+    },
     "hurtFlashMs": 120,
     "spriteKey": "frontierScout",
     "width": 36,
@@ -359,10 +467,16 @@
     "moveSpeedAggro": 55,
     "aggroRangePx": 180,
     "deaggroRangePx": 280,
-    "knockbackOnHit": { "x": 40, "y": 20 },
+    "knockbackOnHit": {
+      "x": 40,
+      "y": 20
+    },
     "hitstunMs": 100,
     "invulnOnHitMs": 120,
-    "dropShells": { "min": 20, "max": 35 },
+    "dropShells": {
+      "min": 20,
+      "max": 35
+    },
     "hurtFlashMs": 120,
     "spriteKey": "frontierWarrior",
     "width": 44,
@@ -379,10 +493,16 @@
     "moveSpeedAggro": 60,
     "aggroRangePx": 450,
     "deaggroRangePx": 600,
-    "knockbackOnHit": { "x": 25, "y": 15 },
+    "knockbackOnHit": {
+      "x": 25,
+      "y": 15
+    },
     "hitstunMs": 100,
     "invulnOnHitMs": 130,
-    "dropShells": { "min": 25, "max": 40 },
+    "dropShells": {
+      "min": 25,
+      "max": 40
+    },
     "hurtFlashMs": 120,
     "spriteKey": "wingedWarrior",
     "width": 40,
@@ -400,10 +520,16 @@
     "moveSpeedAggro": 40,
     "aggroRangePx": 300,
     "deaggroRangePx": 400,
-    "knockbackOnHit": { "x": 20, "y": 10 },
+    "knockbackOnHit": {
+      "x": 20,
+      "y": 10
+    },
     "hitstunMs": 80,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 50, "max": 80 },
+    "dropShells": {
+      "min": 50,
+      "max": 80
+    },
     "hurtFlashMs": 100,
     "spriteKey": "colonyVanguard",
     "width": 64,
@@ -421,10 +547,16 @@
     "moveSpeedAggro": 120,
     "aggroRangePx": 400,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 15, "y": 8 },
+    "knockbackOnHit": {
+      "x": 15,
+      "y": 8
+    },
     "hitstunMs": 60,
     "invulnOnHitMs": 120,
-    "dropShells": { "min": 60, "max": 100 },
+    "dropShells": {
+      "min": 60,
+      "max": 100
+    },
     "hurtFlashMs": 100,
     "spriteKey": "wingedCommander",
     "width": 70,
@@ -443,10 +575,16 @@
     "moveSpeedAggro": 270,
     "aggroRangePx": 180,
     "deaggroRangePx": 300,
-    "knockbackOnHit": { "x": 40, "y": 20 },
+    "knockbackOnHit": {
+      "x": 40,
+      "y": 20
+    },
     "hitstunMs": 120,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 10, "max": 18 },
+    "dropShells": {
+      "min": 10,
+      "max": 18
+    },
     "hurtFlashMs": 120,
     "spriteKey": "frostCharger",
     "width": 48,
@@ -462,10 +600,16 @@
     "moveSpeedAggro": 500,
     "aggroRangePx": 200,
     "deaggroRangePx": 350,
-    "knockbackOnHit": { "x": 120, "y": 60 },
+    "knockbackOnHit": {
+      "x": 120,
+      "y": 60
+    },
     "hitstunMs": 200,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 5, "max": 12 },
+    "dropShells": {
+      "min": 5,
+      "max": 12
+    },
     "hurtFlashMs": 150,
     "spriteKey": "frostShard",
     "width": 36,
@@ -481,10 +625,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 300,
     "deaggroRangePx": 400,
-    "knockbackOnHit": { "x": 25, "y": 12 },
+    "knockbackOnHit": {
+      "x": 25,
+      "y": 12
+    },
     "hitstunMs": 100,
     "invulnOnHitMs": 180,
-    "dropShells": { "min": 30, "max": 50 },
+    "dropShells": {
+      "min": 30,
+      "max": 50
+    },
     "hurtFlashMs": 120,
     "spriteKey": "glacialSentinel",
     "width": 56,
@@ -502,10 +652,16 @@
     "moveSpeedAggro": 30,
     "aggroRangePx": 350,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 15, "y": 8 },
+    "knockbackOnHit": {
+      "x": 15,
+      "y": 8
+    },
     "hitstunMs": 80,
     "invulnOnHitMs": 200,
-    "dropShells": { "min": 60, "max": 100 },
+    "dropShells": {
+      "min": 60,
+      "max": 100
+    },
     "hurtFlashMs": 100,
     "spriteKey": "frozenGatekeeper",
     "width": 75,
@@ -524,10 +680,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 350,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 10, "y": 5 },
+    "knockbackOnHit": {
+      "x": 10,
+      "y": 5
+    },
     "hitstunMs": 0,
     "invulnOnHitMs": 250,
-    "dropShells": { "min": 80, "max": 140 },
+    "dropShells": {
+      "min": 80,
+      "max": 140
+    },
     "hurtFlashMs": 120,
     "spriteKey": "siegeConstruct",
     "width": 80,
@@ -545,10 +707,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 220,
     "deaggroRangePx": 350,
-    "knockbackOnHit": { "x": 100, "y": 60 },
+    "knockbackOnHit": {
+      "x": 100,
+      "y": 60
+    },
     "hitstunMs": 180,
     "invulnOnHitMs": 160,
-    "dropShells": { "min": 12, "max": 20 },
+    "dropShells": {
+      "min": 12,
+      "max": 20
+    },
     "hurtFlashMs": 140,
     "spriteKey": "autumnWraith",
     "width": 30,
@@ -563,10 +731,16 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 250,
     "deaggroRangePx": 400,
-    "knockbackOnHit": { "x": 60, "y": 30 },
+    "knockbackOnHit": {
+      "x": 60,
+      "y": 30
+    },
     "hitstunMs": 160,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 25, "max": 45 },
+    "dropShells": {
+      "min": 25,
+      "max": 45
+    },
     "hurtFlashMs": 140,
     "spriteKey": "ossuarySentinel",
     "width": 40,
@@ -582,14 +756,46 @@
     "moveSpeedAggro": 0,
     "aggroRangePx": 350,
     "deaggroRangePx": 500,
-    "knockbackOnHit": { "x": 80, "y": 50 },
+    "knockbackOnHit": {
+      "x": 80,
+      "y": 50
+    },
     "hitstunMs": 160,
     "invulnOnHitMs": 150,
-    "dropShells": { "min": 20, "max": 35 },
+    "dropShells": {
+      "min": 20,
+      "max": 35
+    },
     "hurtFlashMs": 140,
     "spriteKey": "warfieldReaper",
     "width": 36,
     "height": 44,
     "isFlying": true
+  },
+  "brokenEffigy": {
+    "id": "brokenEffigy",
+    "displayName": "Broken Effigy",
+    "hp": 45,
+    "contactDamage": 2,
+    "moveSpeedPatrol": 40,
+    "moveSpeedAggro": 90,
+    "aggroRangePx": 400,
+    "deaggroRangePx": 600,
+    "knockbackOnHit": {
+      "x": 8,
+      "y": 5
+    },
+    "hitstunMs": 0,
+    "invulnOnHitMs": 200,
+    "dropShells": {
+      "min": 60,
+      "max": 100
+    },
+    "hurtFlashMs": 100,
+    "spriteKey": "brokenEffigy",
+    "width": 70,
+    "height": 60,
+    "isElite": true,
+    "isBoss": true
   }
 }

@@ -34,6 +34,7 @@ import { GlacialTitan } from '../entities/GlacialTitan';
 import { AutumnWraith } from '../entities/AutumnWraith';
 import { OssuarySentinel } from '../entities/OssuarySentinel';
 import { WarfieldReaper } from '../entities/WarfieldReaper';
+import { BrokenEffigy } from '../entities/BrokenEffigy';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
@@ -697,6 +698,9 @@ export class GameScene extends Phaser.Scene {
         } else if (e.type === 'warfieldReaper') {
           const reaper = new WarfieldReaper(this, e.x, e.y, config);
           this.enemies.add(reaper);
+        } else if (e.type === 'brokenEffigy') {
+          const effigy = new BrokenEffigy(this, e.x, e.y, config);
+          this.enemies.add(effigy);
         }
         // Use FlyingEnemySpawner for flying enemies (vengefly type uses random spawner)
         else if (e.type === 'vengefly' || ((config as any).isFlying && e.type !== 'squit')) {
@@ -4443,6 +4447,7 @@ export class GameScene extends Phaser.Scene {
     'skullScuttler', 'adaptedSkuller', 'skullRavanger',
     'wingedWarrior', 'wingedCommander', 'frozenGatekeeper',
     'siegeConstruct', 'frostShard', 'megaSkullRavager',
+    'brokenEffigy',
   ];
 
   private readonly ENDLESS_BOSS_POOL = [
@@ -4530,7 +4535,7 @@ export class GameScene extends Phaser.Scene {
 
     // Mix bosses and mini-bosses
     const pool = [...this.ENDLESS_BOSS_POOL, ...this.ENDLESS_ENEMY_POOL.filter(e => 
-      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger'].includes(e)
+      ['megaSkullRavager', 'siegeConstruct', 'frozenGatekeeper', 'skullRavanger', 'brokenEffigy'].includes(e)
     )];
 
     let spawned = 0;
@@ -4689,6 +4694,8 @@ export class GameScene extends Phaser.Scene {
         entity = new FrostShard(this, x, y, config); break;
       case 'basicHusk':
         entity = new BasicHusk(this, x, y, config); break;
+      case 'brokenEffigy':
+        entity = new BrokenEffigy(this, x, y, config); break;
       default:
         entity = new Enemy(this, x, y, config); break;
     }

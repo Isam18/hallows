@@ -819,6 +819,73 @@ export class BootScene extends Phaser.Scene {
     this.createFrozenGatekeeperSprites();
     this.createSiegeConstructSprites();
     this.createAutumnWraithSprites();
+    this.createBrokenEffigySprites();
+  }
+
+  private createBrokenEffigySprites(): void {
+    const w = 70, h = 60;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Crawling body mass - dead-flesh grey
+    g.fillStyle(0x555555, 1);
+    g.fillEllipse(cx, cy + 5, 60, 40);
+
+    // Extra limb segments
+    g.fillStyle(0x444444, 1);
+    g.fillEllipse(cx - 22, cy + 18, 16, 24);
+    g.fillEllipse(cx + 22, cy + 18, 16, 24);
+    g.fillEllipse(cx - 15, cy - 8, 12, 20);
+    g.fillEllipse(cx + 15, cy - 8, 12, 20);
+
+    // Wire bindings - rusted bronze
+    g.lineStyle(1, 0x886633, 0.7);
+    g.lineBetween(cx - 20, cy - 15, cx + 20, cy + 15);
+    g.lineBetween(cx + 20, cy - 15, cx - 20, cy + 15);
+
+    // Shattered mask head
+    g.fillStyle(0xccbbaa, 1);
+    g.fillEllipse(cx - 20, cy - 15, 18, 22);
+    g.lineStyle(1, 0x332222, 0.8);
+    g.lineBetween(cx - 24, cy - 24, cx - 18, cy - 8);
+
+    // Eye sockets
+    g.fillStyle(0x111111, 1);
+    g.fillCircle(cx - 23, cy - 18, 2.5);
+    g.fillCircle(cx - 16, cy - 14, 2);
+
+    // Chest eye - the weak point
+    g.fillStyle(0xffeecc, 1);
+    g.fillCircle(cx, cy, 8);
+    g.fillStyle(0x44ccaa, 1);
+    g.fillCircle(cx, cy, 5);
+    g.fillStyle(0x111111, 1);
+    g.fillCircle(cx, cy, 3);
+
+    // Rib cage lines
+    g.lineStyle(1, 0x666655, 0.6);
+    for (let i = -3; i <= 3; i++) {
+      g.lineBetween(cx - 15, cy + i * 4, cx + 15, cy + i * 4);
+    }
+
+    // Dried blood splotches
+    g.fillStyle(0x662222, 0.4);
+    g.fillCircle(cx + 10, cy + 10, 5);
+    g.fillCircle(cx - 8, cy + 14, 4);
+
+    g.generateTexture('brokenEffigy', w, h);
+    g.destroy();
+
+    // Hurt variant
+    const hg = this.make.graphics({ x: 0, y: 0 });
+    hg.fillStyle(0x666666, 1);
+    hg.fillEllipse(cx, cy + 5, 60, 40);
+    hg.fillStyle(0xff8844, 1);
+    hg.fillCircle(cx, cy, 10);
+    hg.fillStyle(0xffff88, 1);
+    hg.fillCircle(cx, cy, 6);
+    hg.generateTexture('brokenEffigy_hurt', w, h);
+    hg.destroy();
   }
 
   private createVengeflySprite(): void {
