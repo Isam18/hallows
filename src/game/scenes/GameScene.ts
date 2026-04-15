@@ -4544,6 +4544,7 @@ export class GameScene extends Phaser.Scene {
     { maxWave: 10, pool: ['antElder'] },
     { maxWave: 15, pool: ['falseChampion'] },
     { maxWave: 20, pool: ['glacialTitan'] },
+    { maxWave: 48, pool: ['glacialTitan'] },
     { maxWave: Infinity, pool: ['ravana'] },
   ];
 
