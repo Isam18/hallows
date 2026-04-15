@@ -821,6 +821,91 @@ export class BootScene extends Phaser.Scene {
     this.createAutumnWraithSprites();
     this.createBrokenEffigySprites();
     this.createWarfieldBruteSprites();
+    this.createArborealWarGoliathSprites();
+  }
+
+  private createArborealWarGoliathSprites(): void {
+    const w = 65, h = 60;
+    const cx = w / 2, cy = h / 2;
+    const g = this.make.graphics({ x: 0, y: 0 });
+
+    // Body - bark plating (dark brown/bronze)
+    g.fillStyle(0x5c3a1e, 1);
+    g.fillRoundedRect(cx - 28, cy - 22, 56, 48, 6);
+
+    // Bark plate texture lines
+    g.lineStyle(2, 0x3d2510, 0.8);
+    g.strokeRect(cx - 24, cy - 18, 18, 14);
+    g.strokeRect(cx + 4, cy - 16, 16, 12);
+    g.strokeRect(cx - 20, cy + 2, 22, 16);
+
+    // Sap-tendrils (glowing red connecting limbs)
+    g.lineStyle(3, 0xcc2200, 0.9);
+    g.strokeCircle(cx - 12, cy - 8, 4);
+    g.strokeCircle(cx + 14, cy - 6, 4);
+    g.strokeCircle(cx, cy + 10, 5);
+    g.fillStyle(0xff4400, 0.7);
+    g.fillCircle(cx - 12, cy - 8, 3);
+    g.fillCircle(cx + 14, cy - 6, 3);
+    g.fillCircle(cx, cy + 10, 3);
+
+    // Shoulder spikes (wooden/crystalline)
+    g.fillStyle(0x8b5e3c, 1);
+    g.fillTriangle(cx - 22, cy - 22, cx - 16, cy - 38, cx - 10, cy - 22);
+    g.fillTriangle(cx + 10, cy - 22, cx + 18, cy - 40, cx + 24, cy - 22);
+    // Amber tips
+    g.fillStyle(0xffaa00, 0.8);
+    g.fillTriangle(cx - 18, cy - 30, cx - 16, cy - 38, cx - 14, cy - 30);
+    g.fillTriangle(cx + 14, cy - 32, cx + 18, cy - 40, cx + 20, cy - 32);
+
+    // Arms (thick)
+    g.fillStyle(0x4a2e14, 1);
+    g.fillRoundedRect(cx - 32, cy - 10, 10, 30, 3);
+    g.fillRoundedRect(cx + 22, cy - 10, 10, 30, 3);
+
+    // Legs
+    g.fillRoundedRect(cx - 18, cy + 20, 12, 18, 3);
+    g.fillRoundedRect(cx + 6, cy + 20, 12, 18, 3);
+
+    // Eyes (glowing orange)
+    g.fillStyle(0xff6600, 1);
+    g.fillCircle(cx - 8, cy - 16, 3);
+    g.fillCircle(cx + 8, cy - 16, 3);
+
+    g.generateTexture('arborealWarGoliath', w, h);
+    g.destroy();
+
+    // Hurt variant
+    const gh = this.make.graphics({ x: 0, y: 0 });
+    gh.fillStyle(0x7a4a2a, 1);
+    gh.fillRoundedRect(cx - 28, cy - 22, 56, 48, 6);
+    gh.lineStyle(2, 0x4d3018, 0.8);
+    gh.strokeRect(cx - 24, cy - 18, 18, 14);
+    gh.strokeRect(cx + 4, cy - 16, 16, 12);
+    // Sap glowing brighter when hurt
+    gh.fillStyle(0xff6600, 0.9);
+    gh.fillCircle(cx - 12, cy - 8, 4);
+    gh.fillCircle(cx + 14, cy - 6, 4);
+    gh.fillCircle(cx, cy + 10, 4);
+    // Shoulder spikes
+    gh.fillStyle(0x9b6e4c, 1);
+    gh.fillTriangle(cx - 22, cy - 22, cx - 16, cy - 38, cx - 10, cy - 22);
+    gh.fillTriangle(cx + 10, cy - 22, cx + 18, cy - 40, cx + 24, cy - 22);
+    gh.fillStyle(0xffcc44, 0.9);
+    gh.fillTriangle(cx - 18, cy - 30, cx - 16, cy - 38, cx - 14, cy - 30);
+    gh.fillTriangle(cx + 14, cy - 32, cx + 18, cy - 40, cx + 20, cy - 32);
+    // Arms/legs
+    gh.fillStyle(0x5a3e24, 1);
+    gh.fillRoundedRect(cx - 32, cy - 10, 10, 30, 3);
+    gh.fillRoundedRect(cx + 22, cy - 10, 10, 30, 3);
+    gh.fillRoundedRect(cx - 18, cy + 20, 12, 18, 3);
+    gh.fillRoundedRect(cx + 6, cy + 20, 12, 18, 3);
+    // Eyes
+    gh.fillStyle(0xffaa33, 1);
+    gh.fillCircle(cx - 8, cy - 16, 3);
+    gh.fillCircle(cx + 8, cy - 16, 3);
+    gh.generateTexture('arborealWarGoliathHurt', w, h);
+    gh.destroy();
   }
 
   private createWarfieldBruteSprites(): void {
