@@ -41,6 +41,7 @@ import { WarfieldMedic } from '../entities/WarfieldMedic';
 import { Boss } from '../entities/Boss';
 import { MossTitan } from '../entities/MossTitan';
 import { AntElder } from '../entities/AntElder';
+import { Ravana } from '../entities/Ravana';
 import { Pickup } from '../entities/Pickup';
 import { Bench } from '../entities/Bench';
 import { Portal } from '../entities/Portal';
@@ -4504,7 +4505,8 @@ export class GameScene extends Phaser.Scene {
     { maxWave: 5, pool: ['mossTitan'] },
     { maxWave: 10, pool: ['antElder'] },
     { maxWave: 15, pool: ['falseChampion'] },
-    { maxWave: Infinity, pool: ['glacialTitan'] },
+    { maxWave: 20, pool: ['glacialTitan'] },
+    { maxWave: Infinity, pool: ['ravana'] },
   ];
 
   private getEndlessBossPool(): string[] {
@@ -4610,6 +4612,8 @@ export class GameScene extends Phaser.Scene {
             bossEntity = new GlacialTitan(this, clampedX, bossSpawnY);
           } else if (bossTypeId === 'antElder') {
             bossEntity = new AntElder(this, clampedX, bossSpawnY);
+          } else if (bossTypeId === 'ravana') {
+            bossEntity = new Ravana(this, clampedX, bossSpawnY);
           } else {
             bossEntity = new Boss(this, clampedX, bossSpawnY);
           }
@@ -4674,6 +4678,8 @@ export class GameScene extends Phaser.Scene {
           bossEntity = new GlacialTitan(this, spawnX, bossSpawnY);
         } else if (typeId === 'antElder') {
           bossEntity = new AntElder(this, spawnX, bossSpawnY);
+        } else if (typeId === 'ravana') {
+          bossEntity = new Ravana(this, spawnX, bossSpawnY);
         } else {
           bossEntity = new Boss(this, spawnX, bossSpawnY);
         }

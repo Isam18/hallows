@@ -2516,6 +2516,9 @@ export class BootScene extends Phaser.Scene {
     
     // Glacial Titan - massive ice monument boss
     this.createGlacialTitanSprite('glacialTitan');
+
+    // Ravana, Lord of the Dead - multi-limbed necromancer king
+    this.createRavanaSprite('ravana');
     
     // Ant Elder - Phase 1 (cloaked tank) and Phase 2 (agile predator)
     this.createAntElderPhase1Sprite('antElder_phase1_idle');
@@ -3938,6 +3941,93 @@ export class BootScene extends Phaser.Scene {
     hg.fillTriangle(cx - 2, cy + 10, cx + 10, cy + 24, cx + 8, cy + 10);
     hg.generateTexture('autumnWraith_hurt', w, h);
     hg.destroy();
+  }
+
+  private createRavanaSprite(key: string): void {
+    const g = this.make.graphics({ x: 0, y: 0 });
+    const w = 120;
+    const h = 100;
+    const cx = w / 2;
+    const cy = h / 2;
+
+    // Tattered funeral robes - deep purple base
+    g.fillStyle(0x2a0a3a);
+    g.fillTriangle(cx - 45, cy + 10, cx + 45, cy + 10, cx, cy + 50);
+    g.fillStyle(0x3a0a1a);
+    g.fillTriangle(cx - 35, cy + 15, cx + 35, cy + 15, cx - 5, cy + 48);
+    g.fillTriangle(cx - 30, cy + 15, cx + 40, cy + 15, cx + 5, cy + 48);
+
+    // Ornate blackened bronze armor torso
+    g.fillStyle(0x2a2018);
+    g.fillRect(cx - 28, cy - 25, 56, 40);
+    // Armor detail lines
+    g.fillStyle(0x3a2a1a);
+    g.fillRect(cx - 26, cy - 20, 52, 3);
+    g.fillRect(cx - 24, cy - 10, 48, 3);
+    g.fillRect(cx - 22, cy, 44, 3);
+
+    // Shoulder pauldrons - ornate bronze
+    g.fillStyle(0x4a3520);
+    g.fillEllipse(cx - 32, cy - 18, 22, 16);
+    g.fillEllipse(cx + 32, cy - 18, 22, 16);
+    g.fillStyle(0x5a4530);
+    g.fillEllipse(cx - 32, cy - 20, 16, 10);
+    g.fillEllipse(cx + 32, cy - 20, 16, 10);
+
+    // Multiple arms (6 total) - 3 on each side
+    // Upper arms with spectral blades
+    // Left arms
+    g.fillStyle(0x1a1018);
+    g.fillRect(cx - 48, cy - 15, 18, 5); // upper left
+    g.fillRect(cx - 52, cy - 5, 22, 5);  // mid left
+    g.fillRect(cx - 46, cy + 5, 16, 5);  // lower left
+    // Right arms
+    g.fillRect(cx + 30, cy - 15, 18, 5);
+    g.fillRect(cx + 30, cy - 5, 22, 5);
+    g.fillRect(cx + 30, cy + 5, 16, 5);
+
+    // Spectral blades - orange flame
+    g.fillStyle(0xff6600, 0.8);
+    g.fillTriangle(cx - 55, cy - 14, cx - 58, cy - 6, cx - 50, cy - 17);
+    g.fillTriangle(cx + 50, cy - 14, cx + 58, cy - 6, cx + 54, cy - 17);
+    // Necrotic violet blades
+    g.fillStyle(0x8844cc, 0.8);
+    g.fillTriangle(cx - 58, cy - 3, cx - 62, cy + 5, cx - 52, cy - 7);
+    g.fillTriangle(cx + 54, cy - 3, cx + 62, cy + 5, cx + 56, cy - 7);
+    // More flame blades
+    g.fillStyle(0xff4400, 0.7);
+    g.fillTriangle(cx - 50, cy + 7, cx - 54, cy + 14, cx - 44, cy + 3);
+    g.fillTriangle(cx + 48, cy + 7, cx + 54, cy + 14, cx + 44, cy + 3);
+
+    // Polished faceless iron mask
+    g.fillStyle(0x888888);
+    g.fillEllipse(cx, cy - 32, 18, 22);
+    // Mask sheen
+    g.fillStyle(0xaaaaaa, 0.6);
+    g.fillEllipse(cx - 3, cy - 34, 8, 12);
+    // Mask edge
+    g.lineStyle(1, 0x555555);
+    g.strokeEllipse(cx, cy - 32, 18, 22);
+
+    // Crown/headdress - ornate bronze spikes
+    g.fillStyle(0x4a3520);
+    g.fillTriangle(cx - 12, cy - 44, cx - 8, cy - 56, cx - 4, cy - 44);
+    g.fillTriangle(cx - 4, cy - 44, cx, cy - 60, cx + 4, cy - 44);
+    g.fillTriangle(cx + 4, cy - 44, cx + 8, cy - 56, cx + 12, cy - 44);
+
+    // Glowing eyes behind mask - subtle orange slits
+    g.fillStyle(0xff6600, 0.5);
+    g.fillRect(cx - 6, cy - 34, 4, 2);
+    g.fillRect(cx + 2, cy - 34, 4, 2);
+
+    // Swirling ash vortex at base
+    g.fillStyle(0x554433, 0.3);
+    g.fillEllipse(cx, cy + 45, 80, 12);
+    g.fillStyle(0x443322, 0.2);
+    g.fillEllipse(cx + 10, cy + 42, 50, 8);
+
+    g.generateTexture(key, w, h);
+    g.destroy();
   }
 
   create(): void {
