@@ -4619,17 +4619,60 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
+  private createSpawnCircle(x: number, y: number, isBoss: boolean): Phaser.GameObjects.Ellipse {
+    const radius = isBoss ? 48 : 20;
+    const color = isBoss ? 0xff4400 : 0x44aaff;
+    const circle = this.add.ellipse(x, y, radius * 2, radius * 2, color, 0.0);
+    circle.setDepth(5);
+    circle.setStrokeStyle(2, color, 0.8);
+
+    // Animate: fade in, pulse, then fade out
+    this.tweens.add({
+      targets: circle,
+      fillAlpha: { from: 0, to: 0.35 },
+      scaleX: { from: 0.3, to: 1 },
+      scaleY: { from: 0.3, to: 1 },
+      duration: 400,
+      ease: 'Back.easeOut',
+      yoyo: false,
+    });
+
+    // Pulse glow
+    this.tweens.add({
+      targets: circle,
+      fillAlpha: { from: 0.35, to: 0.15 },
+      duration: 300,
+      delay: 400,
+      yoyo: true,
+      repeat: 2,
+    });
+
+    // Fade out and destroy
+    this.tweens.add({
+      targets: circle,
+      fillAlpha: 0,
+      strokeAlpha: 0,
+      scaleX: 1.5,
+      scaleY: 1.5,
+      duration: 300,
+      delay: 1600,
+      onComplete: () => circle.destroy(),
+    });
+
+    return circle;
+  }
+
   private spawnEndlessWave(): void {
     // Every 10 waves permanently adds +1 enemy, caps at 10 extra
     const bonusEnemies = Math.min(10, Math.floor((this.endlessWave - 1) / 10));
     const spawnCount = 4 + bonusEnemies;
     const arenaWidth = this.currentLevel.width;
-    let spawned = 0;
+
+    // Gather spawn data first
+    const spawnEntries: { x: number; isBoss: boolean; bossTypeId?: string; typeId?: string; config?: any }[] = [];
 
     for (let i = 0; i < spawnCount; i++) {
-      // 25% chance to spawn a boss instead of a normal enemy
       const spawnBoss = Math.random() < 0.10;
-      // Ensure enemies don't spawn on top of the player (min 120px away)
       let spawnX: number;
       if (this.player) {
         const minDist = 120;
@@ -4641,29 +4684,10 @@ export class GameScene extends Phaser.Scene {
       const clampedX = Phaser.Math.Clamp(spawnX, 60, arenaWidth - 60);
 
       if (spawnBoss) {
-        // Force Ravana at wave 50, otherwise pick from pool
         const bossTypeId = this.endlessWave === 50 ? 'ravana' : Phaser.Math.RND.pick(this.getEndlessBossPool());
         const bossData = (bossesData as any)[bossTypeId];
         if (bossData) {
-          const bossSpawnY = this.getLivePlatformSpawnY(clampedX, 120);
-          let bossEntity: any;
-          if (bossTypeId === 'mossTitan') {
-            bossEntity = new MossTitan(this, clampedX, bossSpawnY);
-          } else if (bossTypeId === 'glacialTitan') {
-            bossEntity = new GlacialTitan(this, clampedX, bossSpawnY);
-          } else if (bossTypeId === 'antElder') {
-            bossEntity = new AntElder(this, clampedX, bossSpawnY);
-          } else if (bossTypeId === 'ravana') {
-            bossEntity = new Ravana(this, clampedX, bossSpawnY);
-          } else {
-            bossEntity = new Boss(this, clampedX, bossSpawnY);
-          }
-          this.snapEntityToLivePlatforms(bossEntity);
-          this.physics.add.collider(bossEntity, this.platforms);
-          this.physics.add.collider(bossEntity, this.walls);
-          this.physics.add.overlap(this.player, bossEntity, () => this.handlePlayerBossContact());
-          this.enemies.add(bossEntity);
-          spawned++;
+          spawnEntries.push({ x: clampedX, isBoss: true, bossTypeId });
           continue;
         }
       }
@@ -4672,17 +4696,50 @@ export class GameScene extends Phaser.Scene {
       const typeId = Phaser.Math.RND.pick(currentPool);
       const config = (enemiesData as Record<string, EnemyCombatConfig>)[typeId];
       if (!config) continue;
-
-      const spawnY = (config as any).isFlying
-        ? Phaser.Math.Between(350, 450)
-        : 0;
-
-      this.spawnEndlessEnemy(typeId, clampedX, spawnY, config);
-      spawned++;
+      spawnEntries.push({ x: clampedX, isBoss: false, typeId, config });
     }
 
-    this.endlessActiveEnemies = spawned;
-    this.cameras.main.flash(200, 60, 0, 0);
+    // Show spawn circles at positions
+    for (const entry of spawnEntries) {
+      const circleY = this.getLivePlatformSpawnY(entry.x, entry.isBoss ? 120 : (entry.config?.height ?? 40));
+      this.createSpawnCircle(entry.x, circleY, entry.isBoss);
+    }
+
+    // Delay actual spawning by 1.8 seconds (after circles animate)
+    this.time.delayedCall(1800, () => {
+      let spawned = 0;
+      for (const entry of spawnEntries) {
+        if (entry.isBoss && entry.bossTypeId) {
+          const bossSpawnY = this.getLivePlatformSpawnY(entry.x, 120);
+          let bossEntity: any;
+          if (entry.bossTypeId === 'mossTitan') {
+            bossEntity = new MossTitan(this, entry.x, bossSpawnY);
+          } else if (entry.bossTypeId === 'glacialTitan') {
+            bossEntity = new GlacialTitan(this, entry.x, bossSpawnY);
+          } else if (entry.bossTypeId === 'antElder') {
+            bossEntity = new AntElder(this, entry.x, bossSpawnY);
+          } else if (entry.bossTypeId === 'ravana') {
+            bossEntity = new Ravana(this, entry.x, bossSpawnY);
+          } else {
+            bossEntity = new Boss(this, entry.x, bossSpawnY);
+          }
+          this.snapEntityToLivePlatforms(bossEntity);
+          this.physics.add.collider(bossEntity, this.platforms);
+          this.physics.add.collider(bossEntity, this.walls);
+          this.physics.add.overlap(this.player, bossEntity, () => this.handlePlayerBossContact());
+          this.enemies.add(bossEntity);
+          spawned++;
+        } else if (entry.typeId && entry.config) {
+          const spawnY = (entry.config as any).isFlying
+            ? Phaser.Math.Between(350, 450)
+            : 0;
+          this.spawnEndlessEnemy(entry.typeId, entry.x, spawnY, entry.config);
+          spawned++;
+        }
+      }
+      this.endlessActiveEnemies = spawned;
+      this.cameras.main.flash(200, 60, 0, 0);
+    });
   }
 
   private spawnEndlessBossWave(): void {
