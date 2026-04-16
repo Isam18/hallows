@@ -218,6 +218,9 @@ export class GameScene extends Phaser.Scene {
   private deathMarker: DeathMarker | null = null;
   private boss: Boss | null = null;
   
+  // Energy wave projectiles (spawned by player Y key)
+  private energyWaves: { sprite: Phaser.GameObjects.Container; vx: number; hitIds: Set<any>; life: number }[] = [];
+  
   // Safe position tracking for acid respawn
   private lastSafeX = 0;
   private lastSafeY = 0;
@@ -1104,7 +1107,88 @@ export class GameScene extends Phaser.Scene {
     }
   }
   
-  // Get pickups group for enemy drops
+  /**
+   * Spawn an energy wave projectile from the player.
+   * Pierces through enemies, dealing sword-equivalent damage to each.
+   * Travels in the player's facing direction. Costs 1 soul line (33).
+   */
+  spawnEnergyWave(x: number, y: number, facing: 1 | -1): void {
+    const container = this.add.container(x, y);
+    container.setDepth(11);
+    
+    // Outer glow ring
+    const glow = this.add.ellipse(0, 0, 70, 50, 0xffffff, 0.35);
+    // Inner crescent (use two arcs to suggest a wave shape)
+    const core = this.add.ellipse(0, 0, 50, 36, 0xaaddff, 0.95);
+    const inner = this.add.ellipse(0, 0, 28, 22, 0xffffff, 1);
+    container.add([glow, core, inner]);
+    container.setScale(facing, 1);
+    
+    // Pulse tween
+    this.tweens.add({
+      targets: glow,
+      scaleX: 1.4,
+      scaleY: 1.4,
+      alpha: 0.1,
+      duration: 250,
+      yoyo: true,
+      repeat: -1,
+    });
+    
+    const speed = 720;
+    this.energyWaves.push({
+      sprite: container,
+      vx: facing * speed,
+      hitIds: new Set(),
+      life: 900, // ms
+    });
+  }
+  
+  private updateEnergyWaves(delta: number): void {
+    if (this.energyWaves.length === 0) return;
+    const baseDamage = PLAYER_CONFIG.attackDamage + gameState.getCharmModifier('damageMod');
+    const damage = gameState.isInstakillMode() ? 100000 : baseDamage;
+    
+    for (let i = this.energyWaves.length - 1; i >= 0; i--) {
+      const w = this.energyWaves[i];
+      w.sprite.x += w.vx * (delta / 1000);
+      w.life -= delta;
+      
+      // Build a hit rect around the wave
+      const hb = new Phaser.Geom.Rectangle(w.sprite.x - 35, w.sprite.y - 25, 70, 50);
+      
+      // Hit enemies (pierces - one hit each)
+      this.enemies.getChildren().forEach((enemy) => {
+        const e = enemy as any;
+        if (!e || !e.active || !e.takeDamage) return;
+        if (w.hitIds.has(e)) return;
+        if ((e.isDying?.() ?? e.isDead) || (e.isInvulnerable?.() ?? false)) return;
+        const eb = e.getHitRect ? e.getHitRect() : e.getBounds();
+        if (Phaser.Geom.Rectangle.Overlaps(hb, eb)) {
+          e.takeDamage(damage, w.sprite.x, -1);
+          w.hitIds.add(e);
+        }
+      });
+      
+      // Hit boss
+      if (this.boss && this.boss.active && !this.boss.isDying() && !w.hitIds.has(this.boss)) {
+        const headBounds = this.boss.getHeadBounds();
+        const bossRect = this.boss.getHitRect();
+        if ((headBounds && Phaser.Geom.Rectangle.Overlaps(hb, headBounds)) ||
+            Phaser.Geom.Rectangle.Overlaps(hb, bossRect)) {
+          this.boss.takeDamage(damage, w.sprite.x);
+          w.hitIds.add(this.boss);
+          this.emitUIEvent('bossHpChange', { hp: this.boss.getHp(), maxHp: this.boss.getMaxHp() });
+        }
+      }
+      
+      // Despawn if expired or off-world
+      if (w.life <= 0 || w.sprite.x < -100 || w.sprite.x > this.currentLevel.width + 100) {
+        w.sprite.destroy();
+        this.energyWaves.splice(i, 1);
+      }
+    }
+  }
   getPickupsGroup(): Phaser.Physics.Arcade.Group {
     return this.pickups;
   }
