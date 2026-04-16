@@ -623,6 +623,27 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     return this.isAttacking ? this.attackHitbox : null;
   }
   
+  // Energy wave attack (Y key) - spends 1 soul line for a piercing projectile
+  private handleEnergyWave(): void {
+    if (!inputManager.justPressed('energyWave')) return;
+    if (this.isFocusing) return;
+    if (this.movementState === 'hitstun') return;
+    
+    const cost = gameState.getSoulCostHeal(); // 1 line = 33 soul
+    if (!gameState.spendSoul(cost)) return;
+    
+    // Spawn the wave from the player's position in their facing direction
+    this.gameScene.spawnEnergyWave(this.x, this.y, this.facing);
+    
+    // Brief flash to telegraph the cast
+    this.scene.tweens.add({
+      targets: this,
+      alpha: 0.6,
+      duration: 80,
+      yoyo: true,
+    });
+  }
+  
   // Focus healing system
   private handleFocus(delta: number): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
