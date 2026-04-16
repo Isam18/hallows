@@ -4619,47 +4619,56 @@ export class GameScene extends Phaser.Scene {
     }
   }
 
-  private createSpawnCircle(x: number, y: number, isBoss: boolean): Phaser.GameObjects.Ellipse {
+  private createSpawnCircle(x: number, y: number, isBoss: boolean): Phaser.GameObjects.Graphics {
     const radius = isBoss ? 48 : 20;
     const color = isBoss ? 0xff4400 : 0x44aaff;
-    const circle = this.add.ellipse(x, y, radius * 2, radius * 2, color, 0.0);
-    circle.setDepth(5);
-    circle.setStrokeStyle(2, color, 0.8);
+    const g = this.add.graphics({ x, y });
+    g.setDepth(5);
 
-    // Animate: fade in, pulse, then fade out
+    const draw = (alpha: number, scale: number) => {
+      g.clear();
+      g.fillStyle(color, alpha * 0.5);
+      g.fillCircle(0, 0, radius * scale);
+      g.lineStyle(2, color, alpha);
+      g.strokeCircle(0, 0, radius * scale);
+    };
+
+    const state = { a: 0, s: 0.3 };
+    draw(state.a, state.s);
+
+    // Fade in & grow
     this.tweens.add({
-      targets: circle,
-      fillAlpha: { from: 0, to: 0.35 },
-      scaleX: { from: 0.3, to: 1 },
-      scaleY: { from: 0.3, to: 1 },
+      targets: state,
+      a: 0.9,
+      s: 1,
       duration: 400,
       ease: 'Back.easeOut',
-      yoyo: false,
+      onUpdate: () => draw(state.a, state.s),
     });
 
-    // Pulse glow
+    // Pulse
     this.tweens.add({
-      targets: circle,
-      fillAlpha: { from: 0.35, to: 0.15 },
+      targets: state,
+      a: 0.4,
       duration: 300,
       delay: 400,
       yoyo: true,
       repeat: 2,
+      onUpdate: () => draw(state.a, state.s),
     });
 
-    // Fade out and destroy
+    // Fade out & destroy
     this.tweens.add({
-      targets: circle,
-      fillAlpha: 0,
-      strokeAlpha: 0,
-      scaleX: 1.5,
-      scaleY: 1.5,
+      targets: state,
+      a: 0,
+      s: 1.5,
       duration: 300,
       delay: 1600,
-      onComplete: () => circle.destroy(),
+      onUpdate: () => draw(state.a, state.s),
+      onComplete: () => g.destroy(),
     });
 
-    return circle;
+    return g;
   }
 
   private spawnEndlessWave(): void {
