@@ -4673,8 +4673,8 @@ export class GameScene extends Phaser.Scene {
 
   private spawnEndlessWave(): void {
     // Every 10 waves permanently adds +1 enemy, caps at 10 extra
-    const bonusEnemies = Math.min(10, Math.floor((this.endlessWave - 1) / 10));
-    const spawnCount = 4 + bonusEnemies;
+    // Wave 1 = 3 enemies, +1 per wave, hard cap at 12
+    const spawnCount = Math.min(12, 2 + this.endlessWave);
     const arenaWidth = this.currentLevel.width;
 
     // Gather spawn data first
