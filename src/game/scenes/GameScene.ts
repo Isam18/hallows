@@ -993,7 +993,9 @@ export class GameScene extends Phaser.Scene {
         this.boss.update(time, delta, this.player);
       }
       
-      // Update death marker animation
+      // Update active energy wave projectiles
+      this.updateEnergyWaves(delta);
+      
       if (this.deathMarker) {
         this.deathMarker.update();
       }
