@@ -4669,8 +4669,6 @@ export class GameScene extends Phaser.Scene {
     });
 
     return g;
-
-    return circle;
   }
 
   private spawnEndlessWave(): void {
