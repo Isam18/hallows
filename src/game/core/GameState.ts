@@ -158,6 +158,16 @@ class GameStateManager {
     return this.soul >= SOUL_COST_HEAL && this.playerData.hp < this.playerData.maxHp;
   }
   
+  /**
+   * Spend a fixed amount of soul if available. Returns true on success.
+   */
+  spendSoul(amount: number): boolean {
+    if (this.soul < amount) return false;
+    this.soul -= amount;
+    this.emit('soulChange', this.soul);
+    return true;
+  }
+  
   refillSoul(): void {
     this.soul = MAX_SOUL;
     this.emit('soulChange', this.soul);

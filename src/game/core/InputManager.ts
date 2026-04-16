@@ -8,7 +8,8 @@ export type InputAction =
   | 'interact'
   | 'pause'
   | 'down'
-  | 'focus'; // For focus healing (hold J)
+  | 'focus' // For focus healing (hold J)
+  | 'energyWave'; // Spend soul to fire piercing energy wave (Y)
 
 interface KeyBinding {
   action: InputAction;
@@ -25,6 +26,7 @@ const DEFAULT_BINDINGS: KeyBinding[] = [
   { action: 'pause', keys: ['Escape'] },
   { action: 'down', keys: ['KeyS', 'ArrowDown'] },
   { action: 'focus', keys: ['KeyJ'] },
+  { action: 'energyWave', keys: ['KeyY'] },
 ];
 
 class InputManager {
