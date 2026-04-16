@@ -118,6 +118,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     // Handle attacks (preserved system)
     this.handleAttack(delta);
     
+    // Handle energy wave (Y key) - costs 1 soul line
+    this.handleEnergyWave();
+    
     // Update visual state for animations
     this.updateVisualState();
     
