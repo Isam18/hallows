@@ -4681,7 +4681,7 @@ export class GameScene extends Phaser.Scene {
     const spawnEntries: { x: number; isBoss: boolean; bossTypeId?: string; typeId?: string; config?: any }[] = [];
 
     for (let i = 0; i < spawnCount; i++) {
-      const spawnBoss = Math.random() < 0.10;
+      const spawnBoss = Math.random() < 0.02;
       let spawnX: number;
       if (this.player) {
         const minDist = 120;
