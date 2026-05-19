@@ -1041,6 +1041,11 @@ export class GameScene extends Phaser.Scene {
       if (this.endlessMode) {
         this.updateEndlessMode(delta);
       }
+
+      // Arena mode wave progression
+      if (this.arenaMode) {
+        this.updateArenaMode();
+      }
     }
     
     // Clear just-pressed/released states at END of frame so all systems can read them
