@@ -5125,4 +5125,124 @@ export class GameScene extends Phaser.Scene {
       delete (arena as any).theme;
     }
   }
+
+  // ============= ARENA MODE =============
+  private setupArenaMode(): void {
+    // Apply arena player rules: 5 hearts, no charms, full soul
+    gameState.resetRun();
+    (gameState as any).playerData.maxHp = 5;
+    (gameState as any).playerData.hp = 5;
+    (gameState as any).playerData.equippedCharms = [];
+    gameState.refillSoul();
+    this.emitUIEvent('hpChange', { hp: 5, maxHp: 5 });
+
+    // Define waves per level
+    if (this.levelId === 'forgottenBrawl') {
+      this.arenaWaves = [
+        { label: 'WAVE 1', enemies: [
+          { type: 'basicHusk', x: 400 },
+          { type: 'basicHusk', x: 700 },
+          { type: 'basicHusk', x: 1000 },
+          { type: 'basicHusk', x: 1250 },
+        ]},
+        { label: 'WAVE 2', enemies: [
+          { type: 'huskGuard', x: 500 },
+          { type: 'huskGuard', x: 1100 },
+        ]},
+        { label: 'FINAL: FAILED KNIGHT', boss: true },
+      ];
+    } else {
+      this.arenaWaves = [];
+    }
+
+    this.arenaWaveIndex = -1;
+    this.arenaComplete = false;
+    this.time.delayedCall(1200, () => this.startNextArenaWave());
+  }
+
+  private startNextArenaWave(): void {
+    if (this.arenaComplete) return;
+    this.arenaWaveIndex++;
+    if (this.arenaWaveIndex >= this.arenaWaves.length) {
+      this.finishArenaMode(true);
+      return;
+    }
+    const wave = this.arenaWaves[this.arenaWaveIndex];
+    this.arenaWaveAdvancing = false;
+
+    this.showArenaBanner(wave.label);
+
+    this.time.delayedCall(900, () => {
+      if (wave.boss) {
+        // Spawn Failed Knight (Boss)
+        const bx = this.currentLevel.width / 2;
+        const by = this.currentLevel.height - 120;
+        this.boss = new Boss(this, bx, by);
+        this.physics.add.collider(this.boss, this.platforms);
+        this.physics.add.collider(this.boss, this.walls);
+        this.physics.add.overlap(this.player, this.boss, () => this.handlePlayerBossContact());
+        gameState.setState('boss');
+      } else if (wave.enemies) {
+        wave.enemies.forEach((e) => {
+          const cfg = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
+          if (!cfg) return;
+          const y = this.currentLevel.height - 120;
+          this.spawnEndlessEnemy(e.type, e.x, y, cfg);
+        });
+      }
+    });
+  }
+
+  private updateArenaMode(): void {
+    if (this.arenaComplete || this.arenaWaveAdvancing) return;
+    if (this.arenaWaveIndex < 0 || this.arenaWaveIndex >= this.arenaWaves.length) return;
+    const wave = this.arenaWaves[this.arenaWaveIndex];
+    // Boss waves end via handleBossDefeated
+    if (wave.boss) return;
+    // Count alive enemies
+    const alive = this.enemies.getChildren().filter((e: any) => e.active && (e.hp === undefined || e.hp > 0)).length;
+    if (alive === 0) {
+      this.arenaWaveAdvancing = true;
+      this.time.delayedCall(900, () => this.startNextArenaWave());
+    }
+  }
+
+  private showArenaBanner(text: string): void {
+    const cam = this.cameras.main;
+    const t = this.add.text(cam.width / 2, cam.height / 2 - 40, text, {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '44px',
+      color: '#44cc66',
+      stroke: '#000000',
+      strokeThickness: 6,
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(2000).setAlpha(0);
+    this.tweens.add({
+      targets: t, alpha: 1, duration: 300, yoyo: true, hold: 900,
+      onComplete: () => t.destroy(),
+    });
+  }
+
+  private finishArenaMode(victory: boolean): void {
+    if (this.arenaComplete) return;
+    this.arenaComplete = true;
+    const cam = this.cameras.main;
+    const msg = victory ? 'ARENA CLEARED' : 'ARENA FAILED';
+    const color = victory ? '#44cc66' : '#cc4444';
+    const t = this.add.text(cam.width / 2, cam.height / 2, msg, {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '52px',
+      color,
+      stroke: '#000000',
+      strokeThickness: 6,
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(2000).setAlpha(0);
+    this.tweens.add({ targets: t, alpha: 1, duration: 500 });
+
+    this.time.delayedCall(2800, () => {
+      this.cameras.main.fadeOut(500, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        gameState.resetRun();
+        this.scene.start('MenuScene');
+      });
+    });
+  }
 }
