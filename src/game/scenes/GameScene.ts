@@ -443,6 +443,11 @@ export class GameScene extends Phaser.Scene {
       gameState.setHp(6);
       gameState.refillSoul();
     }
+
+    // Arena mode setup (Forgotten Brawl etc.)
+    if (this.arenaMode) {
+      this.setupArenaMode();
+    }
   }
   
   private setupDebugMode(): void {
