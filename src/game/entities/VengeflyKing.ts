@@ -40,6 +40,10 @@ export class VengeflyKing extends Vengefly {
     super.update(time, delta, player);
     if (this.isDying()) return;
 
+    // Parent class overwrites scale each frame for wing flap — reapply big king size.
+    const flap = this.scaleY / 1; // preserve sine-flap on Y
+    this.setScale(3, 3 * (0.9 + (flap - 0.9)));
+
     // Tick summon timer
     this.summonTimer -= delta;
     if (this.summonTimer <= 0) {
