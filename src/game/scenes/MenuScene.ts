@@ -6,9 +6,11 @@ export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text;
   private startButton!: Phaser.GameObjects.Text;
   private endlessButton!: Phaser.GameObjects.Text;
+  private arenaButton!: Phaser.GameObjects.Text;
   private debugButton!: Phaser.GameObjects.Text;
   private particles!: Phaser.GameObjects.Graphics;
   private debugMode = false;
+  private arenaContainer?: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: 'MenuScene' });
@@ -79,8 +81,28 @@ export class MenuScene extends Phaser.Scene {
       this.startEndlessMode();
     });
 
+    // Arena Mode button (green)
+    this.arenaButton = this.add.text(width / 2, height * 0.68, '[ ARENA MODE ]', {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '20px',
+      color: '#44cc66',
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerover', () => {
+      this.arenaButton.setColor('#88ff99');
+      this.arenaButton.setScale(1.1);
+    })
+    .on('pointerout', () => {
+      this.arenaButton.setColor('#44cc66');
+      this.arenaButton.setScale(1);
+    })
+    .on('pointerdown', () => {
+      this.showArenaMenu();
+    });
+
     // Debug mode toggle button
-    this.debugButton = this.add.text(width / 2, height * 0.73, '[ DEBUG MODE: OFF ]', {
+    this.debugButton = this.add.text(width / 2, height * 0.78, '[ DEBUG MODE: OFF ]', {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '16px',
       color: '#666677',
