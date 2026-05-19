@@ -200,6 +200,7 @@ const LEVELS: Record<string, LevelConfig> = {
   gatekeeperArena3: gatekeeperArena3Data as unknown as LevelConfig,
   gatekeeperArena4: gatekeeperArena4Data as unknown as LevelConfig,
 };
+(LEVELS as any).forgottenBrawl = forgottenBrawlData as unknown as LevelConfig;
 
 export class GameScene extends Phaser.Scene {
   // Core entities
@@ -272,6 +273,13 @@ export class GameScene extends Phaser.Scene {
   private endlessWave = 1;
   private endlessSpawnTimer = 0;
   private endlessActiveEnemies = 0;
+
+  // Arena mode (Forgotten Brawl etc.)
+  public arenaMode = false;
+  private arenaWaves: Array<{ label: string; enemies?: Array<{ type: string; x: number }>; boss?: boolean }> = [];
+  private arenaWaveIndex = 0;
+  private arenaWaveAdvancing = false;
+  private arenaComplete = false;
 
   constructor() {
     super({ key: 'GameScene' });
