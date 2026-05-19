@@ -1761,6 +1761,11 @@ export class GameScene extends Phaser.Scene {
       endlessKills: this.endlessKills,
       endlessWave: this.endlessWave,
     });
+
+    // Arena mode: dramatic "YOU FAILED" then return to title
+    if (this.arenaMode && !this.arenaComplete) {
+      this.showArenaFailure();
+    }
   }
 
   /**
@@ -5223,11 +5228,12 @@ export class GameScene extends Phaser.Scene {
   }
 
   private finishArenaMode(victory: boolean): void {
+    if (!victory) { this.showArenaFailure(); return; }
     if (this.arenaComplete) return;
     this.arenaComplete = true;
     const cam = this.cameras.main;
-    const msg = victory ? 'ARENA CLEARED' : 'ARENA FAILED';
-    const color = victory ? '#44cc66' : '#cc4444';
+    const msg = 'ARENA CLEARED';
+    const color = '#44cc66';
     const t = this.add.text(cam.width / 2, cam.height / 2, msg, {
       fontFamily: 'Cinzel, serif',
       fontSize: '52px',
@@ -5239,6 +5245,54 @@ export class GameScene extends Phaser.Scene {
 
     this.time.delayedCall(2800, () => {
       this.cameras.main.fadeOut(500, 0, 0, 0);
+      this.cameras.main.once('camerafadeoutcomplete', () => {
+        gameState.resetRun();
+        this.scene.start('MenuScene');
+      });
+    });
+  }
+
+  private showArenaFailure(): void {
+    if (this.arenaComplete) return;
+    this.arenaComplete = true;
+    const cam = this.cameras.main;
+
+    // Dark overlay
+    const overlay = this.add.rectangle(cam.width / 2, cam.height / 2, cam.width, cam.height, 0x000000, 0)
+      .setScrollFactor(0).setDepth(1999);
+    this.tweens.add({ targets: overlay, alpha: 0.75, duration: 800 });
+
+    // Dramatic "YOU FAILED"
+    const t = this.add.text(cam.width / 2, cam.height / 2, 'YOU FAILED', {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '88px',
+      color: '#cc1f1f',
+      stroke: '#1a0000',
+      strokeThickness: 10,
+      fontStyle: 'bold',
+    }).setOrigin(0.5).setScrollFactor(0).setDepth(2000).setAlpha(0).setScale(2.2);
+
+    this.tweens.add({
+      targets: t,
+      alpha: 1,
+      scale: 1,
+      duration: 1200,
+      ease: 'Cubic.easeOut',
+    });
+    this.tweens.add({
+      targets: t,
+      scale: 1.06,
+      duration: 1500,
+      delay: 1200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    this.cameras.main.shake(600, 0.012);
+
+    this.time.delayedCall(3600, () => {
+      this.cameras.main.fadeOut(700, 0, 0, 0);
       this.cameras.main.once('camerafadeoutcomplete', () => {
         gameState.resetRun();
         this.scene.start('MenuScene');
