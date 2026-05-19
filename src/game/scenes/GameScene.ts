@@ -1210,7 +1210,9 @@ export class GameScene extends Phaser.Scene {
   private handlePlayerEnemyContact(enemy: Enemy): void {
     if (this.player.isInvulnerable()) return;
     
-    const damage = enemy.getContactDamage();
+    const damage = typeof (enemy as any).getContactDamage === 'function'
+      ? (enemy as any).getContactDamage()
+      : 1;
     this.player.takeDamage(damage, enemy.x);
     
     // Notify BasicHusk that it hit the player (to stop charging)

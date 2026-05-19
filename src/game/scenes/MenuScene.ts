@@ -6,9 +6,11 @@ export class MenuScene extends Phaser.Scene {
   private titleText!: Phaser.GameObjects.Text;
   private startButton!: Phaser.GameObjects.Text;
   private endlessButton!: Phaser.GameObjects.Text;
+  private arenaButton!: Phaser.GameObjects.Text;
   private debugButton!: Phaser.GameObjects.Text;
   private particles!: Phaser.GameObjects.Graphics;
   private debugMode = false;
+  private arenaContainer?: Phaser.GameObjects.Container;
 
   constructor() {
     super({ key: 'MenuScene' });
@@ -79,8 +81,28 @@ export class MenuScene extends Phaser.Scene {
       this.startEndlessMode();
     });
 
+    // Arena Mode button (green)
+    this.arenaButton = this.add.text(width / 2, height * 0.68, '[ ARENA MODE ]', {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '20px',
+      color: '#44cc66',
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerover', () => {
+      this.arenaButton.setColor('#88ff99');
+      this.arenaButton.setScale(1.1);
+    })
+    .on('pointerout', () => {
+      this.arenaButton.setColor('#44cc66');
+      this.arenaButton.setScale(1);
+    })
+    .on('pointerdown', () => {
+      this.showArenaMenu();
+    });
+
     // Debug mode toggle button
-    this.debugButton = this.add.text(width / 2, height * 0.73, '[ DEBUG MODE: OFF ]', {
+    this.debugButton = this.add.text(width / 2, height * 0.78, '[ DEBUG MODE: OFF ]', {
       fontFamily: 'JetBrains Mono, monospace',
       fontSize: '16px',
       color: '#666677',
@@ -212,6 +234,109 @@ export class MenuScene extends Phaser.Scene {
         spawnId: 'default',
         debugMode: this.debugMode,
         endlessMode: true
+      });
+    });
+  }
+
+  private showArenaMenu(): void {
+    if (this.arenaContainer) return;
+    const { width, height } = this.cameras.main;
+    const container = this.add.container(0, 0);
+    this.arenaContainer = container;
+
+    // Dim background
+    const bg = this.add.rectangle(width / 2, height / 2, width, height, 0x000000, 0.85);
+    bg.setInteractive();
+    container.add(bg);
+
+    const title = this.add.text(width / 2, height * 0.12, 'ARENA MODE', {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '40px',
+      color: '#44cc66',
+      stroke: '#114422',
+      strokeThickness: 2,
+    }).setOrigin(0.5);
+    container.add(title);
+
+    const subtitle = this.add.text(width / 2, height * 0.20, 'Choose your stage', {
+      fontFamily: 'Outfit, sans-serif',
+      fontSize: '16px',
+      color: '#88aa99',
+    }).setOrigin(0.5);
+    container.add(subtitle);
+
+    const stages = [
+      { name: 'Forgotten Brawl', stars: 1, max: 12, levelId: 'forgottenBattlefield', locked: false },
+      { name: '???', stars: 0, max: 12, levelId: '', locked: true },
+      { name: '???', stars: 0, max: 12, levelId: '', locked: true },
+    ];
+
+    stages.forEach((stage, i) => {
+      const cy = height * (0.34 + i * 0.18);
+      const cardW = width * 0.6;
+      const cardH = height * 0.14;
+      const cx = width / 2;
+
+      const cardColor = stage.locked ? 0x222222 : 0x1a3a22;
+      const cardStroke = stage.locked ? 0x444444 : 0x44cc66;
+      const card = this.add.rectangle(cx, cy, cardW, cardH, cardColor, 0.9)
+        .setStrokeStyle(2, cardStroke);
+      container.add(card);
+
+      const nameColor = stage.locked ? '#555566' : '#e8ffe8';
+      const nameText = this.add.text(cx - cardW / 2 + 24, cy - 14, stage.locked ? '??? LOCKED' : stage.name, {
+        fontFamily: 'Cinzel, serif',
+        fontSize: '22px',
+        color: nameColor,
+      }).setOrigin(0, 0.5);
+      container.add(nameText);
+
+      // Stars display
+      const starsStr = `${stage.stars}/${stage.max}  ` + '★'.repeat(stage.stars) + '☆'.repeat(stage.max - stage.stars);
+      const starColor = stage.locked ? '#444455' : '#ffcc44';
+      const starsText = this.add.text(cx - cardW / 2 + 24, cy + 16, starsStr, {
+        fontFamily: 'JetBrains Mono, monospace',
+        fontSize: '13px',
+        color: starColor,
+      }).setOrigin(0, 0.5);
+      container.add(starsText);
+
+      if (!stage.locked) {
+        card.setInteractive({ useHandCursor: true })
+          .on('pointerover', () => { card.setFillStyle(0x2a5a35, 0.95); })
+          .on('pointerout', () => { card.setFillStyle(cardColor, 0.9); })
+          .on('pointerdown', () => { this.startArenaStage(stage.levelId); });
+      }
+    });
+
+    const closeBtn = this.add.text(width / 2, height * 0.92, '[ BACK ]', {
+      fontFamily: 'Cinzel, serif',
+      fontSize: '18px',
+      color: '#888899',
+    })
+    .setOrigin(0.5)
+    .setInteractive({ useHandCursor: true })
+    .on('pointerover', () => closeBtn.setColor('#ffffff'))
+    .on('pointerout', () => closeBtn.setColor('#888899'))
+    .on('pointerdown', () => this.hideArenaMenu());
+    container.add(closeBtn);
+  }
+
+  private hideArenaMenu(): void {
+    this.arenaContainer?.destroy();
+    this.arenaContainer = undefined;
+  }
+
+  private startArenaStage(levelId: string): void {
+    gameState.resetRun();
+    gameState.setState('playing');
+    this.cameras.main.fadeOut(300, 0, 30, 0);
+    this.cameras.main.once('camerafadeoutcomplete', () => {
+      this.scene.start('GameScene', {
+        levelId,
+        spawnId: 'default',
+        debugMode: this.debugMode,
+        arenaMode: true,
       });
     });
   }
