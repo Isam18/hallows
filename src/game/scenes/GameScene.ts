@@ -124,6 +124,7 @@ import freezingPlainsRoom16Data from '../data/levels/freezingPlainsRoom16.json';
 import glacialTitanArenaData from '../data/levels/glacialTitanArena.json';
 import forgottenBattlefieldData from '../data/levels/forgottenBattlefield.json';
 import endlessArenaData from '../data/levels/endlessArena.json';
+import forgottenBrawlData from '../data/levels/forgottenBrawl.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
