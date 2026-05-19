@@ -1,0 +1,25 @@
+{
+  "id": "spikyArena",
+  "name": "Spiky",
+  "width": 1000,
+  "height": 600,
+  "backgroundColor": "#0a0810",
+  "spawnPoint": { "x": 500, "y": 360 },
+  "platforms": [
+    { "x": 0, "y": 580, "width": 1000, "height": 20, "type": "ground" },
+    { "x": 0, "y": 0, "width": 20, "height": 600, "type": "wall" },
+    { "x": 980, "y": 0, "width": 20, "height": 600, "type": "wall" },
+    { "x": 430, "y": 400, "width": 140, "height": 18, "type": "platform" }
+  ],
+  "spikes": [
+    { "x": 20, "y": 560, "width": 960 }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [],
+  "portals": [],
+  "hazards": [],
+  "spawns": {
+    "default": { "x": 500, "y": 360 }
+  }
+}
