@@ -266,7 +266,7 @@ export class MenuScene extends Phaser.Scene {
     container.add(subtitle);
 
     const stages = [
-      { name: 'Forgotten Brawl', stars: 1, max: 12, levelId: 'forgottenBattlefield', locked: false },
+      { name: 'Forgotten Brawl', stars: 1, max: 12, levelId: 'forgottenBrawl', locked: false },
       { name: '???', stars: 0, max: 12, levelId: '', locked: true },
       { name: '???', stars: 0, max: 12, levelId: '', locked: true },
     ];
