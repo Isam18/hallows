@@ -1554,6 +1554,15 @@ export class GameScene extends Phaser.Scene {
       this.restoreEndlessPlatforms();
       return;
     }
+
+    // Arena mode: boss is last wave, finish the arena run
+    if (this.arenaMode) {
+      gameState.addShells(50);
+      this.emitUIEvent('shellsChange', gameState.getPlayerData().shells);
+      this.boss = null;
+      this.finishArenaMode(true);
+      return;
+    }
     
     gameState.addShells(100);
     gameState.setState('victory');
