@@ -1761,6 +1761,11 @@ export class GameScene extends Phaser.Scene {
       endlessKills: this.endlessKills,
       endlessWave: this.endlessWave,
     });
+
+    // Arena mode: dramatic "YOU FAILED" then return to title
+    if (this.arenaMode && !this.arenaComplete) {
+      this.showArenaFailure();
+    }
   }
 
   /**
