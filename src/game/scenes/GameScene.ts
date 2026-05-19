@@ -9,6 +9,7 @@ import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { BasicHusk } from '../entities/BasicHusk';
 import { Vengefly } from '../entities/Vengefly';
+import { VengeflyKing } from '../entities/VengeflyKing';
 import { Aspid } from '../entities/Aspid';
 import { HuskGuard } from '../entities/HuskGuard';
 import { InfectedHusk } from '../entities/InfectedHusk';
@@ -125,6 +126,7 @@ import glacialTitanArenaData from '../data/levels/glacialTitanArena.json';
 import forgottenBattlefieldData from '../data/levels/forgottenBattlefield.json';
 import endlessArenaData from '../data/levels/endlessArena.json';
 import forgottenBrawlData from '../data/levels/forgottenBrawl.json';
+import spikyArenaData from '../data/levels/spikyArena.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -201,6 +203,7 @@ const LEVELS: Record<string, LevelConfig> = {
   gatekeeperArena4: gatekeeperArena4Data as unknown as LevelConfig,
 };
 (LEVELS as any).forgottenBrawl = forgottenBrawlData as unknown as LevelConfig;
+(LEVELS as any).spikyArena = spikyArenaData as unknown as LevelConfig;
 
 export class GameScene extends Phaser.Scene {
   // Core entities
@@ -276,7 +279,7 @@ export class GameScene extends Phaser.Scene {
 
   // Arena mode (Forgotten Brawl etc.)
   public arenaMode = false;
-  private arenaWaves: Array<{ label: string; enemies?: Array<{ type: string; x: number }>; boss?: boolean }> = [];
+  private arenaWaves: Array<{ label: string; enemies?: Array<{ type: string; x: number; y?: number }>; boss?: boolean }> = [];
   private arenaWaveIndex = 0;
   private arenaWaveAdvancing = false;
   private arenaComplete = false;
@@ -5038,6 +5041,8 @@ export class GameScene extends Phaser.Scene {
         entity = new WarfieldReaper(this, x, y, config); break;
       case 'vengefly':
         entity = new Vengefly(this, x, y, config); break;
+      case 'vengeflyKing':
+        entity = new VengeflyKing(this, x, y, config); break;
       case 'aspid':
         entity = new Aspid(this, x, y, config); break;
       case 'squit':
@@ -5156,6 +5161,26 @@ export class GameScene extends Phaser.Scene {
         ]},
         { label: 'FINAL: FAILED KNIGHT', boss: true },
       ];
+    } else if (this.levelId === 'spikyArena') {
+      const W = this.currentLevel.width;
+      const airY = 200;
+      this.arenaWaves = [
+        { label: 'WAVE 1: VENGEFLIES', enemies: [
+          { type: 'vengefly', x: 150, y: airY },
+          { type: 'vengefly', x: 380, y: airY - 40 },
+          { type: 'vengefly', x: W - 380, y: airY - 40 },
+          { type: 'vengefly', x: W - 150, y: airY },
+        ]},
+        { label: 'WAVE 2: ASPIDS', enemies: [
+          { type: 'aspid', x: 180, y: airY },
+          { type: 'aspid', x: 420, y: airY - 50 },
+          { type: 'aspid', x: W - 420, y: airY - 50 },
+          { type: 'aspid', x: W - 180, y: airY },
+        ]},
+        { label: 'FINAL: VENGEFLY KING', enemies: [
+          { type: 'vengeflyKing', x: W / 2, y: 180 },
+        ]},
+      ];
     } else {
       this.arenaWaves = [];
     }
@@ -5191,9 +5216,11 @@ export class GameScene extends Phaser.Scene {
       } else if (wave.enemies) {
         wave.enemies.forEach((e) => {
           const cfg = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
-          if (!cfg) return;
-          const y = this.currentLevel.height - 120;
-          this.spawnEndlessEnemy(e.type, e.x, y, cfg);
+          // Vengefly King falls back to vengefly base config since it's a custom subclass
+          const baseCfg = cfg || (enemiesData as Record<string, EnemyCombatConfig>)['vengefly'];
+          if (!baseCfg) return;
+          const y = e.y !== undefined ? e.y : this.currentLevel.height - 120;
+          this.spawnEndlessEnemy(e.type, e.x, y, baseCfg);
         });
       }
     });
