@@ -285,12 +285,16 @@ export class GameScene extends Phaser.Scene {
     super({ key: 'GameScene' });
   }
 
-  init(data: { levelId: string; spawnId: string; respawning?: boolean; debugMode?: boolean; endlessMode?: boolean }): void {
+  init(data: { levelId: string; spawnId: string; respawning?: boolean; debugMode?: boolean; endlessMode?: boolean; arenaMode?: boolean }): void {
     this.levelId = data.levelId || 'fadingTown';
     this.spawnId = data.spawnId || 'default';
     this.isRespawning = data.respawning || false;
     this.debugModeEnabled = data.debugMode || this.registry.get('debugMode') || false;
     this.endlessMode = data.endlessMode || false;
+    this.arenaMode = data.arenaMode || false;
+    this.arenaWaveIndex = 0;
+    this.arenaWaveAdvancing = false;
+    this.arenaComplete = false;
     this.inBossArena = false;
     this.bossGateClosed = false;
     this.fakeBenchTriggered = false;
