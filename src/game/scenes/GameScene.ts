@@ -9,6 +9,7 @@ import { Player } from '../entities/Player';
 import { Enemy } from '../entities/Enemy';
 import { BasicHusk } from '../entities/BasicHusk';
 import { Vengefly } from '../entities/Vengefly';
+import { VengeflyKing } from '../entities/VengeflyKing';
 import { Aspid } from '../entities/Aspid';
 import { HuskGuard } from '../entities/HuskGuard';
 import { InfectedHusk } from '../entities/InfectedHusk';
