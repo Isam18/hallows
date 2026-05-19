@@ -5186,6 +5186,7 @@ export class GameScene extends Phaser.Scene {
         this.physics.add.collider(this.boss, this.platforms);
         this.physics.add.collider(this.boss, this.walls);
         this.physics.add.overlap(this.player, this.boss, () => this.handlePlayerBossContact());
+        this.inBossArena = true;
         gameState.setState('boss');
       } else if (wave.enemies) {
         wave.enemies.forEach((e) => {
