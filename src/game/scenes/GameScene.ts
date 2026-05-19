@@ -279,7 +279,7 @@ export class GameScene extends Phaser.Scene {
 
   // Arena mode (Forgotten Brawl etc.)
   public arenaMode = false;
-  private arenaWaves: Array<{ label: string; enemies?: Array<{ type: string; x: number }>; boss?: boolean }> = [];
+  private arenaWaves: Array<{ label: string; enemies?: Array<{ type: string; x: number; y?: number }>; boss?: boolean }> = [];
   private arenaWaveIndex = 0;
   private arenaWaveAdvancing = false;
   private arenaComplete = false;
@@ -5041,6 +5041,8 @@ export class GameScene extends Phaser.Scene {
         entity = new WarfieldReaper(this, x, y, config); break;
       case 'vengefly':
         entity = new Vengefly(this, x, y, config); break;
+      case 'vengeflyKing':
+        entity = new VengeflyKing(this, x, y, config); break;
       case 'aspid':
         entity = new Aspid(this, x, y, config); break;
       case 'squit':
