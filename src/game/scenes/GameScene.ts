@@ -5222,6 +5222,15 @@ export class GameScene extends Phaser.Scene {
           const y = e.y !== undefined ? e.y : this.currentLevel.height - 120;
           this.spawnEndlessEnemy(e.type, e.x, y, baseCfg);
         });
+        // In spiky arena, force flying enemies into aggro immediately so they chase the player
+        if (this.levelId === 'spikyArena') {
+          this.enemies.getChildren().forEach((ent: any) => {
+            if (ent && (ent.constructor?.name === 'Aspid' || ent.constructor?.name === 'Vengefly' || ent.constructor?.name === 'VengeflyKing')) {
+              ent.aiState = 'aggro';
+              if ('shootTimer' in ent) ent.shootTimer = 2000;
+            }
+          });
+        }
       }
     });
   }
