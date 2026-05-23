@@ -9,7 +9,7 @@
     { "x": 0, "y": 580, "width": 1000, "height": 20, "type": "ground" },
     { "x": 0, "y": 0, "width": 20, "height": 600, "type": "wall" },
     { "x": 980, "y": 0, "width": 20, "height": 600, "type": "wall" },
-    { "x": 430, "y": 400, "width": 140, "height": 18, "type": "platform" }
+    { "x": 320, "y": 400, "width": 360, "height": 18, "type": "platform" }
   ],
   "spikes": [
     { "x": 20, "y": 560, "width": 960 }
