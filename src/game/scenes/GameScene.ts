@@ -127,6 +127,7 @@ import forgottenBattlefieldData from '../data/levels/forgottenBattlefield.json';
 import endlessArenaData from '../data/levels/endlessArena.json';
 import forgottenBrawlData from '../data/levels/forgottenBrawl.json';
 import spikyArenaData from '../data/levels/spikyArena.json';
+import throughTheJungleData from '../data/levels/throughTheJungle.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -204,6 +205,7 @@ const LEVELS: Record<string, LevelConfig> = {
 };
 (LEVELS as any).forgottenBrawl = forgottenBrawlData as unknown as LevelConfig;
 (LEVELS as any).spikyArena = spikyArenaData as unknown as LevelConfig;
+(LEVELS as any).throughTheJungle = throughTheJungleData as unknown as LevelConfig;
 
 export class GameScene extends Phaser.Scene {
   // Core entities
@@ -835,6 +837,7 @@ export class GameScene extends Phaser.Scene {
     if ((this.currentLevel as any).acidPools) {
       (this.currentLevel as any).acidPools.forEach((a: any) => {
         const acid = new AcidPool(this, a.x, a.y, a.width, a.height || 30);
+        if (typeof a.damage === 'number') acid.damageAmount = a.damage;
         this.acidPools.add(acid);
       });
     }
@@ -5181,6 +5184,29 @@ export class GameScene extends Phaser.Scene {
           { type: 'vengeflyKing', x: W / 2, y: 120 },
         ]},
       ];
+    } else if (this.levelId === 'throughTheJungle') {
+      const W = this.currentLevel.width;
+      // Platform y is 430 in level; stand on top (~414).
+      const platY = 410;
+      const platXs = [130, 500, 870];
+      this.arenaWaves = [
+        { label: 'WAVE 1: BUSHLINGS', enemies: [
+          { type: 'mosskin', x: platXs[0] - 30, y: platY },
+          { type: 'mosskin', x: platXs[0] + 30, y: platY },
+          { type: 'mosskin', x: platXs[1] - 30, y: platY },
+          { type: 'mosskin', x: platXs[1] + 30, y: platY },
+          { type: 'mosskin', x: platXs[2] - 30, y: platY },
+          { type: 'mosskin', x: platXs[2] + 30, y: platY },
+        ]},
+        { label: 'WAVE 2: SQUITS', enemies: [
+          { type: 'squit', x: 150, y: 180 },
+          { type: 'squit', x: 350, y: 140 },
+          { type: 'squit', x: 500, y: 180 },
+          { type: 'squit', x: 650, y: 140 },
+          { type: 'squit', x: 850, y: 180 },
+        ]},
+        { label: 'FINAL: MOSS TITAN', boss: true, bossType: 'mossTitan' },
+      ] as any;
     } else {
       this.arenaWaves = [];
     }
@@ -5206,15 +5232,34 @@ export class GameScene extends Phaser.Scene {
 
     this.time.delayedCall(900, () => {
       if (wave.boss) {
-        // Spawn Failed Knight (Boss)
         const bx = this.currentLevel.width / 2;
         const by = this.currentLevel.height - 120;
-        this.boss = new Boss(this, bx, by);
+        const bossType = (wave as any).bossType;
+        if (bossType === 'mossTitan') {
+          // Make the floor whole: clear all acid, add solid platform across width.
+          this.acidPools.getChildren().forEach((p: any) => {
+            if (p && typeof p.clearPool === 'function') p.clearPool();
+          });
+          const W = this.currentLevel.width;
+          const floorY = 560;
+          const biomeCols = this.getBiomePlatformColors();
+          const newFloor = this.add.rectangle(W / 2, floorY + 10, W - 40, 20, biomeCols.main);
+          this.platforms.add(newFloor);
+          this.add.rectangle(W / 2, floorY + 2, W - 40, 4, biomeCols.light);
+          // Spawn Moss Titan on the new floor.
+          this.boss = new MossTitan(this, bx, floorY - 60) as any;
+        } else {
+          this.boss = new Boss(this, bx, by);
+        }
         this.physics.add.collider(this.boss, this.platforms);
         this.physics.add.collider(this.boss, this.walls);
         this.physics.add.overlap(this.player, this.boss, () => this.handlePlayerBossContact());
         this.inBossArena = true;
         gameState.setState('boss');
+        this.emitUIEvent('bossStart', {
+          name: this.boss?.getName?.() ?? 'Boss',
+          maxHp: this.boss?.getMaxHp?.() ?? 100,
+        });
       } else if (wave.enemies) {
         wave.enemies.forEach((e) => {
           const cfg = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];

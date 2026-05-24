@@ -1,0 +1,28 @@
+{
+  "id": "throughTheJungle",
+  "name": "Through the Jungle",
+  "width": 1000,
+  "height": 600,
+  "backgroundColor": "#0a1810",
+  "biome": "greenway",
+  "spawnPoint": { "x": 500, "y": 380 },
+  "platforms": [
+    { "x": 0, "y": 580, "width": 1000, "height": 20, "type": "ground" },
+    { "x": 0, "y": 0, "width": 20, "height": 600, "type": "wall" },
+    { "x": 980, "y": 0, "width": 20, "height": 600, "type": "wall" },
+    { "x": 60, "y": 430, "width": 140, "height": 16, "type": "platform" },
+    { "x": 430, "y": 430, "width": 140, "height": 16, "type": "platform" },
+    { "x": 800, "y": 430, "width": 140, "height": 16, "type": "platform" }
+  ],
+  "acidPools": [
+    { "x": 20, "y": 555, "width": 960, "height": 30, "damage": 2 }
+  ],
+  "enemies": [],
+  "pickups": [],
+  "triggers": [],
+  "portals": [],
+  "hazards": [],
+  "spawns": {
+    "default": { "x": 500, "y": 380 }
+  }
+}
