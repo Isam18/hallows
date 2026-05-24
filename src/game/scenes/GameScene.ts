@@ -5242,10 +5242,10 @@ export class GameScene extends Phaser.Scene {
           });
           const W = this.currentLevel.width;
           const floorY = 560;
-          const cols = (BIOME_COLORS as any).greenway || { mid: 0x1a3a22, light: 0x2d5a35 };
-          const newFloor = this.add.rectangle(W / 2, floorY + 10, W - 40, 20, cols.mid);
+          const biomeCols = this.getBiomePlatformColors();
+          const newFloor = this.add.rectangle(W / 2, floorY + 10, W - 40, 20, biomeCols.main);
           this.platforms.add(newFloor);
-          this.add.rectangle(W / 2, floorY + 2, W - 40, 4, cols.light);
+          this.add.rectangle(W / 2, floorY + 2, W - 40, 4, biomeCols.light);
           // Spawn Moss Titan on the new floor.
           this.boss = new MossTitan(this, bx, floorY - 60) as any;
         } else {
