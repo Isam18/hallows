@@ -6,12 +6,14 @@ import type { Player } from './Player';
  * Damages player and teleports them back to last safe position
  */
 export class AcidPool extends Phaser.GameObjects.Rectangle {
-  private damageAmount = 1;
+  public damageAmount = 1;
   private bubbleTimer = 0;
   private bubbleInterval = 500;
   private poolWidth: number;
   private poolHeight: number;
   private fogOverlay: Phaser.GameObjects.Rectangle | null = null;
+  private highlight: Phaser.GameObjects.Rectangle | null = null;
+  private glow: Phaser.GameObjects.Rectangle | null = null;
 
   constructor(scene: Phaser.Scene, x: number, y: number, width: number, height: number = 30) {
     // Acid pool visual - bright green
@@ -25,14 +27,14 @@ export class AcidPool extends Phaser.GameObjects.Rectangle {
     this.setDepth(2);
     
     // Add surface highlight
-    const highlight = scene.add.rectangle(x + width / 2, y + 3, width, 6, 0x88ee66, 0.9);
-    highlight.setDepth(3);
+    this.highlight = scene.add.rectangle(x + width / 2, y + 3, width, 6, 0x88ee66, 0.9);
+    this.highlight.setDepth(3);
     
     // Glow effect
-    const glow = scene.add.rectangle(x + width / 2, y + height / 2, width + 20, height + 10, 0x55aa33, 0.3);
-    glow.setDepth(1);
+    this.glow = scene.add.rectangle(x + width / 2, y + height / 2, width + 20, height + 10, 0x55aa33, 0.3);
+    this.glow.setDepth(1);
     scene.tweens.add({
-      targets: glow,
+      targets: this.glow,
       alpha: { from: 0.2, to: 0.4 },
       duration: 1500,
       yoyo: true,
@@ -52,6 +54,14 @@ export class AcidPool extends Phaser.GameObjects.Rectangle {
     
     // Create initial bubbles
     this.createBubbles();
+  }
+
+  /** Fully remove acid pool and all decorative visuals. */
+  public clearPool(): void {
+    this.fogOverlay?.destroy(); this.fogOverlay = null;
+    this.highlight?.destroy(); this.highlight = null;
+    this.glow?.destroy(); this.glow = null;
+    this.destroy();
   }
 
   private createBubbles(): void {
