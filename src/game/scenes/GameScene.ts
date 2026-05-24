@@ -127,6 +127,7 @@ import forgottenBattlefieldData from '../data/levels/forgottenBattlefield.json';
 import endlessArenaData from '../data/levels/endlessArena.json';
 import forgottenBrawlData from '../data/levels/forgottenBrawl.json';
 import spikyArenaData from '../data/levels/spikyArena.json';
+import throughTheJungleData from '../data/levels/throughTheJungle.json';
 import gatekeeperArena1Data from '../data/levels/gatekeeperArena1.json';
 import gatekeeperArena2Data from '../data/levels/gatekeeperArena2.json';
 import gatekeeperArena3Data from '../data/levels/gatekeeperArena3.json';
@@ -204,6 +205,7 @@ const LEVELS: Record<string, LevelConfig> = {
 };
 (LEVELS as any).forgottenBrawl = forgottenBrawlData as unknown as LevelConfig;
 (LEVELS as any).spikyArena = spikyArenaData as unknown as LevelConfig;
+(LEVELS as any).throughTheJungle = throughTheJungleData as unknown as LevelConfig;
 
 export class GameScene extends Phaser.Scene {
   // Core entities
