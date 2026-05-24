@@ -5198,7 +5198,9 @@ export class GameScene extends Phaser.Scene {
       return;
     }
     const wave = this.arenaWaves[this.arenaWaveIndex];
-    this.arenaWaveAdvancing = false;
+    // Keep advancing flag true until enemies actually spawn,
+    // so updateArenaMode doesn't see "0 alive" during the banner delay.
+    this.arenaWaveAdvancing = true;
 
     this.showArenaBanner(wave.label);
 
@@ -5232,6 +5234,7 @@ export class GameScene extends Phaser.Scene {
           });
         }
       }
+      this.arenaWaveAdvancing = false;
     });
   }
 
