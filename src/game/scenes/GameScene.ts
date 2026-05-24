@@ -5232,15 +5232,34 @@ export class GameScene extends Phaser.Scene {
 
     this.time.delayedCall(900, () => {
       if (wave.boss) {
-        // Spawn Failed Knight (Boss)
         const bx = this.currentLevel.width / 2;
         const by = this.currentLevel.height - 120;
-        this.boss = new Boss(this, bx, by);
+        const bossType = (wave as any).bossType;
+        if (bossType === 'mossTitan') {
+          // Make the floor whole: clear all acid, add solid platform across width.
+          this.acidPools.getChildren().forEach((p: any) => {
+            if (p && typeof p.clearPool === 'function') p.clearPool();
+          });
+          const W = this.currentLevel.width;
+          const floorY = 560;
+          const cols = (BIOME_COLORS as any).greenway || { mid: 0x1a3a22, light: 0x2d5a35 };
+          const newFloor = this.add.rectangle(W / 2, floorY + 10, W - 40, 20, cols.mid);
+          this.platforms.add(newFloor);
+          this.add.rectangle(W / 2, floorY + 2, W - 40, 4, cols.light);
+          // Spawn Moss Titan on the new floor.
+          this.boss = new MossTitan(this, bx, floorY - 60) as any;
+        } else {
+          this.boss = new Boss(this, bx, by);
+        }
         this.physics.add.collider(this.boss, this.platforms);
         this.physics.add.collider(this.boss, this.walls);
         this.physics.add.overlap(this.player, this.boss, () => this.handlePlayerBossContact());
         this.inBossArena = true;
         gameState.setState('boss');
+        this.emitUIEvent('bossStart', {
+          name: this.boss?.getName?.() ?? 'Boss',
+          maxHp: this.boss?.getMaxHp?.() ?? 100,
+        });
       } else if (wave.enemies) {
         wave.enemies.forEach((e) => {
           const cfg = (enemiesData as Record<string, EnemyCombatConfig>)[e.type];
