@@ -5163,22 +5163,22 @@ export class GameScene extends Phaser.Scene {
       ];
     } else if (this.levelId === 'spikyArena') {
       const W = this.currentLevel.width;
-      const airY = 200;
+      const airY = 140;
       this.arenaWaves = [
         { label: 'WAVE 1: VENGEFLIES', enemies: [
-          { type: 'vengefly', x: 150, y: airY },
-          { type: 'vengefly', x: 380, y: airY - 40 },
-          { type: 'vengefly', x: W - 380, y: airY - 40 },
-          { type: 'vengefly', x: W - 150, y: airY },
+          { type: 'vengefly', x: 200, y: airY },
+          { type: 'vengefly', x: 400, y: airY - 30 },
+          { type: 'vengefly', x: W - 400, y: airY - 30 },
+          { type: 'vengefly', x: W - 200, y: airY },
         ]},
         { label: 'WAVE 2: ASPIDS', enemies: [
-          { type: 'aspid', x: 180, y: airY },
-          { type: 'aspid', x: 420, y: airY - 50 },
-          { type: 'aspid', x: W - 420, y: airY - 50 },
-          { type: 'aspid', x: W - 180, y: airY },
+          { type: 'aspid', x: 220, y: airY },
+          { type: 'aspid', x: 440, y: airY - 30 },
+          { type: 'aspid', x: W - 440, y: airY - 30 },
+          { type: 'aspid', x: W - 220, y: airY },
         ]},
         { label: 'FINAL: VENGEFLY KING', enemies: [
-          { type: 'vengeflyKing', x: W / 2, y: 180 },
+          { type: 'vengeflyKing', x: W / 2, y: 120 },
         ]},
       ];
     } else {
