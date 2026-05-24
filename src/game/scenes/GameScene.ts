@@ -837,6 +837,7 @@ export class GameScene extends Phaser.Scene {
     if ((this.currentLevel as any).acidPools) {
       (this.currentLevel as any).acidPools.forEach((a: any) => {
         const acid = new AcidPool(this, a.x, a.y, a.width, a.height || 30);
+        if (typeof a.damage === 'number') acid.damageAmount = a.damage;
         this.acidPools.add(acid);
       });
     }
