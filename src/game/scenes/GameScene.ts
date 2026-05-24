@@ -5184,6 +5184,29 @@ export class GameScene extends Phaser.Scene {
           { type: 'vengeflyKing', x: W / 2, y: 120 },
         ]},
       ];
+    } else if (this.levelId === 'throughTheJungle') {
+      const W = this.currentLevel.width;
+      // Platform y is 430 in level; stand on top (~414).
+      const platY = 410;
+      const platXs = [130, 500, 870];
+      this.arenaWaves = [
+        { label: 'WAVE 1: BUSHLINGS', enemies: [
+          { type: 'mosskin', x: platXs[0] - 30, y: platY },
+          { type: 'mosskin', x: platXs[0] + 30, y: platY },
+          { type: 'mosskin', x: platXs[1] - 30, y: platY },
+          { type: 'mosskin', x: platXs[1] + 30, y: platY },
+          { type: 'mosskin', x: platXs[2] - 30, y: platY },
+          { type: 'mosskin', x: platXs[2] + 30, y: platY },
+        ]},
+        { label: 'WAVE 2: SQUITS', enemies: [
+          { type: 'squit', x: 150, y: 180 },
+          { type: 'squit', x: 350, y: 140 },
+          { type: 'squit', x: 500, y: 180 },
+          { type: 'squit', x: 650, y: 140 },
+          { type: 'squit', x: 850, y: 180 },
+        ]},
+        { label: 'FINAL: MOSS TITAN', boss: true, bossType: 'mossTitan' },
+      ] as any;
     } else {
       this.arenaWaves = [];
     }
