@@ -15,6 +15,10 @@ export class VengeflyKing extends Vengefly {
   private summons: Vengefly[] = [];
   public readonly isVengeflyKing = true;
 
+  // Charge / pause cycle (Hollow Knight style)
+  private phase: 'charging' | 'pausing' = 'pausing';
+  private phaseTimer = 800; // brief initial pause
+
   constructor(scene: Phaser.Scene, x: number, y: number, baseConfig: EnemyCombatConfig) {
     const cfg: EnemyCombatConfig = {
       ...baseConfig,
@@ -43,6 +47,28 @@ export class VengeflyKing extends Vengefly {
     // Parent class overwrites scale each frame for wing flap — reapply big king size.
     const flapY = this.scaleY; // 0.8..1.0 from base wing flap
     this.setScale(3, 3 * flapY);
+
+    // Charge / pause cycle — override parent's constant chase
+    this.phaseTimer -= delta;
+    if (this.phaseTimer <= 0) {
+      if (this.phase === 'charging') {
+        this.phase = 'pausing';
+        this.phaseTimer = Phaser.Math.Between(900, 1600);
+      } else {
+        this.phase = 'charging';
+        this.phaseTimer = Phaser.Math.Between(1200, 2000);
+      }
+    }
+
+    const body = this.body as Phaser.Physics.Arcade.Body | null;
+    if (body) {
+      if (this.phase === 'pausing') {
+        // Hold position with a slight bob
+        body.setVelocity(body.velocity.x * 0.6, Math.sin(time * 0.005) * 18);
+        // Face the player while waiting
+        this.setFlipX(player.x < this.x);
+      }
+    }
 
     // Tick summon timer
     this.summonTimer -= delta;
