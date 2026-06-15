@@ -5186,24 +5186,23 @@ export class GameScene extends Phaser.Scene {
       ];
     } else if (this.levelId === 'throughTheJungle') {
       const W = this.currentLevel.width;
-      // Platform y is 430 in level; stand on top (~414).
-      const platY = 410;
-      const platXs = [130, 500, 870];
+      // Ground top is at y=580; spawn everyone standing on the floor.
+      const groundY = 540;
       this.arenaWaves = [
         { label: 'WAVE 1: BUSHLINGS', enemies: [
-          { type: 'mosskin', x: platXs[0] - 30, y: platY },
-          { type: 'mosskin', x: platXs[0] + 30, y: platY },
-          { type: 'mosskin', x: platXs[1] - 30, y: platY },
-          { type: 'mosskin', x: platXs[1] + 30, y: platY },
-          { type: 'mosskin', x: platXs[2] - 30, y: platY },
-          { type: 'mosskin', x: platXs[2] + 30, y: platY },
+          { type: 'mosskin', x: 120, y: groundY },
+          { type: 'mosskin', x: 260, y: groundY },
+          { type: 'mosskin', x: 400, y: groundY },
+          { type: 'mosskin', x: 600, y: groundY },
+          { type: 'mosskin', x: 740, y: groundY },
+          { type: 'mosskin', x: 880, y: groundY },
         ]},
         { label: 'WAVE 2: SQUITS', enemies: [
-          { type: 'squit', x: 150, y: 180 },
-          { type: 'squit', x: 350, y: 140 },
-          { type: 'squit', x: 500, y: 180 },
-          { type: 'squit', x: 650, y: 140 },
-          { type: 'squit', x: 850, y: 180 },
+          { type: 'squit', x: 150, y: groundY },
+          { type: 'squit', x: 350, y: groundY },
+          { type: 'squit', x: 500, y: groundY },
+          { type: 'squit', x: 650, y: groundY },
+          { type: 'squit', x: 850, y: groundY },
         ]},
         { label: 'FINAL: MOSS TITAN', boss: true, bossType: 'mossTitan' },
       ] as any;
