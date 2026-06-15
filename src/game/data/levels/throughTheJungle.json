@@ -14,9 +14,7 @@
     { "x": 430, "y": 430, "width": 140, "height": 16, "type": "platform" },
     { "x": 800, "y": 430, "width": 140, "height": 16, "type": "platform" }
   ],
-  "acidPools": [
-    { "x": 20, "y": 555, "width": 960, "height": 30, "damage": 2 }
-  ],
+  "acidPools": [],
   "enemies": [],
   "pickups": [],
   "triggers": [],
