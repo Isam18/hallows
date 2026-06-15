@@ -477,30 +477,15 @@ export class MossTitan extends Phaser.Physics.Arcade.Sprite {
     
     const instakill = this.scene.game.registry.get('endlessInstakill');
     if (instakill) { this.bossHp = 0; this.die(); return true; }
-    
-    this.totalDamageDealt += amount;
-    
-    // If staggered and head exposed, damage main HP
-    if (this.isStaggered && this.headExposed) {
-      this.bossHp -= amount;
-      this.flashGreen();
-      
-      if (this.bossHp <= 0) {
-        this.die();
-      }
-      return true;
-    } else if (!this.isStaggered) {
-      // Add to stagger meter
-      this.staggerDamage += amount;
-      this.flashGreen();
-      
-      if (this.staggerDamage >= CFG.staggerThreshold) {
-        this.enterStagger();
-      }
-      return true;
+
+    // Every hit chips exactly 1 HP — 50 hits to defeat. No stagger/stutter.
+    this.bossHp -= 1;
+    this.totalDamageDealt += 1;
+    this.flashGreen();
+    if (this.bossHp <= 0) {
+      this.die();
     }
-    
-    return false;
+    return true;
   }
 
   private flashGreen(): void {

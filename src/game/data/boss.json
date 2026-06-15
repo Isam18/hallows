@@ -48,40 +48,40 @@
     "name": "Moss Titan",
     "subtitle": "The King of Greenway",
     "nameColor": "#44ff44",
-    "maxHp": 350,
-    "staggerThreshold": 20,
+    "maxHp": 50,
+    "staggerThreshold": 99999,
     "staggerDuration": 4000,
     "staggerRecoveryRageTime": 2500,
     "headExposureCondition": {
-      "timeThresholdSec": 60,
-      "damageThresholdRatio": 0.25
+      "timeThresholdSec": 0,
+      "damageThresholdRatio": 0
     },
     "attackPatterns": {
       "groundPound": {
-        "windupTime": 600,
-        "slamSpeed": 700,
-        "shockwaveWidth": 200,
+        "windupTime": 350,
+        "slamSpeed": 900,
+        "shockwaveWidth": 260,
         "shockwaveDamage": 2,
-        "cooldown": 1800
+        "cooldown": 700
       },
       "chargeAttack": {
-        "windupTime": 400,
-        "chargeSpeed": 500,
+        "windupTime": 250,
+        "chargeSpeed": 520,
         "chargeDuration": 800,
         "damage": 2,
-        "cooldown": 2000
+        "cooldown": 800
       },
       "sporeBurst": {
-        "windupTime": 800,
-        "sporeCount": 12,
-        "sporeDamage": 1,
-        "cooldown": 2500
+        "windupTime": 450,
+        "sporeCount": 14,
+        "sporeDamage": 2,
+        "cooldown": 1000
       },
       "roarAttack": {
-        "windupTime": 1000,
-        "roarDamage": 1,
-        "roarRange": 300,
-        "cooldown": 3000
+        "windupTime": 600,
+        "roarDamage": 2,
+        "roarRange": 320,
+        "cooldown": 1200
       }
     },
     "contactDamage": 2,
