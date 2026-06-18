@@ -5148,6 +5148,11 @@ export class GameScene extends Phaser.Scene {
     (gameState as any).playerData.equippedCharms = [];
     gameState.refillSoul();
     this.emitUIEvent('hpChange', { hp: 5, maxHp: 5 });
+    
+    // Increase jump height for arena stages
+    if (this.player) {
+      this.player.jumpMultiplier = 3;
+    }
 
     // Define waves per level
     if (this.levelId === 'forgottenBrawl') {
